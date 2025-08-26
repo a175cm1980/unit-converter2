@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程計算器</title>
+    <!-- 引入 Tailwind CSS 以便快速設計 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .file-btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+            transition-property: background-color, transform, box-shadow;
+            transition-duration: 300ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: none;
+        }
+        .file-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .file-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container bg-white rounded-3xl shadow-2xl p-8 transform transition-all duration-500 hover:scale-[1.01]">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">工程計算器</h1>
+        <p class="text-gray-600 text-center mb-10">點擊下方按鈕以在新分頁中開啟對應的計算器。</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 每個按鈕都使用 'data-file' 屬性來儲存檔案名稱 -->
+            <button class="file-btn" data-file="停止直徑計算器.html">
+                停止直徑計算器
+            </button>
+            <button class="file-btn" data-file="減速比計算器.html">
+                減速比計算器
+            </button>
+            <button class="file-btn" data-file="膜料長度計算器.html">
+                膜料長度計算器
+            </button>
+            <button class="file-btn" data-file="慣量計算器 .html">
+                結構慣量計算器
+            </button>
+            <button class="file-btn" data-file="馬達計算器.html">
+                馬達計算器
+            </button>
+            <button class="file-btn" data-file="計算機.html">
+                計算機
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 找到所有帶有 .file-btn class 的按鈕
+            const buttons = document.querySelectorAll('.file-btn');
+
+            // 針對每個按鈕添加點擊事件監聽器
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 從 data-file 屬性中獲取檔案名稱
+                    const fileName = button.getAttribute('data-file');
+                    
+                    // 檢查檔案名稱是否存在
+                    if (fileName) {
+                        // 使用 window.open 在新分頁中打開檔案
+                        window.open(fileName, '_blank');
+                    } else {
+                        // 如果沒有檔案名稱，顯示錯誤訊息
+                        console.error('File name not found for this button.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
