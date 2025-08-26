@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程計算機</title>
+    <!-- 引入 Inter 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* 基本按鈕樣式 */
+        .calc-button {
+            @apply p-3 rounded-xl font-bold text-center transition-colors duration-200 shadow-sm;
+            @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100;
+            @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- 主程式容器 -->
+    <div id="app" class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden transition-colors duration-300">
+
+        <!-- 顯示區 -->
+        <div class="px-6 py-8">
+            <div id="expression" class="h-8 text-sm text-right text-gray-500 dark:text-gray-400 truncate"></div>
+            <div id="result" class="h-12 text-3xl font-bold text-right truncate">0</div>
+        </div>
+
+        <!-- 按鈕區 -->
+        <div class="grid grid-cols-5 gap-1.5 p-3 bg-gray-100 dark:bg-gray-900 rounded-b-2xl" id="button-container">
+            <!-- 記憶按鈕群組框架 -->
+            <div class="col-span-5 bg-gray-200 dark:bg-gray-700 p-2 rounded-xl shadow-inner">
+                <!-- 記憶按鈕註解 -->
+                <div class="text-left text-xs text-gray-600 dark:text-gray-300 mb-2 pl-2">
+                    長按1秒儲存，短按呼叫數值
+                </div>
+                <!-- 多個記憶按鈕 -->
+                <div class="grid grid-cols-5 gap-1.5">
+                    <button class="calc-button bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl">M1</button>
+                    <button class="calc-button bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl">M2</button>
+                    <button class="calc-button bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl">M3</button>
+                    <button class="calc-button bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl">M4</button>
+                    <button class="calc-button bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl">M5</button>
+                </div>
+            </div>
+
+            <!-- 數學函數與常數按鈕 -->
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">sin</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">cos</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">tan</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">log</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">π</button>
+
+            <!-- 括號與單位轉換 -->
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">(</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">)</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-xs font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">直徑→圓周</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 text-xs font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">圓周→直徑</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">%</button>
+            
+            <!-- 記憶功能與特殊運算 -->
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">MC</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">MR</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">M+</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">^</button>
+            <button class="calc-button bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">√</button>
+
+
+            <!-- 數字與運算符號 -->
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">7</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">8</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">9</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">-</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">+</button>
+
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">4</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">5</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">6</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">/</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">*</button>
+
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">1</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">2</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">3</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">AC</button>
+            <button class="calc-button py-4 text-xl bg-gray-200 dark:bg-gray-700 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl">←</button>
+            
+            <button class="calc-button py-4 text-xl col-span-2 bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">0</button>
+            <button class="calc-button py-4 text-xl bg-green-200 dark:bg-green-700 hover:bg-green-300 dark:hover:bg-green-600 text-green-800 dark:text-green-200 rounded-xl">.</button>
+            <button class="calc-button py-4 text-3xl bg-emerald-500 text-white font-bold col-span-2 hover:bg-emerald-600 rounded-xl">=</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const expressionDisplay = document.getElementById('expression');
+            const resultDisplay = document.getElementById('result');
+            const buttonContainer = document.getElementById('button-container');
+
+            let currentExpression = '';
+            let isResultShown = false;
+            let memory = 0;
+            let memories = {};
+
+            // 長按事件變數
+            let longPressTimer;
+            const LONG_PRESS_THRESHOLD = 500; // 長按閾值，單位毫秒
+
+            // 處理三角函數的弧度與角度轉換
+            const toRadians = (degrees) => degrees * (Math.PI / 180);
+
+            // 處理階乘
+            const factorial = (n) => {
+                if (n < 0) return NaN;
+                if (n !== Math.floor(n)) return NaN;
+                if (n === 0) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                }
+                return result;
+            };
+
+            const calculate = () => {
+                try {
+                    // 使用更可靠的方式來處理運算式
+                    let evalExpression = currentExpression;
+
+                    // 處理 π 常數
+                    evalExpression = evalExpression.replace(/π/g, 'Math.PI');
+                    
+                    // 處理根號和指數運算
+                    evalExpression = evalExpression.replace(/√/g, 'Math.sqrt');
+                    evalExpression = evalExpression.replace(/\^/g, '**');
+
+                    // 處理函數，並將其替換為 JavaScript 的 Math 函數
+                    evalExpression = evalExpression.replace(/sin/g, 'Math.sin(toRadians(');
+                    evalExpression = evalExpression.replace(/cos/g, 'Math.cos(toRadians(');
+                    evalExpression = evalExpression.replace(/tan/g, 'Math.tan(toRadians(');
+                    evalExpression = evalExpression.replace(/log/g, 'Math.log10(');
+                    
+                    // 為了處理像 '3(' 這種隱藏的乘法
+                    evalExpression = evalExpression.replace(/(\d+)\(/g, '$1*(');
+
+                    const result = eval(evalExpression);
+
+                    if (isNaN(result) || !isFinite(result)) {
+                        resultDisplay.textContent = '錯誤';
+                        return;
+                    }
+
+                    // 限制小數點位數
+                    resultDisplay.textContent = parseFloat(result.toFixed(8));
+                    expressionDisplay.textContent = currentExpression + '=';
+                    currentExpression = resultDisplay.textContent;
+                    isResultShown = true;
+
+                } catch (error) {
+                    resultDisplay.textContent = '錯誤';
+                    expressionDisplay.textContent = '';
+                }
+            };
+            
+            // 處理短按 (點擊)
+            const handleShortPress = (event) => {
+                const button = event.target;
+                
+                // 檢查是否為長按後的點擊
+                if (button.dataset.isLongPress === 'true') {
+                    button.dataset.isLongPress = 'false'; // 重設標記
+                    return;
+                }
+
+                if (!button.classList.contains('calc-button')) return;
+
+                const value = button.textContent;
+                const resultValue = parseFloat(resultDisplay.textContent);
+
+                // 如果按下了等於號後再按數字或函數，則清空顯示
+                if (isResultShown && /[0-9.)π]/.test(value)) {
+                    currentExpression = '';
+                    expressionDisplay.textContent = '';
+                    isResultShown = false;
+                }
+
+                switch (value) {
+                    case 'AC':
+                        currentExpression = '';
+                        expressionDisplay.textContent = '';
+                        resultDisplay.textContent = '0';
+                        isResultShown = false;
+                        break;
+                    case '←':
+                        currentExpression = currentExpression.slice(0, -1);
+                        if (currentExpression === '') {
+                            resultDisplay.textContent = '0';
+                        }
+                        break;
+                    case '直徑→圓周':
+                        if (!isNaN(resultValue)) {
+                            const newResult = resultValue * Math.PI;
+                            resultDisplay.textContent = parseFloat(newResult.toFixed(8));
+                            expressionDisplay.textContent = `${resultValue} × π`;
+                            currentExpression = resultDisplay.textContent;
+                            isResultShown = true;
+                        }
+                        break;
+                    case '圓周→直徑':
+                        if (!isNaN(resultValue)) {
+                            const newResult = resultValue / Math.PI;
+                            resultDisplay.textContent = parseFloat(newResult.toFixed(8));
+                            expressionDisplay.textContent = `${resultValue} ÷ π`;
+                            currentExpression = resultDisplay.textContent;
+                            isResultShown = true;
+                        }
+                        break;
+                    case 'M+':
+                        if (!isNaN(resultValue)) {
+                            memory += resultValue;
+                            expressionDisplay.textContent = `M+ (${memory.toFixed(8)})`;
+                        }
+                        break;
+                    case 'MR':
+                        resultDisplay.textContent = memory.toFixed(8);
+                        currentExpression = resultDisplay.textContent;
+                        expressionDisplay.textContent = 'MR';
+                        isResultShown = true;
+                        break;
+                    case 'MC':
+                        memory = 0;
+                        expressionDisplay.textContent = 'Memory Cleared';
+                        break;
+                    case '=':
+                        calculate();
+                        break;
+                    // 記憶按鈕處理 (短按: 呼叫數值)
+                    case 'M1':
+                    case 'M2':
+                    case 'M3':
+                    case 'M4':
+                    case 'M5':
+                        const key = `M${value.slice(1)}`;
+                        if (memories[key] !== undefined) {
+                            const storedValue = memories[key].toString();
+                            const lastChar = currentExpression.slice(-1);
+                            const operators = ['+', '-', '*', '/', '^', '√', '(', 'π'];
+                            
+                            // 判斷最後一個字元是否為運算子
+                            const shouldAppend = operators.includes(lastChar);
+                            
+                            if (shouldAppend) {
+                                currentExpression += storedValue;
+                            } else {
+                                // 如果不是運算子，則直接取代現有數值
+                                currentExpression = storedValue;
+                            }
+                            
+                            resultDisplay.textContent = currentExpression;
+                            expressionDisplay.textContent = `${value} 呼叫`;
+                            isResultShown = false;
+
+                        } else {
+                            expressionDisplay.textContent = '無儲存數值';
+                        }
+                        break;
+                    // 這類的函數需要後續接括號
+                    case 'sin':
+                    case 'cos':
+                    case 'tan':
+                    case 'log':
+                        currentExpression += `${value}(`;
+                        break;
+                    // 這些運算符只需要直接加入
+                    case '√':
+                    case '^':
+                    case 'x!':
+                        currentExpression += value;
+                        break;
+                    default:
+                        currentExpression += value;
+                        break;
+                }
+
+                if (value !== '=' && value !== 'AC' && value !== '直徑→圓周' && value !== '圓周→直徑' && !value.startsWith('M')) {
+                    resultDisplay.textContent = currentExpression || '0';
+                }
+            };
+            
+            // 處理長按 (儲存數值)
+            const handleLongPress = (button, value) => {
+                button.dataset.isLongPress = 'true'; // 設置長按標記
+                const resultValue = parseFloat(resultDisplay.textContent);
+                const key = `M${value.slice(1)}`;
+
+                if (!isNaN(resultValue)) {
+                    memories[key] = resultValue;
+                    expressionDisplay.textContent = `儲存至 ${value}`;
+                } else {
+                    expressionDisplay.textContent = '無效數值，無法儲存';
+                }
+            };
+
+            // 處理按鈕按下事件 (滑鼠/觸控)
+            buttonContainer.addEventListener('mousedown', (event) => {
+                const button = event.target;
+                const value = button.textContent;
+                // 檢查按鈕是否為記憶按鈕
+                if (!value.startsWith('M')) return;
+                
+                clearTimeout(longPressTimer);
+                button.dataset.isLongPress = 'false';
+
+                longPressTimer = setTimeout(() => {
+                    handleLongPress(button, value);
+                }, LONG_PRESS_THRESHOLD);
+            });
+
+            buttonContainer.addEventListener('mouseup', (event) => {
+                const button = event.target;
+                if (!button.classList.contains('calc-button')) return;
+                
+                clearTimeout(longPressTimer);
+            });
+            
+            // 為觸控裝置增加觸控事件監聽
+            buttonContainer.addEventListener('touchstart', (event) => {
+                const button = event.target;
+                const value = button.textContent;
+                // 檢查按鈕是否為記憶按鈕
+                if (!value.startsWith('M')) return;
+
+                clearTimeout(longPressTimer);
+                button.dataset.isLongPress = 'false';
+                
+                longPressTimer = setTimeout(() => {
+                    handleLongPress(button, value);
+                }, LONG_PRESS_THRESHOLD);
+
+            }, { passive: true });
+            
+            buttonContainer.addEventListener('touchend', (event) => {
+                const button = event.target;
+                if (!button.classList.contains('calc-button')) return;
+                
+                clearTimeout(longPressTimer);
+            });
+            
+            // 處理點擊事件 (短按)
+            buttonContainer.addEventListener('click', handleShortPress);
+
+        });
+    </script>
+</body>
+</html>
