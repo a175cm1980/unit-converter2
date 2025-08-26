@@ -25,18 +25,23 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 2rem;
+            padding: 1rem; /* 調整為更適合手機的 padding */
         }
         .container {
             background-color: #ffffff;
-            padding: 2.5rem;
+            padding: 1.5rem; /* 調整為更適合手機的 padding */
             border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 868px;
         }
+        /* 新增表格容器以處理水平滾動 */
+        .stage-table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         .stage-table {
-            width: 100%;
+            min-width: 600px; /* 確保表格在小螢幕上有最小寬度 */
             border-collapse: collapse;
             margin-top: 1rem;
         }
@@ -57,7 +62,7 @@
             border-radius: 0.75rem;
             border: 1px solid #e5e7eb;
             margin-top: 1.5rem;
-            max-width: 100%;
+            width: 100%; /* 確保 canvas 寬度響應式 */
             height: auto;
         }
         .input-group {
@@ -77,20 +82,22 @@
         <p class="text-center text-gray-600 mb-8">從馬達端開始，依序輸入每一級傳動的參數來計算總減速比，下方會即時顯示視覺圖示。</p>
         
         <!-- 動態生成傳動級數的表格 -->
-        <table class="stage-table">
-            <thead>
-                <tr>
-                    <th>項次</th>
-                    <th>傳動類型</th>
-                    <th>參數</th>
-                    <th>本級減速比</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="stages-table-body">
-                <!-- 傳動級數會在這裡被 JavaScript 動態生成 -->
-            </tbody>
-        </table>
+        <div class="stage-table-container">
+            <table class="stage-table">
+                <thead>
+                    <tr>
+                        <th>項次</th>
+                        <th>傳動類型</th>
+                        <th>參數</th>
+                        <th>本級減速比</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="stages-table-body">
+                    <!-- 傳動級數會在這裡被 JavaScript 動態生成 -->
+                </tbody>
+            </table>
+        </div>
 
         <!-- 按鈕及總減速比顯示區 -->
         <div class="flex flex-col sm:flex-row justify-between items-center mt-8">
@@ -104,7 +111,7 @@
 
         <!-- 視覺化繪圖區 -->
         <div class="mt-8 flex justify-center">
-            <canvas id="visual-canvas" width="800" height="200"></canvas>
+            <canvas id="visual-canvas"></canvas>
         </div>
 
     </div>
@@ -118,8 +125,19 @@
             const totalRatioSpan = document.getElementById('total-ratio');
             const canvas = document.getElementById('visual-canvas');
             const ctx = canvas.getContext('2d');
-
+            
+            // 監聽視窗大小改變事件，確保圖表響應式
+            window.addEventListener('resize', resizeCanvas);
+            
             let stageCount = 0;
+
+            // 調整 canvas 大小並重繪
+            function resizeCanvas() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = 200; // 固定高度，但寬度響應式
+                drawVisuals();
+            }
 
             // 創建單一傳動級數的表格行
             function createStageRow(stageNumber) {
@@ -371,7 +389,13 @@
                 }
                 addStage();
             });
+
+            // 初始化時呼叫一次 resizeCanvas
+            resizeCanvas();
         });
     </script>
 </body>
+</html>
+</body>
+
 </html>
