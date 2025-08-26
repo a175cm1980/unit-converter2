@@ -425,94 +425,117 @@
                 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                const padding = 50;
-                const legendWidth = 150;
-                const chartWidth = canvas.width - padding * 2 - legendWidth;
-                const chartHeight = canvas.height - padding * 2;
+                // 根據螢幕寬度調整邊距和字體大小
+                const isMobile = window.innerWidth < 768;
+                const paddingLeft = isMobile ? 60 : 80;
+                const paddingRight = isMobile ? 20 : 50;
+                const paddingTop = isMobile ? 30 : 50;
+                const paddingBottom = isMobile ? 40 : 50;
+                const legendWidth = isMobile ? 120 : 150;
+                const chartWidth = canvas.width - paddingLeft - paddingRight;
+                const chartHeight = canvas.height - paddingTop - paddingBottom;
+                const labelFontSize = isMobile ? 10 : 12;
+                const axisLabelFontSize = isMobile ? 12 : 14;
 
-                if (timePoints.length < 2) return;
+                if (timePoints.length < 2 || chartWidth <= 0 || chartHeight <= 0) return;
 
                 const maxTime = timePoints[timePoints.length - 1];
                 const allYValues = [...displacementPoints, ...velocityPoints, ...accelerationPoints];
                 const maxAbsY = allYValues.length > 0 ? Math.max(...allYValues.map(Math.abs)) : 0;
                 const yAxisRange = maxAbsY > 0 ? maxAbsY * 2 : 1;
-                const yZero = padding + chartHeight / 2;
+                const yZero = paddingTop + chartHeight / 2;
                 const timeScale = chartWidth / maxTime;
                 const yScale = chartHeight / yAxisRange;
                 
                 ctx.strokeStyle = '#e5e7eb';
                 ctx.lineWidth = 1;
                 ctx.fillStyle = '#6b7280';
-                ctx.font = '12px Inter';
+                ctx.font = `${labelFontSize}px Inter`;
                 
-                const numXLabels = Math.min(10, Math.floor(maxTime) + 1);
+                // 繪製 X 軸網格線和標籤
+                const numXLabels = Math.min(isMobile ? 5 : 10, Math.floor(maxTime) + 1);
                 const xInterval = maxTime / numXLabels;
                 for (let i = 0; i <= numXLabels; i++) {
-                    const x = padding + (i * xInterval * timeScale);
+                    const x = paddingLeft + (i * xInterval * timeScale);
                     ctx.beginPath();
-                    ctx.moveTo(x, padding);
-                    ctx.lineTo(x, padding + chartHeight);
+                    ctx.moveTo(x, paddingTop);
+                    ctx.lineTo(x, paddingTop + chartHeight);
                     ctx.stroke();
                     
                     ctx.textAlign = 'center';
-                    ctx.fillText( (i * xInterval).toFixed(1) , x, padding + chartHeight + 15);
+                    ctx.fillText( (i * xInterval).toFixed(1) , x, paddingTop + chartHeight + 15);
                 }
 
-                const numYLabels = 10;
+                // 繪製 Y 軸網格線和標籤
+                const numYLabels = isMobile ? 6 : 10;
                 const yInterval = yAxisRange / numYLabels;
                 for (let i = 0; i <= numYLabels; i++) {
                     const yValue = -maxAbsY + (i * yInterval);
                     const y = yZero - yValue * yScale;
                     ctx.beginPath();
-                    ctx.moveTo(padding, y);
-                    ctx.lineTo(padding + chartWidth, y);
+                    ctx.moveTo(paddingLeft, y);
+                    ctx.lineTo(paddingLeft + chartWidth, y);
                     ctx.stroke();
 
                     ctx.textAlign = 'right';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(yValue.toFixed(1), padding - 5, y);
+                    ctx.fillText(yValue.toFixed(1), paddingLeft - 5, y);
                 }
 
+                // 繪製坐標軸
                 ctx.strokeStyle = '#4b5563';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.moveTo(padding, yZero);
-                ctx.lineTo(padding + chartWidth, yZero);
+                ctx.moveTo(paddingLeft, yZero);
+                ctx.lineTo(paddingLeft + chartWidth, yZero);
                 ctx.stroke();
                 ctx.beginPath();
-                ctx.moveTo(padding, padding);
-                ctx.lineTo(padding, padding + chartHeight);
+                ctx.moveTo(paddingLeft, paddingTop);
+                ctx.lineTo(paddingLeft, paddingTop + chartHeight);
                 ctx.stroke();
 
+                // 繪製坐標軸名稱
                 ctx.fillStyle = '#1f2937';
-                ctx.font = '14px Inter';
+                ctx.font = `${axisLabelFontSize}px Inter`;
                 ctx.textAlign = 'center';
-                ctx.fillText('時間 (s)', padding + chartWidth / 2, canvas.height - 10);
+                ctx.fillText('時間 (s)', paddingLeft + chartWidth / 2, canvas.height - 10);
                 ctx.save();
-                ctx.translate(padding / 2, yZero);
+                ctx.translate(paddingLeft / 2, yZero);
                 ctx.rotate(-Math.PI / 2);
                 ctx.fillText('數值', 0, 0);
                 ctx.restore();
 
+                // 繪製曲線和圖例
                 const drawLine = (points, color, label, unit, legendIndex) => {
                     ctx.beginPath();
                     ctx.strokeStyle = color;
                     ctx.lineWidth = 2;
-                    const firstX = padding + timePoints[0] * timeScale;
+                    const firstX = paddingLeft + timePoints[0] * timeScale;
                     const firstY = yZero - (points.length > 0 ? points[0] * yScale : 0);
                     ctx.moveTo(firstX, firstY);
 
                     for (let i = 1; i < points.length; i++) {
-                        const x = padding + timePoints[i] * timeScale;
+                        const x = paddingLeft + timePoints[i] * timeScale;
                         const y = yZero - points[i] * yScale;
                         ctx.lineTo(x, y);
                     }
                     ctx.stroke();
 
+                    // 繪製圖例
                     ctx.fillStyle = color;
                     ctx.textAlign = 'left';
                     const maxVal = points.length > 0 ? Math.max(...points.map(Math.abs)) : 0;
-                    ctx.fillText(`${label} (${maxVal.toFixed(2)} ${unit})`, canvas.width - legendWidth + 10, padding + 20 + legendIndex * 20);
+                    ctx.font = `${labelFontSize}px Inter`;
+                    // 圖例位置調整為更緊湊的佈局
+                    if (isMobile) {
+                         const legendX = paddingLeft + chartWidth + 10;
+                         const legendY = paddingTop + 10 + legendIndex * 20;
+                         ctx.fillText(`${label}`, legendX, legendY);
+                         ctx.font = `${labelFontSize - 2}px Inter`;
+                         ctx.fillText(`(${maxVal.toFixed(2)} ${unit})`, legendX, legendY + 12);
+                    } else {
+                        ctx.fillText(`${label} (${maxVal.toFixed(2)} ${unit})`, canvas.width - legendWidth, paddingTop + 20 + legendIndex * 20);
+                    }
                 };
                 
                 drawLine(displacementPoints, '#3b82f6', '位移', 'm', 0);
@@ -981,3 +1004,4 @@
     </script>
 </body>
 </html>
+
