@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport 標籤是響應式設計的基石，它確保頁面在所有裝置上都能正確縮放。 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>響應式馬達計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* 確保所有輸入框的樣式一致 */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* 自定義彈出訊息框的樣式 */
+        .message-box-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .message-box {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        /* 確保圖表容器在不同尺寸下都能維持良好的比例 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px; /* 手機上的預設高度 */
+            margin-top: 2rem;
+            overflow: hidden;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px; /* 平板上的高度 */
+            }
+        }
+        @media (min-width: 1024px) {
+            .chart-container {
+                height: 500px; /* 桌機上的高度 */
+            }
+        }
+        .chart-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
+    <div class="w-full max-w-6xl bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+        <!-- 標題與簡介，使用響應式字體大小 -->
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-4 sm:mb-6">馬達計算器</h1>
+        <p class="text-gray-600 text-center mb-6 sm:mb-8 text-sm sm:text-base">請輸入以下參數並定義運動曲線，程式將計算所需的馬達規格。</p>
+
+        <!-- 主內容區塊，使用響應式網格佈局 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <!-- 系統與負載參數區 -->
+            <div class="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200 md:col-span-1 lg:col-span-1">
+                <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">系統與負載參數</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="rpm" class="block text-sm font-medium text-gray-700">馬達最高轉速 (RPM)</label>
+                        <input type="number" id="rpm" value="3000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="gearRatio" class="block text-sm font-medium text-gray-700">減速比 (GR)</label>
+                        <input type="number" id="gearRatio" value="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="pulleyDiameter" class="block text-sm font-medium text-gray-700">傳動輪圓周 (mm)</label>
+                        <input type="number" id="pulleyDiameter" value="314.159" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="loadInertia" class="block text-sm font-medium text-gray-700">傳動結構總慣量 ($J_L$, kg-cm²)</label>
+                        <input type="number" id="loadInertia" value="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="motorInertia" class="block text-sm font-medium text-gray-700">馬達慣量 ($J_M$, kg-cm²)</label>
+                        <input type="number" id="motorInertia" value="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="loadMass" class="block text-sm font-medium text-gray-700">載重公斤數 (kg)</label>
+                        <input type="number" id="loadMass" value="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="frictionCoefficient" class="block text-sm font-medium text-gray-700">摩擦係數 (μ)</label>
+                        <input type="number" id="frictionCoefficient" value="0.1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="safetyFactor" class="block text-sm font-medium text-gray-700">安全係數</label>
+                        <input type="number" id="safetyFactor" value="1.2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="motorEfficiency" class="block text-sm font-medium text-gray-700">馬達效率 (η, %)</label>
+                        <input type="number" id="motorEfficiency" value="90" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 運動設定區 -->
+            <div class="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200 md:col-span-1 lg:col-span-2">
+                <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">運動設定</h2>
+                
+                <!-- 運動類型按鈕，使用 flex 佈局確保在手機上也能正常顯示 -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button id="multiStageBtn" data-motion-type="multi-stage" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-sm transition-colors duration-200 font-bold text-sm sm:text-base text-white bg-blue-600 hover:bg-blue-700 flex-1">多階段運動</button>
+                    <button id="triangleBtn" data-motion-type="triangle" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-sm transition-colors duration-200 font-bold text-sm sm:text-base text-gray-800 bg-gray-200 hover:bg-gray-300 flex-1">三角形運動</button>
+                    <button id="trapezoidBtn" data-motion-type="trapezoid" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-sm transition-colors duration-200 font-bold text-sm sm:text-base text-gray-800 bg-gray-200 hover:bg-gray-300 flex-1">梯形運動</button>
+                </div>
+                
+                <!-- 多階段運動設定 (預設顯示) -->
+                <div id="multiStageConfig" class="space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">階段</th>
+                                    <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">類型</th>
+                                    <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">時間 (s)</th>
+                                    <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">位移量 (m)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stagesTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Stages will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+                        <button id="addStageBtn" class="bg-green-500 text-white font-bold py-2 px-4 rounded-md shadow-md hover:bg-green-600 transition duration-300">
+                            新增階段
+                        </button>
+                        <button id="removeStageBtn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-md shadow-md hover:bg-red-600 transition duration-300">
+                            移除階段
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 三角形運動設定 (預設隱藏) -->
+                <div id="triangleConfig" class="hidden space-y-4">
+                    <div>
+                        <label for="triangleDisplacement" class="block text-sm font-medium text-gray-700">總距離 (m)</label>
+                        <input type="number" id="triangleDisplacement" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="triangleTime" class="block text-sm font-medium text-gray-700">總時間 (s)</label>
+                        <input type="number" id="triangleTime" value="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                </div>
+                
+                <!-- 梯形運動設定 (預設隱藏) -->
+                <div id="trapezoidConfig" class="hidden space-y-4">
+                    <div>
+                        <label for="trapezoidDisplacement" class="block text-sm font-medium text-gray-700">總距離 (m)</label>
+                        <input type="number" id="trapezoidDisplacement" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="trapezoidTime" class="block text-sm font-medium text-gray-700">總時間 (s)</label>
+                        <input type="number" id="trapezoidTime" value="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="trapezoidAccelTime" class="block text-sm font-medium text-gray-700">加速時間 (s)</label>
+                        <input type="number" id="trapezoidAccelTime" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="calculateBtn" class="mt-6 sm:mt-8 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-md hover:bg-blue-700 transition duration-300 text-base sm:text-lg">
+            計算馬達規格
+        </button>
+
+        <!-- 結果顯示區，使用響應式網格佈局 -->
+        <div class="mt-6 sm:mt-8 bg-blue-50 p-4 md:p-6 rounded-lg border border-blue-200">
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">計算結果</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">總慣量 ($J_{total}$):</span>
+                    <span id="totalInertia" class="text-lg font-bold text-blue-600 text-right">0.000 kg-cm²</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">慣量比:</span>
+                    <span id="inertiaRatio" class="text-lg font-bold text-blue-600 text-right">0.00 : 1</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">總位移量:</span>
+                    <span id="totalDisplacement" class="text-lg font-bold text-blue-600 text-right">0.000 m</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">馬達平均轉速:</span>
+                    <span id="averageVelocity" class="text-lg font-bold text-blue-600 text-right">0.000 RPM</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">馬達最大轉速:</span>
+                    <span id="maxVelocity" class="text-lg font-bold text-blue-600 text-right">0.000 RPM</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">所需最大扭矩 ($T_{max}$):</span>
+                    <span id="maxTorque" class="text-lg font-bold text-blue-600 text-right">0.000 N-m</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">所需有效力矩 ($T_{rms}$):</span>
+                    <span id="rmsTorque" class="text-lg font-bold text-blue-600 text-right">0.000 N-m</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">所需最大功率 ($P_{max}$):</span>
+                    <span id="maxPower" class="text-lg font-bold text-blue-600 text-right">0.000 kW</span>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span class="text-gray-600 text-sm">建議馬力:</span>
+                    <span id="recommendedHorsepower" class="text-lg font-bold text-blue-600 text-right">0.000 HP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 馬達選型建議區 -->
+        <div class="mt-6 sm:mt-8 bg-purple-50 p-4 md:p-6 rounded-lg border border-purple-200">
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">馬達選型建議</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <!-- 伺服馬達建議 -->
+                <div>
+                    <h3 class="text-lg md:text-xl font-medium text-purple-700 mb-2">伺服馬達 (Servo Motor)</h3>
+                    <div id="servoMotorResult" class="space-y-3">
+                        <p class="text-gray-500">點擊計算後顯示建議</p>
+                    </div>
+                </div>
+                <!-- 變頻馬達建議 -->
+                <div>
+                    <h3 class="text-lg md:text-xl font-medium text-purple-700 mb-2">4極變頻馬達 (VFD Motor)</h3>
+                    <div id="vfdMotorResult" class="space-y-3">
+                        <p class="text-gray-500">點擊計算後顯示建議</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rexroth 型號解讀區 -->
+        <div class="mt-6 sm:mt-8 bg-indigo-50 p-4 md:p-6 rounded-lg border border-indigo-200">
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">Rexroth MS2N 系列馬達型號解讀</h2>
+            <div id="modelCodeExplanation" class="text-gray-600 text-sm space-y-4">
+                <p><strong>範例型號：MS2N05-C0BNN-CMSG0-NNNNN-NN</strong></p>
+                <ul class="list-disc list-inside space-y-1 pl-4">
+                    <li><strong>MS2N</strong>：系列名稱。</li>
+                    <li><strong>05</strong>：法蘭尺寸。</li>
+                    <li><strong>C0</strong>：馬達長度與線圈繞組。</li>
+                    <li><strong>B</strong>：軸封與保持煞車（B=帶軸封/無煞車，C=帶軸封/有煞車）。</li>
+                    <li><strong>NN</strong>：額外選配。</li>
+                    <li><strong>C</strong>：電氣連接類型（C=單電纜連接）。</li>
+                    <li><strong>M</strong>：軸設計（M=平滑軸/帶軸封，K=鍵槽軸/帶軸封）。</li>
+                    <li><strong>SG0</strong>：編碼器類型（S=標準, C=進階, A=基本）、轉數類型（G=單圈, S=多圈）、解析度。</li>
+                    <li><strong>NNNNN-NN</strong>：未使用。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 運動曲線圖表區 -->
+        <div class="mt-6 sm:mt-8 bg-white p-4 md:p-6 rounded-lg border border-gray-200">
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4">運動曲線圖</h2>
+            <div class="chart-container">
+                <canvas id="motionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const motionTypeButtons = document.querySelectorAll('[data-motion-type]');
+            let currentMotionType = 'multi-stage';
+
+            const multiStageConfig = document.getElementById('multiStageConfig');
+            const triangleConfig = document.getElementById('triangleConfig');
+            const trapezoidConfig = document.getElementById('trapezoidConfig');
+
+            const rpmInput = document.getElementById('rpm');
+            const gearRatioInput = document.getElementById('gearRatio');
+            const pulleyDiameterInput = document.getElementById('pulleyDiameter');
+            const loadInertiaInput = document.getElementById('loadInertia');
+            const motorInertiaInput = document.getElementById('motorInertia');
+            
+            const loadMassInput = document.getElementById('loadMass');
+            const frictionCoefficientInput = document.getElementById('frictionCoefficient');
+            const safetyFactorInput = document.getElementById('safetyFactor');
+            const motorEfficiencyInput = document.getElementById('motorEfficiency');
+
+            const triangleDisplacementInput = document.getElementById('triangleDisplacement');
+            const triangleTimeInput = document.getElementById('triangleTime');
+
+            const trapezoidDisplacementInput = document.getElementById('trapezoidDisplacement');
+            const trapezoidTimeInput = document.getElementById('trapezoidTime');
+            const trapezoidAccelTimeInput = document.getElementById('trapezoidAccelTime');
+
+            const stagesTableBody = document.getElementById('stagesTableBody');
+            const addStageBtn = document.getElementById('addStageBtn');
+            const removeStageBtn = document.getElementById('removeStageBtn');
+            const calculateBtn = document.getElementById('calculateBtn');
+
+            const totalInertiaOutput = document.getElementById('totalInertia');
+            const inertiaRatioOutput = document.getElementById('inertiaRatio');
+            const totalDisplacementOutput = document.getElementById('totalDisplacement');
+            const averageVelocityOutput = document.getElementById('averageVelocity');
+            const maxVelocityOutput = document.getElementById('maxVelocity');
+            const maxTorqueOutput = document.getElementById('maxTorque');
+            const rmsTorqueOutput = document.getElementById('rmsTorque');
+            const maxPowerOutput = document.getElementById('maxPower');
+            const recommendedHorsepowerOutput = document.getElementById('recommendedHorsepower');
+
+            const servoMotorResultOutput = document.getElementById('servoMotorResult');
+            const vfdMotorResultOutput = document.getElementById('vfdMotorResult');
+
+            const chartCanvas = document.getElementById('motionChart');
+            const ctx = chartCanvas.getContext('2d');
+
+            // 範例馬達數據 (Example motor data)
+            const tecoMotors = [
+                { brand: '東元', model: 'AEEF', power: 0.75, torque: 4.77, rpm: 1750 },
+                { brand: '東元', model: 'AEEF', power: 1.5, torque: 9.55, rpm: 1750 },
+                { brand: '東元', model: 'AEEF', power: 2.2, torque: 14.0, rpm: 1750 },
+                { brand: '東元', model: 'AEEF', power: 3.7, torque: 23.6, rpm: 1750 },
+            ];
+
+            const yaskawaServos = [
+                { brand: '安川', series: 'SGD7S', power: 0.75, torque: 2.39, rpm: 3000 },
+                { brand: '安川', series: 'SGD7S', power: 1.0, torque: 3.18, rpm: 3000 },
+                { brand: '安川', series: 'SGD7S', power: 1.5, torque: 4.77, rpm: 3000 },
+                { brand: '安川', series: 'SGD7S', power: 2.0, torque: 6.37, rpm: 3000 },
+            ];
+
+            const panasonicServos = [
+                { brand: '國際牌', series: 'MINAS A5', power: 0.75, torque: 2.39, rpm: 3000 },
+                { brand: '國際牌', series: 'MINAS A5', power: 1.0, torque: 3.18, rpm: 3000 },
+                { brand: '國際牌', series: 'MINAS A5', power: 1.5, torque: 4.77, rpm: 3000 },
+                { brand: '國際牌', series: 'MINAS A5', power: 2.0, torque: 6.37, rpm: 3000 },
+            ];
+
+            const mitsubishiServos = [
+                { brand: '三菱', series: 'MELSERVO-J4', power: 0.75, torque: 2.39, rpm: 3000 },
+                { brand: '三菱', series: 'MELSERVO-J4', power: 1.0, torque: 3.18, rpm: 3000 },
+                { brand: '三菱', series: 'MELSERVO-J4', power: 1.5, torque: 4.77, rpm: 3000 },
+                { brand: '三菱', series: 'MELSERVO-J4', power: 2.0, torque: 6.37, rpm: 3000 },
+            ];
+
+            const deltaServos = [
+                { brand: '台達', series: 'ASDA-B2', power: 0.75, torque: 2.39, rpm: 3000 },
+                { brand: '台達', series: 'ASDA-B2', power: 1.0, torque: 3.18, rpm: 3000 },
+                { brand: '台達', series: 'ASDA-B2', power: 1.5, torque: 4.77, rpm: 3000 },
+                { brand: '台達', series: 'ASDA-B2', power: 2.0, torque: 6.37, rpm: 3000 },
+            ];
+
+            const rexrothServos = [
+                { brand: 'Rexroth', series: 'MS2N', power: 0.75, torque: 2.4, rpm: 3000, size: '05', winding: 'C0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 1.0, torque: 3.2, rpm: 3000, size: '05', winding: 'D0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 1.5, torque: 4.8, rpm: 3000, size: '06', winding: 'C0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 2.0, torque: 6.4, rpm: 3000, size: '07', winding: 'D0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 2.2, torque: 7.15, rpm: 6000, size: '06', winding: 'G0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 3.7, torque: 11.9, rpm: 6000, size: '07', winding: 'G0' },
+                { brand: 'Rexroth', series: 'MS2N', power: 1.45, torque: 1.45, rpm: 9000, size: '05', winding: 'G0' },
+            ];
+
+            /**
+             * 根據扭矩和轉速要求尋找合適的馬達 (Finds a suitable motor based on torque and RPM requirements)
+             * @param {Array<Object>} motors - 馬達數據列表 (List of motor data)
+             * @param {number} requiredTorque - 所需扭矩 (Required torque)
+             * @param {number} requiredRpm - 所需轉速 (Required RPM)
+             * @returns {Object|null} - 找到的最適合馬達或 null (The best-fit motor found, or null)
+             */
+            const findSuitableMotor = (motors, requiredTorque, requiredRpm) => {
+                const candidates = motors.filter(motor => 
+                    motor.torque >= requiredTorque && motor.rpm >= requiredRpm
+                );
+                if (candidates.length === 0) {
+                    return null;
+                }
+                return candidates.reduce((min, current) => 
+                    (current.power < min.power ? current : min)
+                );
+            };
+
+            const showMessageBox = (message, type = 'info') => {
+                const existingBox = document.querySelector('.message-box-container');
+                if (existingBox) existingBox.remove();
+                const container = document.createElement('div');
+                container.className = 'message-box-container';
+                const messageBox = document.createElement('div');
+                messageBox.className = 'message-box';
+                const colorClass = type === 'error' ? 'text-red-600' : 'text-blue-600';
+                const buttonClass = type === 'error' ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600';
+                messageBox.innerHTML = `
+                    <p class="font-bold mb-4 ${colorClass}">${message}</p>
+                    <button onclick="this.closest('.message-box-container').remove()" class="w-full ${buttonClass} text-white py-2 rounded-md transition duration-300">確定</button>
+                `;
+                container.appendChild(messageBox);
+                document.body.appendChild(container);
+            };
+
+            // 響應式圖表繪製，會在視窗大小改變時自動調整
+            const drawMotionChart = (timePoints, displacementPoints, velocityPoints, accelerationPoints) => {
+                const canvas = document.getElementById('motionChart');
+                const ctx = canvas.getContext('2d');
+                
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const padding = 50;
+                const legendWidth = 150;
+                const chartWidth = canvas.width - padding * 2 - legendWidth;
+                const chartHeight = canvas.height - padding * 2;
+
+                if (timePoints.length < 2) return;
+
+                const maxTime = timePoints[timePoints.length - 1];
+                const allYValues = [...displacementPoints, ...velocityPoints, ...accelerationPoints];
+                const maxAbsY = allYValues.length > 0 ? Math.max(...allYValues.map(Math.abs)) : 0;
+                const yAxisRange = maxAbsY > 0 ? maxAbsY * 2 : 1;
+                const yZero = padding + chartHeight / 2;
+                const timeScale = chartWidth / maxTime;
+                const yScale = chartHeight / yAxisRange;
+                
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '12px Inter';
+                
+                const numXLabels = Math.min(10, Math.floor(maxTime) + 1);
+                const xInterval = maxTime / numXLabels;
+                for (let i = 0; i <= numXLabels; i++) {
+                    const x = padding + (i * xInterval * timeScale);
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding);
+                    ctx.lineTo(x, padding + chartHeight);
+                    ctx.stroke();
+                    
+                    ctx.textAlign = 'center';
+                    ctx.fillText( (i * xInterval).toFixed(1) , x, padding + chartHeight + 15);
+                }
+
+                const numYLabels = 10;
+                const yInterval = yAxisRange / numYLabels;
+                for (let i = 0; i <= numYLabels; i++) {
+                    const yValue = -maxAbsY + (i * yInterval);
+                    const y = yZero - yValue * yScale;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(padding + chartWidth, y);
+                    ctx.stroke();
+
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(yValue.toFixed(1), padding - 5, y);
+                }
+
+                ctx.strokeStyle = '#4b5563';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(padding, yZero);
+                ctx.lineTo(padding + chartWidth, yZero);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, padding + chartHeight);
+                ctx.stroke();
+
+                ctx.fillStyle = '#1f2937';
+                ctx.font = '14px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('時間 (s)', padding + chartWidth / 2, canvas.height - 10);
+                ctx.save();
+                ctx.translate(padding / 2, yZero);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('數值', 0, 0);
+                ctx.restore();
+
+                const drawLine = (points, color, label, unit, legendIndex) => {
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 2;
+                    const firstX = padding + timePoints[0] * timeScale;
+                    const firstY = yZero - (points.length > 0 ? points[0] * yScale : 0);
+                    ctx.moveTo(firstX, firstY);
+
+                    for (let i = 1; i < points.length; i++) {
+                        const x = padding + timePoints[i] * timeScale;
+                        const y = yZero - points[i] * yScale;
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'left';
+                    const maxVal = points.length > 0 ? Math.max(...points.map(Math.abs)) : 0;
+                    ctx.fillText(`${label} (${maxVal.toFixed(2)} ${unit})`, canvas.width - legendWidth + 10, padding + 20 + legendIndex * 20);
+                };
+                
+                drawLine(displacementPoints, '#3b82f6', '位移', 'm', 0);
+                drawLine(velocityPoints, '#ef4444', '速度', 'RPM', 1);
+                drawLine(accelerationPoints, '#10b981', '加速度', 'rad/s²', 2);
+            };
+
+            // 當視窗大小改變時，重新繪製圖表以適應新的尺寸
+            window.addEventListener('resize', () => {
+                // 檢查是否正在顯示圖表，避免不必要的繪製
+                const isChartVisible = document.getElementById('motionChart').offsetParent !== null;
+                if (isChartVisible) {
+                    updateChartPreview();
+                }
+            });
+
+            let stageCount = 0;
+            const addStage = (type = 'accelerate') => {
+                stageCount++;
+                const row = document.createElement('tr');
+                row.id = `stage-row-${stageCount}`;
+                row.className = 'stage-row';
+                row.innerHTML = `
+                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${stageCount}</td>
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
+                        <select class="stage-type block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 text-sm">
+                            <option value="accelerate">加速</option>
+                            <option value="constant">等速</option>
+                            <option value="decelerate">減速</option>
+                            <option value="pause">暫停</option>
+                        </select>
+                    </td>
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
+                        <input type="number" value="1" class="stage-time block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 text-sm">
+                    </td>
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
+                        <input type="number" value="0.1" class="stage-displacement block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 text-sm">
+                    </td>
+                `;
+                stagesTableBody.appendChild(row);
+
+                const stageTypeSelect = row.querySelector('.stage-type');
+                const displacementInput = row.querySelector('.stage-displacement');
+                
+                stageTypeSelect.value = type;
+
+                stageTypeSelect.addEventListener('change', updateChartPreview);
+                row.querySelector('.stage-time').addEventListener('input', updateChartPreview);
+                displacementInput.addEventListener('input', updateChartPreview);
+
+                const handleStageTypeChange = () => {
+                    const selectedType = stageTypeSelect.value;
+                    if (selectedType === 'constant' || selectedType === 'pause') {
+                        displacementInput.disabled = true;
+                        displacementInput.classList.add('bg-gray-200', 'cursor-not-allowed');
+                        displacementInput.value = '';
+                    } else {
+                        displacementInput.disabled = false;
+                        displacementInput.classList.remove('bg-gray-200', 'cursor-not-allowed');
+                        if (displacementInput.value === '') {
+                             displacementInput.value = 0.1;
+                        }
+                    }
+                    updateChartPreview();
+                };
+
+                stageTypeSelect.addEventListener('change', handleStageTypeChange);
+                handleStageTypeChange();
+            };
+            
+            const updateChartPreview = () => {
+                const pulleyCircumference = parseFloat(pulleyDiameterInput.value);
+                if (isNaN(pulleyCircumference) || pulleyCircumference <= 0) {
+                    drawMotionChart([], [], [], []);
+                    return;
+                }
+                
+                let stages = [];
+
+                if (currentMotionType === 'multi-stage') {
+                    const stageRows = document.querySelectorAll('.stage-row');
+                    stageRows.forEach(row => {
+                        const type = row.querySelector('.stage-type').value;
+                        const time = parseFloat(row.querySelector('.stage-time').value);
+                        const displacementInput = row.querySelector('.stage-displacement');
+                        const displacement = displacementInput.disabled ? 0 : parseFloat(displacementInput.value);
+                        
+                        if (isNaN(time) || time <= 0) return;
+                        if (!displacementInput.disabled && isNaN(displacement)) return;
+                        stages.push({ type, time, displacement });
+                    });
+                } else if (currentMotionType === 'triangle') {
+                    const totalDisplacement = parseFloat(triangleDisplacementInput.value);
+                    const totalTime = parseFloat(triangleTimeInput.value);
+                    if (isNaN(totalDisplacement) || isNaN(totalTime) || totalTime <= 0) {
+                        drawMotionChart([], [], [], []);
+                        return;
+                    }
+                    stages = [
+                        { type: 'accelerate', time: totalTime / 2, displacement: totalDisplacement / 2 },
+                        { type: 'decelerate', time: totalTime / 2, displacement: totalDisplacement / 2 }
+                    ];
+                } else if (currentMotionType === 'trapezoid') {
+                    const totalDisplacement = parseFloat(trapezoidDisplacementInput.value);
+                    const totalTime = parseFloat(trapezoidTimeInput.value);
+                    const accelTime = parseFloat(trapezoidAccelTimeInput.value);
+                    const constantTime = totalTime - 2 * accelTime;
+                    
+                    if (isNaN(totalDisplacement) || isNaN(totalTime) || isNaN(accelTime) || totalTime <= 0 || accelTime <= 0 || constantTime < 0) {
+                         drawMotionChart([], [], [], []);
+                         return;
+                    }
+                    
+                    const maxVelocity = totalDisplacement / (totalTime - accelTime);
+                    const accelDisplacement = 0.5 * maxVelocity * accelTime;
+                    const constantDisplacement = maxVelocity * constantTime;
+
+                    stages = [
+                        { type: 'accelerate', time: accelTime, displacement: accelDisplacement },
+                        { type: 'constant', time: constantTime, displacement: constantDisplacement },
+                        { type: 'decelerate', time: accelTime, displacement: accelDisplacement }
+                    ];
+                }
+                
+                if (stages.length === 0) {
+                    drawMotionChart([], [], [], []);
+                    return;
+                }
+
+                let currentLinearVelocity = 0;
+                let totalDisplacementAcc = 0;
+                let totalTimeAcc = 0;
+                const pulleyRadius = (pulleyCircumference / 1000) / (2 * Math.PI);
+                const gearRatio = parseFloat(gearRatioInput.value);
+
+                const timePoints = [0];
+                const displacementPoints = [0];
+                const velocityPoints = [0];
+                const accelerationPoints = [0];
+
+                for (const stage of stages) {
+                    const startLinearVelocity = currentLinearVelocity;
+                    let endLinearVelocity = 0;
+                    let acceleration = 0;
+                    const stageTime = stage.time;
+                    let stageDisplacement = stage.displacement;
+
+                    if (stage.type === 'constant') {
+                        endLinearVelocity = startLinearVelocity;
+                        acceleration = 0;
+                        stageDisplacement = startLinearVelocity * stageTime;
+                    } else if (stage.type === 'pause') {
+                        endLinearVelocity = 0;
+                        acceleration = (endLinearVelocity - startLinearVelocity) / stageTime;
+                        stageDisplacement = 0;
+                    } else {
+                        endLinearVelocity = (2 * stageDisplacement / stageTime) - startLinearVelocity;
+                        acceleration = (endLinearVelocity - startLinearVelocity) / stageTime;
+                    }
+                    
+                    const dt = 0.05;
+                    let t = 0;
+                    while (t < stageTime) {
+                        const currentT = totalTimeAcc + t;
+                        const currentVelocity = startLinearVelocity + acceleration * t;
+                        const currentDisplacement = totalDisplacementAcc + startLinearVelocity * t + 0.5 * acceleration * t * t;
+                        
+                        timePoints.push(currentT);
+                        displacementPoints.push(currentDisplacement);
+                        velocityPoints.push((currentVelocity / pulleyRadius) * gearRatio * 60 / (2 * Math.PI));
+                        accelerationPoints.push((acceleration / pulleyRadius) * gearRatio);
+                        t += dt;
+                    }
+                    
+                    totalTimeAcc += stageTime;
+                    totalDisplacementAcc += stageDisplacement;
+                    
+                    timePoints.push(totalTimeAcc);
+                    displacementPoints.push(totalDisplacementAcc);
+                    velocityPoints.push((endLinearVelocity / pulleyRadius) * gearRatio * 60 / (2 * Math.PI));
+                    accelerationPoints.push((acceleration / pulleyRadius) * gearRatio);
+
+                    currentLinearVelocity = endLinearVelocity;
+                }
+                
+                drawMotionChart(timePoints, displacementPoints, velocityPoints, accelerationPoints);
+            };
+
+            const toggleMotionConfig = (motionType) => {
+                currentMotionType = motionType;
+                
+                motionTypeButtons.forEach(btn => {
+                    if (btn.dataset.motionType === motionType) {
+                        btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                        btn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+                    } else {
+                        btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                        btn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+                    }
+                });
+
+                multiStageConfig.classList.add('hidden');
+                triangleConfig.classList.add('hidden');
+                trapezoidConfig.classList.add('hidden');
+                
+                if (motionType === 'multi-stage') {
+                    multiStageConfig.classList.remove('hidden');
+                    if (stageCount === 0) {
+                        addStage('accelerate');
+                        addStage('constant');
+                        addStage('decelerate');
+                    }
+                } else if (motionType === 'triangle') {
+                    triangleConfig.classList.remove('hidden');
+                } else if (motionType === 'trapezoid') {
+                    trapezoidConfig.classList.remove('hidden');
+                }
+                updateChartPreview();
+            };
+
+            [rpmInput, gearRatioInput, pulleyDiameterInput, loadInertiaInput, motorInertiaInput, loadMassInput, frictionCoefficientInput, safetyFactorInput, motorEfficiencyInput].forEach(input => {
+                input.addEventListener('input', updateChartPreview);
+            });
+
+            motionTypeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    toggleMotionConfig(btn.dataset.motionType);
+                });
+            });
+            [triangleDisplacementInput, triangleTimeInput, trapezoidDisplacementInput, trapezoidTimeInput, trapezoidAccelTimeInput].forEach(input => {
+                input.addEventListener('input', updateChartPreview);
+            });
+
+            addStageBtn.addEventListener('click', () => {
+                addStage('constant');
+                updateChartPreview();
+            });
+            
+            removeStageBtn.addEventListener('click', () => {
+                if (stageCount > 1) {
+                    const lastRow = document.getElementById(`stage-row-${stageCount}`);
+                    lastRow.remove();
+                    stageCount--;
+                    updateChartPreview();
+                } else if (stageCount === 1) {
+                    stagesTableBody.innerHTML = '';
+                    stageCount = 0;
+                    updateChartPreview();
+                }
+            });
+
+            calculateBtn.addEventListener('click', () => {
+                const rpmMaxMotor = parseFloat(rpmInput.value);
+                const gearRatio = parseFloat(gearRatioInput.value);
+                const pulleyCircumference = parseFloat(pulleyDiameterInput.value);
+                const loadInertia_cm2 = parseFloat(loadInertiaInput.value);
+                const motorInertia_cm2 = parseFloat(motorInertiaInput.value);
+                const loadMass = parseFloat(loadMassInput.value);
+                const frictionCoefficient = parseFloat(frictionCoefficientInput.value);
+                const safetyFactor = parseFloat(safetyFactorInput.value);
+                const motorEfficiency = parseFloat(motorEfficiencyInput.value);
+                
+                if ([rpmMaxMotor, gearRatio, pulleyCircumference, loadInertia_cm2, motorInertia_cm2, loadMass, frictionCoefficient, safetyFactor].some(val => isNaN(val) || val <= 0)) {
+                    showMessageBox('請輸入有效的正數值。', 'error');
+                    return;
+                }
+                if (isNaN(motorEfficiency) || motorEfficiency <= 0 || motorEfficiency > 100) {
+                    showMessageBox('馬達效率必須為介於 0 到 100 之間的數值。', 'error');
+                    return;
+                }
+
+                let stages = [];
+                let totalDisplacement = 0;
+                let totalTime = 0;
+
+                if (currentMotionType === 'multi-stage') {
+                    const stageRows = document.querySelectorAll('.stage-row');
+                    if (stageRows.length === 0) {
+                        showMessageBox('請至少新增一個運動階段。', 'error');
+                        return;
+                    }
+
+                    let validationFailed = false;
+                    stageRows.forEach(row => {
+                        if (validationFailed) return;
+                        const type = row.querySelector('.stage-type').value;
+                        const time = parseFloat(row.querySelector('.stage-time').value);
+                        const displacementInput = row.querySelector('.stage-displacement');
+                        const displacement = displacementInput.disabled ? 0 : parseFloat(displacementInput.value);
+
+                        if (isNaN(time) || time <= 0) {
+                            showMessageBox(`警告：階段 ${stages.length + 1} 的時間必須為正數。`, 'error');
+                            validationFailed = true;
+                            return;
+                        }
+                        if (!displacementInput.disabled && isNaN(displacement)) {
+                            showMessageBox(`警告：階段 ${stages.length + 1} 的位移量必須為數值。`, 'error');
+                            validationFailed = true;
+                            return;
+                        }
+                        stages.push({ type, time, displacement });
+                        totalDisplacement += displacement;
+                        totalTime += time;
+                    });
+                    if (validationFailed) return;
+
+                } else if (currentMotionType === 'triangle') {
+                    totalDisplacement = parseFloat(triangleDisplacementInput.value);
+                    totalTime = parseFloat(triangleTimeInput.value);
+                    
+                    if (isNaN(totalDisplacement) || isNaN(totalTime) || totalTime <= 0 || totalDisplacement === 0) {
+                        showMessageBox('請輸入有效的總距離和總時間。', 'error');
+                        return;
+                    }
+                    stages = [
+                        { type: 'accelerate', time: totalTime / 2, displacement: totalDisplacement / 2 },
+                        { type: 'decelerate', time: totalTime / 2, displacement: totalDisplacement / 2 }
+                    ];
+
+                } else if (currentMotionType === 'trapezoid') {
+                    totalDisplacement = parseFloat(trapezoidDisplacementInput.value);
+                    totalTime = parseFloat(trapezoidTimeInput.value);
+                    const accelTime = parseFloat(trapezoidAccelTimeInput.value);
+                    const constantTime = totalTime - 2 * accelTime;
+                    
+                    if (isNaN(totalDisplacement) || isNaN(totalTime) || isNaN(accelTime) || totalTime <= 0 || accelTime <= 0 || constantTime < 0) {
+                        showMessageBox('請輸入有效的總距離、總時間和加速時間，且總時間必須大於2倍加速時間。', 'error');
+                        return;
+                    }
+
+                    const maxVelocity = totalDisplacement / (totalTime - accelTime);
+                    const accelDisplacement = 0.5 * maxVelocity * accelTime;
+                    const constantDisplacement = maxVelocity * constantTime;
+
+                    stages = [
+                        { type: 'accelerate', time: accelTime, displacement: accelDisplacement },
+                        { type: 'constant', time: constantTime, displacement: constantDisplacement },
+                        { type: 'decelerate', time: accelTime, displacement: accelDisplacement }
+                    ];
+                }
+                
+                if (stages.length === 0) {
+                    showMessageBox('無法計算，請檢查運動設定參數。', 'error');
+                    return;
+                }
+
+                const loadInertia_m2 = loadInertia_cm2 / 10000;
+                const motorInertia_m2 = motorInertia_cm2 / 10000;
+                const motorEfficiencyDecimal = motorEfficiency / 100;
+
+                const totalInertia_m2 = motorInertia_m2 + (loadInertia_m2 / (gearRatio * gearRatio));
+                totalInertiaOutput.textContent = `${(totalInertia_m2 * 10000).toFixed(5)} kg-cm²`;
+                
+                let calculatedInertiaRatio = 0;
+                if (motorInertia_m2 > 0) {
+                    calculatedInertiaRatio = (loadInertia_m2 / (gearRatio * gearRatio)) / motorInertia_m2;
+                    inertiaRatioOutput.textContent = `${calculatedInertiaRatio.toFixed(2)} : 1`;
+                    inertiaRatioOutput.classList.add('text-blue-600');
+                } else {
+                    inertiaRatioOutput.textContent = `N/A`;
+                    inertiaRatioOutput.classList.add('text-gray-500');
+                }
+
+                let maxTorque_raw = 0;
+                let maxPower_shaft_raw = 0;
+                let currentLinearVelocity = 0;
+                let maxLinearVelocity = 0;
+                let totalTorqueSquaredSum = 0;
+                const pulleyRadius = (pulleyCircumference / 1000) / (2 * Math.PI);
+                const gravity = 9.81;
+                const frictionTorque = frictionCoefficient * loadMass * gravity * pulleyRadius;
+
+                for (const stage of stages) {
+                    const startLinearVelocity = currentLinearVelocity;
+                    let endLinearVelocity = 0;
+                    let acceleration = 0;
+                    const stageTime = stage.time;
+                    let stageDisplacement = stage.displacement;
+
+                    if (stage.type === 'constant') {
+                        endLinearVelocity = startLinearVelocity;
+                        acceleration = 0;
+                    } else if (stage.type === 'pause') {
+                        endLinearVelocity = 0;
+                        acceleration = (endLinearVelocity - startLinearVelocity) / stageTime;
+                    } else {
+                        endLinearVelocity = (2 * stageDisplacement / stageTime) - startLinearVelocity;
+                        acceleration = (endLinearVelocity - startLinearVelocity) / stageTime;
+                    }
+
+                    maxLinearVelocity = Math.max(maxLinearVelocity, Math.abs(startLinearVelocity), Math.abs(endLinearVelocity));
+                    const startOmegaMotor = (Math.abs(startLinearVelocity) / pulleyRadius) * gearRatio;
+                    const endOmegaMotor = (Math.abs(endLinearVelocity) / pulleyRadius) * gearRatio;
+                    const accelOmegaMotor = (acceleration / pulleyRadius) * gearRatio;
+
+                    const maxRpmForStage = (Math.max(startOmegaMotor, endOmegaMotor) * 60) / (2 * Math.PI);
+                    if (maxRpmForStage > rpmMaxMotor) {
+                        showMessageBox(`警告：馬達最高轉速 (${maxRpmForStage.toFixed(0)} RPM) 超過輸入設定 (${rpmMaxMotor} RPM)。`, 'error');
+                        return;
+                    }
+
+                    const torqueForStage_raw = Math.abs(totalInertia_m2 * accelOmegaMotor) + frictionTorque;
+                    const powerForStage_shaft_raw = (Math.abs(torqueForStage_raw) * Math.max(startOmegaMotor, endOmegaMotor)) / 1000;
+                    maxTorque_raw = Math.max(maxTorque_raw, torqueForStage_raw);
+                    maxPower_shaft_raw = Math.max(maxPower_shaft_raw, powerForStage_shaft_raw);
+                    totalTorqueSquaredSum += (torqueForStage_raw * torqueForStage_raw) * stageTime;
+                    currentLinearVelocity = endLinearVelocity;
+                }
+                
+                const averageLinearVelocity = totalTime > 0 ? totalDisplacement / totalTime : 0;
+                const rmsTorque_raw = totalTime > 0 ? Math.sqrt(totalTorqueSquaredSum / totalTime) : 0;
+                const maxTorque_final = maxTorque_raw * safetyFactor;
+                const rmsTorque_final = rmsTorque_raw * safetyFactor;
+                const maxPower_final = (maxPower_shaft_raw * safetyFactor) / motorEfficiencyDecimal;
+                const recommendedHorsepower = maxPower_final / 0.746;
+                const averageAngularVelocityLoad = averageLinearVelocity / pulleyRadius;
+                const maxAngularVelocityLoad = maxLinearVelocity / pulleyRadius;
+                const averageRpmMotor = (averageAngularVelocityLoad * gearRatio * 60) / (2 * Math.PI);
+                const maxRpmMotor = (maxAngularVelocityLoad * gearRatio * 60) / (2 * Math.PI);
+
+                totalDisplacementOutput.textContent = `${totalDisplacement.toFixed(3)} m`;
+                averageVelocityOutput.textContent = `${averageRpmMotor.toFixed(3)} RPM`;
+                maxVelocityOutput.textContent = `${maxRpmMotor.toFixed(3)} RPM`;
+                maxTorqueOutput.textContent = `${maxTorque_final.toFixed(3)} N-m`;
+                rmsTorqueOutput.textContent = `${rmsTorque_final.toFixed(3)} N-m`;
+                maxPowerOutput.textContent = `${maxPower_final.toFixed(3)} kW`;
+                recommendedHorsepowerOutput.textContent = `${recommendedHorsepower.toFixed(3)} HP`;
+
+                const vfdMotor = findSuitableMotor(tecoMotors, maxTorque_final, maxRpmMotor);
+                const yaskawaServo = findSuitableMotor(yaskawaServos, maxTorque_final, maxRpmMotor);
+                const panasonicServo = findSuitableMotor(panasonicServos, maxTorque_final, maxRpmMotor);
+                const mitsubishiServo = findSuitableMotor(mitsubishiServos, maxTorque_final, maxRpmMotor);
+                const deltaServo = findSuitableMotor(deltaServos, maxTorque_final, maxRpmMotor);
+                const rexrothServo = findSuitableMotor(rexrothServos, maxTorque_final, maxRpmMotor);
+
+                if (vfdMotor) {
+                    vfdMotorResultOutput.innerHTML = `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${vfdMotor.brand} 馬達</strong></p><p>型號: ${vfdMotor.model}</p><p>功率: ${vfdMotor.power} kW</p><p>額定扭矩: ${vfdMotor.torque} N-m</p><p>額定轉速: ${vfdMotor.rpm} RPM</p></div>`;
+                } else {
+                    vfdMotorResultOutput.innerHTML = `<p class="text-red-500">沒有找到符合條件的東元變頻馬達。</p>`;
+                }
+                
+                let servoResultsHtml = '';
+                if (yaskawaServo) servoResultsHtml += `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${yaskawaServo.brand} 伺服</strong></p><p>系列: ${yaskawaServo.series}</p><p>功率: ${yaskawaServo.power} kW</p><p>額定扭矩: ${yaskawaServo.torque} N-m</p><p>額定轉速: ${yaskawaServo.rpm} RPM</p></div>`;
+                else servoResultsHtml += `<p class="text-red-500">沒有找到符合條件的安川伺服馬達。</p>`;
+                if (panasonicServo) servoResultsHtml += `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${panasonicServo.brand} 伺服</strong></p><p>系列: ${panasonicServo.series}</p><p>功率: ${panasonicServo.power} kW</p><p>額定扭矩: ${panasonicServo.torque} N-m</p><p>額定轉速: ${panasonicServo.rpm} RPM</p></div>`;
+                else servoResultsHtml += `<p class="text-red-500">沒有找到符合條件的國際牌伺服馬達。</p>`;
+                if (mitsubishiServo) servoResultsHtml += `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${mitsubishiServo.brand} 伺服</strong></p><p>系列: ${mitsubishiServo.series}</p><p>功率: ${mitsubishiServo.power} kW</p><p>額定扭矩: ${mitsubishiServo.torque} N-m</p><p>額定轉速: ${mitsubishiServo.rpm} RPM</p></div>`;
+                else servoResultsHtml += `<p class="text-red-500">沒有找到符合條件的三菱伺服馬達。</p>`;
+                if (deltaServo) servoResultsHtml += `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${deltaServo.brand} 伺服</strong></p><p>系列: ${deltaServo.series}</p><p>功率: ${deltaServo.power} kW</p><p>額定扭矩: ${deltaServo.torque} N-m</p><p>額定轉速: ${deltaServo.rpm} RPM</p></div>`;
+                else servoResultsHtml += `<p class="text-red-500">沒有找到符合條件的台達伺服馬達。</p>`;
+                if (rexrothServo) {
+                    const detailedModel = `MS2N${rexrothServo.size}-${rexrothServo.winding}BNN-CMSG0-NNNNN-NN`;
+                    servoResultsHtml += `<div class="bg-white p-4 rounded-md shadow-sm"><p><strong class="text-gray-700">${rexrothServo.brand} 伺服</strong></p><p>參考型號: ${detailedModel}</p><p>功率: ${rexrothServo.power} kW</p><p>額定扭矩: ${rexrothServo.torque} N-m</p><p>額定轉速: ${rexrothServo.rpm} RPM</p></div>`;
+                } else {
+                    servoResultsHtml += `<p class="text-red-500">沒有找到符合條件的 Rexroth MS2N 伺服馬達。</p>`;
+                }
+                servoMotorResultOutput.innerHTML = servoResultsHtml;
+
+                updateChartPreview();
+            });
+
+            toggleMotionConfig('multi-stage');
+        });
+    </script>
+</body>
+</html>
