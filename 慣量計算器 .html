@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>結構慣量計算機</title>
+    <!-- 使用 Tailwind CSS 進行快速、響應式設計 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 900px;
+        }
+        /* 隱藏 Chrome 和 Firefox 中的數字輸入框箭頭 */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* 調整輸入群組以適應橫向排列 */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            white-space: nowrap; /* 防止標籤換行 */
+        }
+        .input-group label {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 bg-gray-100 min-h-screen flex items-start justify-center">
+
+    <div class="container bg-white shadow-xl rounded-lg p-6 w-full">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">結構慣量計算機</h1>
+        <p class="text-gray-600 mb-8 text-center">選擇形狀、輸入尺寸和材質，即可自動計算慣量並加總。</p>
+        
+        <!-- 形狀容器，所有形狀卡片將在這裡動態生成 -->
+        <div id="shapes-container" class="space-y-6 mb-6">
+            <!-- 初始形狀卡片將由 JS 動態生成 -->
+        </div>
+
+        <!-- 新增形狀按鈕 -->
+        <div class="flex justify-center mb-6">
+            <button id="add-shape-btn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                <span>新增</span>
+            </button>
+        </div>
+
+        <!-- 總慣量顯示區 -->
+        <div class="border-t-2 border-dashed border-gray-300 pt-6">
+            <div class="text-center">
+                <p class="text-lg font-medium text-gray-700">總慣量</p>
+                <p id="total-inertia" class="text-4xl font-extrabold text-blue-600 mt-2">0.00</p>
+                <p class="text-gray-500 mt-1">公斤·平方公分 (kg.cm^2)</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 頁面加載完成後執行主程式碼
+        window.onload = function() {
+            // 定義常見材質及其密度 (單位: kg/m^3)
+            const materials = {
+                'steel': 7850,
+                'aluminum': 2700,
+                'concrete': 2400,
+                'wood': 700,
+                'pvc': 1400,
+            };
+
+            const shapesContainer = document.getElementById('shapes-container');
+            const addShapeBtn = document.getElementById('add-shape-btn');
+            const totalInertiaDisplay = document.getElementById('total-inertia');
+            let shapeCounter = 0; // 用於給每個形狀卡片獨特的 ID
+
+            /**
+             * 根據形狀類型獲取輸入欄位的 HTML 模板
+             * @param {string} shapeType - 形狀類型 ('roller', 'gear', 'block')
+             * @returns {string} - HTML 字串
+             */
+            function getShapeInputsHtml(shapeType) {
+                // 使用 Flexbox 進行橫向排列，並加入間距
+                return `<div class="flex flex-wrap items-end gap-4">
+                            ${(() => {
+                                switch (shapeType) {
+                                    case 'roller':
+                                        return `
+                                            <div class="input-group">
+                                                <label for="roller-outer-diameter">外徑 (mm)</label>
+                                                <input type="number" id="roller-outer-diameter" data-key="outerDiameter" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：200">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="roller-inner-diameter">內徑 (mm)</label>
+                                                <input type="number" id="roller-inner-diameter" data-key="innerDiameter" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：100">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="roller-length">長度 (mm)</label>
+                                                <input type="number" id="roller-length" data-key="length" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：300">
+                                            </div>
+                                        `;
+                                    case 'gear':
+                                        return `
+                                            <div class="input-group">
+                                                <label for="gear-outer-diameter">外徑 (mm)</label>
+                                                <input type="number" id="gear-outer-diameter" data-key="outerDiameter" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：150">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="gear-width">寬度 (mm)</label>
+                                                <input type="number" id="gear-width" data-key="width" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：50">
+                                            </div>
+                                        `;
+                                    case 'block':
+                                        return `
+                                            <div class="input-group">
+                                                <label for="block-length">長 (mm)</label>
+                                                <input type="number" id="block-length" data-key="length" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：500">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="block-width">寬 (mm)</label>
+                                                <input type="number" id="block-width" data-key="width" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：200">
+                                            </div>
+                                            <div class="input-group">
+                                                <label for="block-height">高 (mm)</label>
+                                                <input type="number" id="block-height" data-key="height" class="w-28 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：100">
+                                            </div>
+                                        `;
+                                    default:
+                                        return '';
+                                }
+                            })()}
+                        </div>`;
+            }
+
+            /**
+             * 計算單一形狀的慣量
+             * @param {string} shapeType - 形狀類型
+             * @param {string} materialType - 材質類型
+             * @param {object} dimensions - 尺寸物件
+             * @returns {number|null} - 慣量值或 null（如果輸入無效）
+             */
+            function calculateInertia(shapeType, materialType, dimensions) {
+                const density = materials[materialType];
+                if (!density) return null;
+
+                // 所有單位從 mm 轉換為 m
+                for (const key in dimensions) {
+                    if (dimensions.hasOwnProperty(key)) {
+                        dimensions[key] /= 1000;
+                    }
+                }
+
+                try {
+                    switch (shapeType) {
+                        case 'roller':
+                            const outerR = dimensions.outerDiameter / 2;
+                            const innerR = dimensions.innerDiameter / 2;
+                            const length = dimensions.length;
+
+                            if (outerR <= 0 || innerR < 0 || innerR >= outerR || length <= 0) return null;
+
+                            const massRoller = density * Math.PI * (outerR * outerR - innerR * innerR) * length;
+                            return (1 / 2) * massRoller * (outerR * outerR + innerR * innerR);
+
+                        case 'gear':
+                            const gearR = dimensions.outerDiameter / 2;
+                            const gearWidth = dimensions.width;
+
+                            if (gearR <= 0 || gearWidth <= 0) return null;
+
+                            const massGear = density * Math.PI * gearR * gearR * gearWidth;
+                            return (1 / 2) * massGear * gearR * gearR;
+
+                        case 'block':
+                            const blockL = dimensions.length;
+                            const blockW = dimensions.width;
+                            const blockH = dimensions.height;
+
+                            if (blockL <= 0 || blockW <= 0 || blockH <= 0) return null;
+
+                            const massBlock = density * blockL * blockW * blockH;
+                            // 塊狀物慣量依轉軸不同而異，此處假設轉軸穿過中心且垂直於最長邊（L, W）
+                            return (1 / 12) * massBlock * (blockW * blockW + blockH * blockH);
+                        default:
+                            return null;
+                    }
+                } catch (e) {
+                    console.error("計算慣量時發生錯誤:", e);
+                    return null;
+                }
+            }
+
+            /**
+             * 更新所有形狀的慣量並加總
+             */
+            function updateTotal() {
+                let totalInertia = 0;
+                const shapeCards = shapesContainer.querySelectorAll('.shape-card');
+                const CONVERSION_FACTOR = 10000; // 1 m^2 = 10000 cm^2
+
+                shapeCards.forEach(card => {
+                    const shapeType = card.querySelector('.shape-select').value;
+                    const materialType = card.querySelector('.material-select').value;
+                    const inertiaDisplay = card.querySelector('.inertia-value');
+
+                    // 收集尺寸數據
+                    const dimensions = {};
+                    const inputs = card.querySelectorAll('input[type="number"]');
+                    inputs.forEach(input => {
+                        // 這裡使用 data-key 屬性來取得正確的變數名稱
+                        const key = input.dataset.key;
+                        dimensions[key] = parseFloat(input.value) || 0;
+                    });
+
+                    // 計算慣量（單位：kg·m^2）
+                    const inertia_m2 = calculateInertia(shapeType, materialType, dimensions);
+                    
+                    if (inertia_m2 !== null && !isNaN(inertia_m2)) {
+                        const inertia_cm2 = inertia_m2 * CONVERSION_FACTOR;
+                        totalInertia += inertia_cm2;
+                        inertiaDisplay.textContent = inertia_cm2.toFixed(6);
+                        inertiaDisplay.classList.remove('text-red-500');
+                    } else {
+                        inertiaDisplay.textContent = '無效輸入';
+                        inertiaDisplay.classList.add('text-red-500');
+                    }
+                });
+
+                // 更新總慣量顯示（單位：kg·cm^2）
+                totalInertiaDisplay.textContent = totalInertia.toFixed(6);
+            }
+
+            /**
+             * 新增一個形狀卡片
+             */
+            function addShapeCard() {
+                shapeCounter++;
+                const cardId = `card-${shapeCounter}`;
+
+                const cardHtml = `
+                    <div id="${cardId}" class="shape-card bg-gray-50 border border-gray-200 rounded-lg p-5 shadow-sm">
+                        <!-- 橫向排列的內容區塊 -->
+                        <div class="flex flex-wrap items-center gap-4">
+                            <!-- 項目號碼 -->
+                            <div class="input-group">
+                                <label class="text-sm font-medium text-gray-700">項目</label>
+                                <span class="font-bold text-lg text-gray-800">${shapeCounter}</span>
+                            </div>
+                            
+                            <!-- 形狀選擇 -->
+                            <div class="input-group">
+                                <label for="shape-select-${shapeCounter}" class="text-sm font-medium text-gray-700">形狀選擇</label>
+                                <select id="shape-select-${shapeCounter}" class="shape-select block w-full pl-2 pr-8 py-1 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="roller">滾輪</option>
+                                    <option value="gear">齒輪</option>
+                                    <option value="block">塊狀</option>
+                                </select>
+                            </div>
+
+                            <!-- 材質選擇 -->
+                            <div class="input-group">
+                                <label for="material-select-${shapeCounter}" class="text-sm font-medium text-gray-700">材質</label>
+                                <select id="material-select-${shapeCounter}" class="material-select block w-full pl-2 pr-8 py-1 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="steel">鋼 (Steel)</option>
+                                    <option value="aluminum">鋁 (Aluminum)</option>
+                                    <option value="concrete">混凝土 (Concrete)</option>
+                                    <option value="wood">木材 (Wood)</option>
+                                    <option value="pvc">PVC</option>
+                                </select>
+                            </div>
+
+                            <!-- 尺寸輸入欄位將動態載入 -->
+                            <div class="dimensions-inputs flex flex-wrap items-end gap-4"></div>
+
+                            <!-- 慣量結果顯示區 -->
+                            <div class="input-group flex-grow">
+                                <label class="text-sm font-medium text-gray-700">慣量</label>
+                                <p class="inertia-value text-xl font-bold text-blue-600">0.00</p>
+                                <p class="text-xs text-gray-500 mt-1">(kg.cm^2)</p>
+                            </div>
+                            
+                            <!-- 移除按鈕 -->
+                            <div>
+                                <button class="remove-btn text-gray-400 hover:text-red-600 transition-colors duration-200" data-card-id="${cardId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                shapesContainer.insertAdjacentHTML('beforeend', cardHtml);
+                const newCard = document.getElementById(cardId);
+                const dimensionsContainer = newCard.querySelector('.dimensions-inputs');
+                const shapeSelect = newCard.querySelector('.shape-select');
+
+                // 初始載入滾輪的輸入欄位
+                dimensionsContainer.innerHTML = getShapeInputsHtml(shapeSelect.value);
+
+                // 綁定事件監聽器
+                shapeSelect.addEventListener('change', (e) => {
+                    dimensionsContainer.innerHTML = getShapeInputsHtml(e.target.value);
+                    updateTotal();
+                });
+
+                newCard.addEventListener('input', updateTotal);
+            }
+
+            // 綁定新增形狀按鈕事件
+            addShapeBtn.addEventListener('click', addShapeCard);
+
+            // 處理移除按鈕的事件代理
+            shapesContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.remove-btn')) {
+                    const btn = e.target.closest('.remove-btn');
+                    const cardId = btn.getAttribute('data-card-id');
+                    const cardToRemove = document.getElementById(cardId);
+                    if (cardToRemove) {
+                        cardToRemove.remove();
+                        updateTotal();
+                    }
+                }
+            });
+
+            // 初始載入一個形狀卡片
+            addShapeCard();
+        };
+    </script>
+</body>
+</html>

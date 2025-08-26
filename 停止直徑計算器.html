@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放料捲停止直徑計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full transform transition-all duration-300 hover:shadow-2xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">放料捲停止直徑計算</h1>
+        
+        <div class="space-y-4">
+            
+            <!-- 初始速度輸入框 -->
+            <div>
+                <label for="initialSpeed" class="block text-sm font-medium text-gray-700">
+                    初始速度 (M/min)
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="initialSpeed" value="300" placeholder="300"
+                           class="block w-full rounded-md border-gray-300 p-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                           step="any">
+                </div>
+            </div>
+
+            <!-- 材料厚度輸入框 -->
+            <div>
+                <label for="materialThickness" class="block text-sm font-medium text-gray-700">
+                    材料厚度 (mm)
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="materialThickness" value="0.2" placeholder="0.2"
+                           class="block w-full rounded-md border-gray-300 p-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                           step="any">
+                </div>
+            </div>
+
+            <!-- 選擇輸入模式 -->
+            <div>
+                <label for="calculationMode" class="block text-sm font-medium text-gray-700">
+                    選擇計算模式
+                </label>
+                <select id="calculationMode" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="time">減速時間 (秒)</option>
+                    <option value="rate">減速速率 (M/min/s)</option>
+                </select>
+            </div>
+
+            <!-- 減速時間輸入框 (預設顯示) -->
+            <div id="decelerationTimeGroup">
+                <label for="decelerationTime" class="block text-sm font-medium text-gray-700">
+                    減速時間 (秒)
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="decelerationTime" value="60" placeholder="60"
+                           class="block w-full rounded-md border-gray-300 p-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                           step="any">
+                </div>
+            </div>
+
+            <!-- 減速速率輸入框 (預設隱藏) -->
+            <div id="decelerationRateGroup" class="hidden">
+                <label for="decelerationRateMmin" class="block text-sm font-medium text-gray-700">
+                    減速速率 (M/min/s)
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="decelerationRateMmin" value="5" placeholder="例如：每秒減速5米/分鐘，請輸入5"
+                           class="block w-full rounded-md border-gray-300 p-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                           step="any">
+                </div>
+            </div>
+
+            <!-- 目標直徑輸入框 -->
+            <div>
+                <label for="targetDiameter" class="block text-sm font-medium text-gray-700">
+                    目標直徑 (mm)
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="targetDiameter" value="100" placeholder="100"
+                           class="block w-full rounded-md border-gray-300 p-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                           step="any">
+                </div>
+            </div>
+            
+            <!-- 計算按鈕 -->
+            <button id="calculateBtn"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                計算
+            </button>
+        </div>
+
+        <!-- 結果顯示區 -->
+        <div id="resultContainer" class="mt-8 p-6 bg-indigo-50 rounded-2xl border border-indigo-200 hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">計算結果</h2>
+            <p id="resultText" class="text-lg text-gray-700"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', calculateStopDiameter);
+        document.getElementById('calculationMode').addEventListener('change', toggleInput);
+
+        // 初始化：根據下拉選單的預設值來顯示/隱藏輸入框
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleInput();
+        });
+
+        // 根據選擇模式切換輸入框的顯示
+        function toggleInput() {
+            const mode = document.getElementById('calculationMode').value;
+            const timeGroup = document.getElementById('decelerationTimeGroup');
+            const rateGroup = document.getElementById('decelerationRateGroup');
+
+            if (mode === 'time') {
+                timeGroup.classList.remove('hidden');
+                rateGroup.classList.add('hidden');
+            } else { // mode === 'rate'
+                timeGroup.classList.add('hidden');
+                rateGroup.classList.remove('hidden');
+            }
+        }
+
+        function calculateStopDiameter() {
+            const mode = document.getElementById('calculationMode').value;
+            const initialSpeedMmin = parseFloat(document.getElementById('initialSpeed').value);
+            const materialThicknessMm = parseFloat(document.getElementById('materialThickness').value);
+            const targetDiameterMm = parseFloat(document.getElementById('targetDiameter').value);
+            
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+
+            // 檢查基本輸入
+            if (isNaN(initialSpeedMmin) || isNaN(materialThicknessMm) || isNaN(targetDiameterMm)) {
+                resultText.innerHTML = '<span class="text-red-600">請輸入所有有效的數值。</span>';
+                resultContainer.classList.remove('hidden');
+                return;
+            }
+
+            let decelerationTime, decelerationRateMmin, decelerationRate;
+            const initialSpeedMs = initialSpeedMmin / 60;
+
+            // 根據選擇的模式進行計算
+            if (mode === 'time') {
+                const timeInput = parseFloat(document.getElementById('decelerationTime').value);
+                if (isNaN(timeInput) || timeInput <= 0) {
+                    resultText.innerHTML = '<span class="text-red-600">請輸入有效的減速時間。</span>';
+                    resultContainer.classList.remove('hidden');
+                    return;
+                }
+                decelerationTime = timeInput;
+                decelerationRateMmin = initialSpeedMmin / decelerationTime;
+                decelerationRate = initialSpeedMs / decelerationTime;
+            } else { // mode === 'rate'
+                const rateInput = parseFloat(document.getElementById('decelerationRateMmin').value);
+                if (isNaN(rateInput) || rateInput <= 0) {
+                    resultText.innerHTML = '<span class="text-red-600">請輸入有效的減速速率 (M/min/s)。</span>';
+                    resultContainer.classList.remove('hidden');
+                    return;
+                }
+                decelerationRateMmin = rateInput;
+                decelerationTime = initialSpeedMmin / decelerationRateMmin;
+                decelerationRate = initialSpeedMs / decelerationTime;
+            }
+            
+            try {
+                // 計算減速時放出的材料長度
+                const L_unwound_M = (initialSpeedMs / 2) * decelerationTime;
+                const L_unwound_mm = L_unwound_M * 1000;
+                const materialArea = L_unwound_mm * materialThicknessMm;
+
+                const targetRadiusMm = targetDiameterMm / 2;
+                const A_target = Math.PI * Math.pow(targetRadiusMm, 2);
+
+                const A_start = A_target + materialArea;
+
+                const startRadiusMm = Math.sqrt(A_start / Math.PI);
+                const startDiameterMm = startRadiusMm * 2;
+
+                // 顯示結果
+                resultText.innerHTML = `
+                    <p class="mb-2">為了讓放料捲最終停在 **${targetDiameterMm} mm**，</p>
+                    <p class="mb-2">你需要在放料捲直徑達到 **${startDiameterMm.toFixed(2)} mm** 時，開始減速。</p>
+                    <hr class="my-4">
+                    <p class="text-sm text-gray-500">減速所需時間：${decelerationTime.toFixed(2)} 秒</p>
+                    <p class="text-sm text-gray-500">減速速率：${decelerationRateMmin.toFixed(2)} M/min/s</p>
+                    <p class="text-sm text-gray-500">平均減速速率 (物理)：${decelerationRate.toFixed(4)} M/s²</p>
+                    <p class="text-sm text-gray-500">計算過程中會放出的材料長度：${L_unwound_M.toFixed(2)} M</p>
+                `;
+                resultContainer.classList.remove('hidden');
+            } catch (error) {
+                resultText.innerHTML = `<span class="text-red-600">發生錯誤：${error.message}</span>`;
+                resultContainer.classList.remove('hidden');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

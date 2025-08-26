@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式齒輪減速比計算器</title>
+    <!-- 引入 Tailwind CSS 確保響應式設計和美觀 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'Arial', 'sans-serif';
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 868px;
+        }
+        .stage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .stage-table th, .stage-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .stage-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        .stage-table td:last-child {
+            text-align: center;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            margin-top: 1.5rem;
+            max-width: 100%;
+            height: auto;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .input-group input {
+            width: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">互動式齒輪減速比計算器</h1>
+        <p class="text-center text-gray-600 mb-8">從馬達端開始，依序輸入每一級傳動的參數來計算總減速比，下方會即時顯示視覺圖示。</p>
+        
+        <!-- 動態生成傳動級數的表格 -->
+        <table class="stage-table">
+            <thead>
+                <tr>
+                    <th>項次</th>
+                    <th>傳動類型</th>
+                    <th>參數</th>
+                    <th>本級減速比</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="stages-table-body">
+                <!-- 傳動級數會在這裡被 JavaScript 動態生成 -->
+            </tbody>
+        </table>
+
+        <!-- 按鈕及總減速比顯示區 -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mt-8">
+            <button id="add-stage-btn" class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200">
+                新增一級
+            </button>
+            <div id="total-ratio-display" class="mt-4 sm:mt-0 text-xl font-bold text-gray-800">
+                總減速比: <span id="total-ratio" class="text-red-500">1</span>
+            </div>
+        </div>
+
+        <!-- 視覺化繪圖區 -->
+        <div class="mt-8 flex justify-center">
+            <canvas id="visual-canvas" width="800" height="200"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+        // 確保 DOM 加載完成後再執行腳本
+        document.addEventListener('DOMContentLoaded', () => {
+            // 獲取 DOM 元素
+            const stagesTableBody = document.getElementById('stages-table-body');
+            const addStageBtn = document.getElementById('add-stage-btn');
+            const totalRatioSpan = document.getElementById('total-ratio');
+            const canvas = document.getElementById('visual-canvas');
+            const ctx = canvas.getContext('2d');
+
+            let stageCount = 0;
+
+            // 創建單一傳動級數的表格行
+            function createStageRow(stageNumber) {
+                const tr = document.createElement('tr');
+                tr.dataset.stageId = stageNumber;
+                
+                let selectOptions = '';
+                let inputHtml = '';
+                
+                if (stageNumber === 1) {
+                    // 第一級只能是減速機
+                    selectOptions = `<option value="gearbox">減速機</option>`;
+                    inputHtml = `
+                        <input type="number" class="input-param-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="輸入減速比">
+                    `;
+                } else {
+                    // 後續級數可以是齒輪或皮帶輪
+                    selectOptions = `
+                        <option value="gear">齒輪</option>
+                        <option value="pulley">皮帶輪</option>
+                    `;
+                    inputHtml = `
+                        <div class="input-group">
+                            <input type="number" class="input-param-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="驅動齒數">
+                            <input type="number" class="input-param-2 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="被動齒數">
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td>${stageNumber}</td>
+                    <td>
+                        <select class="type-select w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            ${selectOptions}
+                        </select>
+                    </td>
+                    <td>
+                        ${inputHtml}
+                    </td>
+                    <td><span class="ratio-display font-semibold text-sm">---</span></td>
+                    <td><button class="delete-btn text-red-500 hover:text-red-700 transition-colors duration-200">刪除</button></td>
+                `;
+                return tr;
+            }
+
+            // 繪製視覺圖示
+            function drawVisuals() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const stageRows = stagesTableBody.querySelectorAll('tr');
+                let currentX = 50;
+                const centerY = canvas.height / 2;
+                const spacing = 40;
+
+                // 繪製馬達
+                ctx.fillStyle = '#6b7280';
+                ctx.fillRect(currentX, centerY - 20, 40, 40);
+                ctx.strokeStyle = '#6b7280';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(currentX, centerY - 20, 40, 40);
+                ctx.fillStyle = '#1f2937';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('馬達', currentX + 20, centerY);
+
+                currentX += 40 + spacing;
+
+                const params = Array.from(stageRows).map(row => {
+                    const type = row.querySelector('.type-select').value;
+                    const param1 = parseFloat(row.querySelector('.input-param-1')?.value);
+                    const param2 = parseFloat(row.querySelector('.input-param-2')?.value);
+                    return { type, param1, param2 };
+                });
+
+                params.forEach((paramObj, index) => {
+                    const { type, param1, param2 } = paramObj;
+
+                    if (type === 'gearbox' && !isNaN(param1) && param1 > 0) {
+                        // 繪製減速機方塊
+                        ctx.fillStyle = '#4b5563';
+                        ctx.fillRect(currentX, centerY - 25, 60, 50);
+                        ctx.strokeStyle = '#1f2937';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(currentX, centerY - 25, 60, 50);
+                        ctx.fillStyle = '#e5e7eb';
+                        ctx.font = '14px sans-serif';
+                        ctx.fillText('減速機', currentX + 30, centerY - 10);
+                        ctx.fillText(`1:${param1.toFixed(2)}`, currentX + 30, centerY + 10);
+                        currentX += 60 + spacing;
+
+                    } else if (type === 'gear' || type === 'pulley') {
+                        // 繪製齒輪/皮帶輪對
+                        if (!isNaN(param1) && !isNaN(param2) && param1 > 0 && param2 > 0) {
+                            const radiusA = Math.min(30, param1 / 2);
+                            const radiusB = Math.min(30, param2 / 2);
+                            
+                            // 輸入輪 (驅動輪)
+                            ctx.beginPath();
+                            ctx.arc(currentX + radiusA, centerY, radiusA, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#a8b6c4';
+                            ctx.fill();
+                            ctx.strokeStyle = '#374151';
+                            ctx.stroke();
+                            ctx.fillStyle = '#1f2937';
+                            ctx.font = '12px sans-serif';
+                            ctx.fillText(`In`, currentX + radiusA, centerY);
+                            ctx.closePath();
+
+                            currentX += radiusA * 2 + 10;
+
+                            // 輸出輪 (被動輪)
+                            ctx.beginPath();
+                            ctx.arc(currentX + radiusB, centerY, radiusB, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#a8b6c4';
+                            ctx.fill();
+                            ctx.strokeStyle = '#374151';
+                            ctx.stroke();
+                            ctx.fillStyle = '#1f2937';
+                            ctx.fillText(`Out`, currentX + radiusB, centerY);
+                            ctx.closePath();
+                            
+                            currentX += radiusB * 2 + spacing;
+                        } else {
+                             // 如果參數無效，則只畫一個空圓
+                            ctx.beginPath();
+                            ctx.arc(currentX + 20, centerY, 20, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#f3f4f6';
+                            ctx.fill();
+                            ctx.strokeStyle = '#9ca3af';
+                            ctx.stroke();
+                            ctx.closePath();
+                            currentX += 40 + spacing;
+                        }
+                    }
+                });
+            }
+
+            // 計算所有傳動級數的減速比並更新總減速比
+            function calculateAllRatios() {
+                const stages = stagesTableBody.querySelectorAll('tr');
+                let totalRatio = 1;
+                
+                stages.forEach((row, index) => {
+                    const type = row.querySelector('.type-select').value;
+                    const param1 = parseFloat(row.querySelector('.input-param-1')?.value);
+                    const param2 = parseFloat(row.querySelector('.input-param-2')?.value);
+                    const ratioDisplay = row.querySelector('.ratio-display');
+                    
+                    let stageRatio = 1;
+                    
+                    if (type === 'gearbox') {
+                        if (!isNaN(param1) && param1 > 0) {
+                            stageRatio = param1;
+                        } else {
+                            stageRatio = 1;
+                            ratioDisplay.textContent = '---';
+                            return;
+                        }
+                    } else if (type === 'gear' || type === 'pulley') {
+                        if (!isNaN(param1) && !isNaN(param2) && param1 > 0 && param2 > 0) {
+                            stageRatio = param2 / param1;
+                        } else {
+                            stageRatio = 1;
+                            ratioDisplay.textContent = '---';
+                            return;
+                        }
+                    }
+                    
+                    // 根據需求將本級減速比的顯示精度調整為小數點後第四位
+                    ratioDisplay.textContent = stageRatio.toFixed(4);
+                    totalRatio *= stageRatio;
+                });
+
+                totalRatioSpan.textContent = totalRatio.toFixed(4);
+                drawVisuals(); // 每次計算後重新繪製
+            }
+
+            // 新增傳動級數
+            function addStage() {
+                stageCount++;
+                const newRow = createStageRow(stageCount);
+                stagesTableBody.appendChild(newRow);
+
+                // 監聽新加入的輸入框和下拉選單
+                const inputs = newRow.querySelectorAll('.input-param-1, .input-param-2');
+                const select = newRow.querySelector('.type-select');
+                const deleteBtn = newRow.querySelector('.delete-btn');
+                
+                inputs.forEach(input => {
+                    input.addEventListener('input', calculateAllRatios);
+                });
+                
+                select?.addEventListener('change', () => {
+                    const selectedType = select.value;
+                    const paramContainer = newRow.querySelector('td:nth-child(3)');
+                    let newInputsHtml = '';
+                    
+                    if (selectedType === 'gear') {
+                        newInputsHtml = `
+                            <div class="input-group">
+                                <input type="number" class="input-param-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="驅動齒數">
+                                <input type="number" class="input-param-2 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="被動齒數">
+                            </div>
+                        `;
+                    } else if (selectedType === 'pulley') {
+                        newInputsHtml = `
+                            <div class="input-group">
+                                <input type="number" class="input-param-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="驅動圓周/直徑" step="0.0001">
+                                <input type="number" class="input-param-2 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="被動圓周/直徑" step="0.0001">
+                            </div>
+                        `;
+                    }
+                    paramContainer.innerHTML = newInputsHtml;
+                    const newInputs = paramContainer.querySelectorAll('input');
+                    newInputs.forEach(input => {
+                        input.addEventListener('input', calculateAllRatios);
+                    });
+                    
+                    calculateAllRatios();
+                });
+                
+                deleteBtn.addEventListener('click', () => {
+                    newRow.remove();
+                    // 重新排序項次
+                    const rows = stagesTableBody.querySelectorAll('tr');
+                    rows.forEach((row, index) => {
+                        row.querySelector('td:first-child').textContent = index + 1;
+                        row.dataset.stageId = index + 1;
+                        // 檢查第一行是否為減速機
+                        if (index === 0) {
+                            const selectElement = row.querySelector('.type-select');
+                            selectElement.innerHTML = `<option value="gearbox">減速機</option>`;
+                        }
+                    });
+                    stageCount = rows.length;
+                    calculateAllRatios();
+                });
+                
+                calculateAllRatios();
+            }
+
+            // 初始載入第一級傳動
+            addStage();
+            // 監聽新增按鈕點擊事件
+            addStageBtn.addEventListener('click', () => {
+                if (stageCount >= 5) {
+                    // Limit the number of stages for visual clarity
+                    return;
+                }
+                addStage();
+            });
+        });
+    </script>
+</body>
+</html>

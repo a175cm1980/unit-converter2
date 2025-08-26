@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>膜料長度計算機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        canvas {
+            background-color: #e2e8f0;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-4 my-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">膜料長度計算機</h1>
+        <p class="text-gray-600 text-center mb-6">請輸入A、B、C、D輪的直徑以及C、D輪的XY座標 (單位: mm)。</p>
+
+        <!-- Canvas for the visual representation -->
+        <div class="flex justify-center mb-6">
+            <canvas id="beltCanvas" class="w-full max-w-xl h-[400px]"></canvas>
+        </div>
+
+        <!-- Input fields for all wheel diameters and coordinates -->
+        <div class="space-y-4 mb-6">
+            <div class="flex items-center">
+                <label for="a_diameter" class="w-2/5 text-gray-700 text-right pr-4">A輪直徑:</label>
+                <input type="number" id="a_diameter" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 200" value="268">
+            </div>
+            <div class="flex items-center">
+                <label for="b_diameter" class="w-2/5 text-gray-700 text-right pr-4">B輪直徑:</label>
+                <input type="number" id="b_diameter" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 100" value="140">
+            </div>
+            <div class="flex items-center">
+                <label for="c_diameter" class="w-2/5 text-gray-700 text-right pr-4">C輪直徑:</label>
+                <input type="number" id="c_diameter" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 100" value="100">
+            </div>
+            <div class="flex items-center">
+                <label for="d_diameter" class="w-2/5 text-gray-700 text-right pr-4">D輪直徑:</label>
+                <input type="number" id="d_diameter" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 100" value="100">
+            </div>
+             <div class="flex items-center">
+                <label for="c_x" class="w-2/5 text-gray-700 text-right pr-4">C輪 X 座標:</label>
+                <input type="number" id="c_x" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: -171" value="-171">
+            </div>
+            <div class="flex items-center">
+                <label for="c_y" class="w-2/5 text-gray-700 text-right pr-4">C輪 Y 座標 (請輸入正值):</label>
+                <input type="number" id="c_y" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 325" value="325">
+            </div>
+             <div class="flex items-center">
+                <label for="d_x" class="w-2/5 text-gray-700 text-right pr-4">D輪 X 座標:</label>
+                <input type="number" id="d_x" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 190" value="190">
+            </div>
+            <div class="flex items-center">
+                <label for="d_y" class="w-2/5 text-gray-700 text-right pr-4">D輪 Y 座標 (請輸入正值):</label>
+                <input type="number" id="d_y" class="w-3/5 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例如: 360" value="360">
+            </div>
+        </div>
+
+        <!-- Calculation button -->
+        <div class="flex justify-center">
+            <button onclick="calculateLength()" class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                計算長度
+            </button>
+        </div>
+
+        <!-- Result display area -->
+        <div id="result" class="mt-8 p-4 bg-blue-100 text-blue-800 rounded-lg text-lg font-bold text-center hidden">
+            <!-- Result will be displayed here -->
+        </div>
+
+        <!-- Error message display area -->
+        <div id="error" class="mt-8 p-4 bg-red-100 text-red-800 rounded-lg text-lg font-bold text-center hidden">
+            <!-- Error messages will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Get canvas and its context
+        const canvas = document.getElementById('beltCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Function to normalize an angle to be between 0 and 2*PI
+        function normalizeAngle(angle) {
+            let normalized = angle % (2 * Math.PI);
+            if (normalized < 0) {
+                normalized += 2 * Math.PI;
+            }
+            return normalized;
+        }
+
+        // Function to draw the entire diagram
+        function drawDiagram(dA, dB, dC, dD, cX, cY, dX, dY) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate radii
+            const rA = dA / 2;
+            const rB = dB / 2;
+            const rC = dC / 2;
+            const rD = dD / 2;
+            
+            // Define the logical coordinates of wheel centers
+            const logicalXA = 0;
+            const logicalYA = 0;
+            const logicalXB = 0;
+            const logicalYB = logicalYA - (rA + rB);
+            // 將使用者輸入的正 Y 座標轉換為內部繪圖使用的負值
+            const logicalXC = cX;
+            const logicalYC = -cY; 
+            const logicalXD = dX;
+            const logicalYD = -dY;
+
+            // Calculate the total required diagram dimensions and find a suitable scale
+            const allX = [logicalXA, logicalXB, logicalXC, logicalXD];
+            const allY = [logicalYA, logicalYB, logicalYC, logicalYD];
+            const allR = [rA, rB, rC, rD];
+            
+            const minX = Math.min(...allX) - Math.max(...allR);
+            const maxX = Math.max(...allX) + Math.max(...allR);
+            const minY = Math.min(...allY) - Math.max(...allR);
+            const maxY = Math.max(...allY) + Math.max(...allR);
+
+            const diagramWidth = maxX - minX;
+            const diagramHeight = maxY - minY;
+            const padding = 50;
+
+            const scaleX = (canvas.width - padding) / diagramWidth;
+            const scaleY = (canvas.height - padding) / diagramHeight;
+            const scale = Math.min(scaleX, scaleY);
+
+            // Function to convert logical mm to canvas pixels with scaling
+            function toCanvas(value) {
+                return value * scale;
+            }
+
+            // Define the canvas origin to center the diagram
+            const xOffset = canvas.width / 2 - toCanvas((minX + maxX) / 2);
+            const yOffset = canvas.height / 2 - toCanvas((minY + maxY) / 2);
+
+            // Function to draw a wheel
+            function drawWheel(logicalX, logicalY, r, color, label) {
+                const x = xOffset + toCanvas(logicalX);
+                const y = yOffset + toCanvas(logicalY);
+                const radius = toCanvas(r) >= 0 ? toCanvas(r) : 0;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#000';
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, x, y);
+            }
+            
+            // Draw all wheels
+            drawWheel(logicalXA, logicalYA, rA, '#fff', 'A');
+            // 繪製A輪的座標
+            ctx.fillStyle = '#000';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`(0, 0)`, xOffset + toCanvas(logicalXA), yOffset + toCanvas(logicalYA) + 35);
+
+
+            drawWheel(logicalXB, logicalYB, rB, '#fff', 'B');
+            
+            drawWheel(logicalXC, logicalYC, rC, '#80c0c0', 'C');
+            // 繪製C輪的座標，使用使用者輸入的原始值
+            ctx.fillStyle = '#000';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`(${cX}, ${cY})`, xOffset + toCanvas(logicalXC), yOffset + toCanvas(logicalYC) - 35);
+            
+            drawWheel(logicalXD, logicalYD, rD, '#ffff00', 'D');
+            // 繪製D輪的座標，使用使用者輸入的原始值
+            ctx.fillStyle = '#000';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`(${dX}, ${dY})`, xOffset + toCanvas(logicalXD), yOffset + toCanvas(logicalYD) - 35);
+
+            // ----------------------------------------------------
+            // Calculate and draw the membrane path (purple)
+            // ----------------------------------------------------
+            
+            // --- Tangent line C to B (left side) ---
+            const distCB = Math.sqrt(Math.pow(logicalXC - logicalXB, 2) + Math.pow(logicalYC - logicalYB, 2));
+            const angleCB_center = Math.atan2(logicalYC - logicalYB, logicalXC - logicalXB);
+            const angleOffsetCB = Math.acos((rB - rC) / distCB);
+            
+            // Tangent point angle on B wheel for the left side
+            const tangentAngleB_C_point = angleCB_center - angleOffsetCB;
+
+            const tanPointB_C_x_logical = logicalXB + rB * Math.cos(tangentAngleB_C_point);
+            const tanPointB_C_y_logical = logicalYB + rB * Math.sin(tangentAngleB_C_point);
+            
+            const tanPointC_x_logical = logicalXC + rC * Math.cos(tangentAngleB_C_point);
+            const tanPointC_y_logical = logicalYC + rC * Math.sin(tangentAngleB_C_point);
+
+            // --- Tangent line B to D (right side) ---
+            const distDB = Math.sqrt(Math.pow(logicalXD - logicalXB, 2) + Math.pow(logicalYD - logicalYB, 2));
+            const angleDB_center = Math.atan2(logicalYD - logicalYB, logicalXD - logicalXB);
+            const angleOffsetDB = Math.acos((rB - rD) / distDB);
+
+            // Tangent point angle on B wheel for the right side
+            const tangentAngleB_D_point = angleDB_center + angleOffsetDB;
+
+            const tanPointB_D_x_logical = logicalXB + rB * Math.cos(tangentAngleB_D_point);
+            const tanPointB_D_y_logical = logicalYB + rB * Math.sin(tangentAngleB_D_point);
+            
+            const tanPointD_x_logical = logicalXD + rD * Math.cos(tangentAngleB_D_point);
+            const tanPointD_y_logical = logicalYD + rD * Math.sin(tangentAngleB_D_point);
+
+
+            // Draw the membrane path
+            ctx.strokeStyle = '#8b008b'; // Purple color
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            
+            // Line from C to B
+            ctx.moveTo(xOffset + toCanvas(tanPointC_x_logical), yOffset + toCanvas(tanPointC_y_logical));
+            ctx.lineTo(xOffset + toCanvas(tanPointB_C_x_logical), yOffset + toCanvas(tanPointB_C_y_logical));
+
+            // Arc on wheel B
+            const startAngleB = Math.atan2(tanPointB_C_y_logical - logicalYB, tanPointB_C_x_logical - logicalXB);
+            const endAngleB = Math.atan2(tanPointB_D_y_logical - logicalYB, tanPointB_D_x_logical - logicalXB);
+            
+            // Draw the counter-clockwise arc to trace the bottom path
+            ctx.arc(xOffset + toCanvas(logicalXB), yOffset + toCanvas(logicalYB), toCanvas(rB), startAngleB, endAngleB, true);
+            
+            // Line from B to D
+            ctx.lineTo(xOffset + toCanvas(tanPointD_x_logical), yOffset + toCanvas(tanPointD_y_logical));
+
+            ctx.stroke();
+        }
+
+        // Main calculation function
+        function calculateLength() {
+            // Get user input from the input fields
+            const dA = parseFloat(document.getElementById('a_diameter').value);
+            const dB = parseFloat(document.getElementById('b_diameter').value);
+            const dC = parseFloat(document.getElementById('c_diameter').value);
+            const dD = parseFloat(document.getElementById('d_diameter').value);
+            const cX = parseFloat(document.getElementById('c_x').value);
+            const cY = parseFloat(document.getElementById('c_y').value);
+            const dX = parseFloat(document.getElementById('d_x').value);
+            const dY = parseFloat(document.getElementById('d_y').value);
+
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            
+            // Hide previous results and errors
+            resultDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+            
+            // Validate input
+            if (isNaN(dA) || isNaN(dB) || isNaN(dC) || isNaN(dD) || isNaN(cX) || isNaN(cY) || isNaN(dX) || isNaN(dY) || dA <= 0 || dB <= 0 || dC <= 0 || dD <= 0) {
+                errorDiv.textContent = '請輸入有效的正數直徑和座標！';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Call the function to draw the updated diagram, converting user Y input to logical Y
+            drawDiagram(dA, dB, dC, dD, cX, cY, dX, dY);
+
+            // Calculate radii
+            const rA = dA / 2;
+            const rB = dB / 2;
+            const rC = dC / 2;
+            const rD = dD / 2;
+            
+            // Define the center coordinates for calculation
+            const xA = 0;
+            const yA = 0;
+            const xB = 0;
+            const yB = -(rA + rB);
+            
+            // Use logical (negative) Y coordinates for calculations
+            const logicalYC = -cY;
+            const logicalYD = -dY;
+            
+            // ----------------------------------------------------
+            // 1. Calculate the length of the tangent line from C to B
+            // ----------------------------------------------------
+            const distCB = Math.sqrt(Math.pow(cX - xB, 2) + Math.pow(logicalYC - yB, 2));
+            const tangentCB = Math.sqrt(Math.pow(distCB, 2) - Math.pow(rB - rC, 2));
+
+            // ----------------------------------------------------
+            // 2. Calculate the length of the tangent line from B to D
+            // ----------------------------------------------------
+            const distDB = Math.sqrt(Math.pow(dX - xB, 2) + Math.pow(logicalYD - yB, 2));
+            const tangentDB = Math.sqrt(Math.pow(distDB, 2) - Math.pow(rB - rD, 2));
+
+            // ----------------------------------------------------
+            // 3. Calculate the arc length on B wheel
+            // ----------------------------------------------------
+            const angleCB_center = Math.atan2(logicalYC - yB, cX - xB);
+            const angleDB_center = Math.atan2(logicalYD - yB, dX - xB);
+            
+            const angleOffsetC = Math.acos((rB - rC) / distCB);
+            const startAngleB = angleCB_center - angleOffsetC;
+            
+            const angleOffsetD = Math.acos((rB - rD) / distDB);
+            const endAngleB = angleDB_center + angleOffsetD;
+
+            // Ensure start and end angles are within a 0-2PI range for consistent calculation
+            const normalizedStartAngle = normalizeAngle(startAngleB);
+            const normalizedEndAngle = normalizeAngle(endAngleB);
+
+            // Calculate the angle of the shorter arc. The belt is on the outside, so it should be the smaller angle
+            const shortSweptAngle = Math.abs(normalizedEndAngle - normalizedStartAngle);
+            const sweptAngle = shortSweptAngle;
+            
+            const arcLengthB = rB * sweptAngle;
+
+            // ----------------------------------------------------
+            // 4. Calculate the final total length
+            // ----------------------------------------------------
+            const finalTotalLength = tangentCB + tangentDB + arcLengthB;
+
+            // Display the result
+            resultDiv.textContent = `總長度為: ${finalTotalLength.toFixed(2)} mm`;
+            resultDiv.classList.remove('hidden');
+        }
+        
+        // Initial drawing when the page loads
+        window.onload = function() {
+            // Adjust canvas size for responsiveness
+            function resizeCanvas() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                calculateLength(); // Recalculate and redraw on resize
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Initial calculation with default values
+            calculateLength();
+        };
+    </script>
+
+</body>
+</html>
