@@ -65,13 +65,15 @@
             width: 100%; /* 確保 canvas 寬度響應式 */
             height: auto;
         }
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .input-group input {
-            width: 50%;
+        /* 針對小螢幕，移除 input-group 的 flexbox 樣式，使其自動換行 */
+        @media (max-width: 640px) {
+            .input-group {
+                display: block; /* 讓內容垂直堆疊 */
+            }
+            .input-group input {
+                width: 100%; /* 讓輸入框佔滿整個寬度 */
+                margin-top: 0.5rem; /* 增加輸入框之間的間距 */
+            }
         }
     </style>
 </head>
@@ -159,6 +161,7 @@
                         <option value="gear">齒輪</option>
                         <option value="pulley">皮帶輪</option>
                     `;
+                    // 針對小螢幕使用 block 樣式，讓輸入框自動換行
                     inputHtml = `
                         <div class="input-group">
                             <input type="number" class="input-param-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="驅動齒數">
@@ -395,7 +398,4 @@
         });
     </script>
 </body>
-</html>
-</body>
-
 </html>
