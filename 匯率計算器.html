@@ -1,9 +1,8 @@
-
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>即時匯率查詢與換算</title>
+    <title>即時雙向匯率查詢與換算</title>
     <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 設置字體為 Inter -->
@@ -21,32 +20,10 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-<div class="bg-white p-8 rounded-2xl shadow-xl max-w-lg w-full transform transition-transform duration-500 hover:scale-105">
+<div class="bg-white p-8 rounded-2xl shadow-xl max-w-xl w-full transform transition-transform duration-500 hover:scale-105">
     <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">即時匯率查詢與換算</h1>
-        <p class="text-gray-500">查看新台幣（TWD）兌換其他貨幣的最新匯率</p>
-    </div>
-
-    <!-- 貨幣選擇區塊 -->
-    <div class="flex flex-col items-center mb-6">
-        <label for="currency-select" class="block text-lg font-medium text-gray-700 mb-2">選擇貨幣：</label>
-        <select id="currency-select" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg cursor-pointer">
-            <option value="USD">美元 (USD)</option>
-            <option value="JPY">日圓 (JPY)</option>
-            <option value="EUR">歐元 (EUR)</option>
-            <option value="GBP">英鎊 (GBP)</option>
-            <option value="AUD">澳幣 (AUD)</option>
-            <option value="CAD">加拿大幣 (CAD)</option>
-            <option value="CNY">人民幣 (CNY)</option>
-            <option value="KRW">韓圓 (KRW)</option>
-            <option value="HKD">港幣 (HKD)</option>
-            <option value="SGD">新加坡幣 (SGD)</option>
-            <option value="THB">泰銖 (THB)</option>
-            <option value="PHP">菲律賓披索 (PHP)</option>
-            <option value="IDR">印尼盾 (IDR)</option>
-            <option value="MYR">馬來西亞令吉 (MYR)</option>
-            <option value="VND">越南盾 (VND)</option>
-        </select>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">即時雙向匯率查詢與換算</h1>
+        <p class="text-gray-500">選擇貨幣並輸入金額，即可自動換算</p>
     </div>
 
     <!-- 匯率顯示區塊 -->
@@ -54,7 +31,7 @@
         <div id="loading-message" class="text-gray-500 text-lg">載入中...</div>
         <div id="result-container" class="hidden">
             <p class="text-xl font-medium text-gray-600 mb-2" id="exchange-rate-text">
-                1 TWD = <span id="exchange-rate" class="text-4xl font-extrabold text-blue-600">--</span> <span id="target-currency-symbol">USD</span>
+                1 <span id="base-currency-symbol">TWD</span> = <span id="exchange-rate" class="text-4xl font-extrabold text-blue-600">--</span> <span id="target-currency-symbol">USD</span>
             </p>
             <p class="text-sm text-gray-400" id="last-updated">更新時間：--</p>
         </div>
@@ -63,11 +40,71 @@
     <!-- 匯率計算器區塊 -->
     <div class="flex flex-col items-center p-6 bg-gray-50 rounded-2xl shadow-inner mb-6">
         <h3 class="text-2xl font-bold text-gray-700 mb-4">匯率計算器</h3>
-        <!-- 使用 flex-col 在小螢幕上垂直排列，使用 md:flex-row 在中等螢幕上水平排列 -->
+        
+        <!-- 輸入區塊 - 來源貨幣 -->
         <div class="flex flex-col md:flex-row items-center w-full mb-4">
-            <input type="number" id="twd-input" value="1" min="0" class="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg md:mr-2" />
-            <span class="text-lg font-medium text-gray-600 my-2 md:my-0">TWD =</span>
-            <input type="text" id="foreign-output" class="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg md:ml-2" readonly />
+            <div class="w-full md:w-1/2 flex items-center md:mr-2 mb-2 md:mb-0">
+                <input type="number" id="base-input" value="1" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg" />
+            </div>
+            <div class="w-full md:w-1/2 flex items-center md:ml-2">
+                <label for="base-currency-select" class="sr-only">選擇來源貨幣</label>
+                <select id="base-currency-select" class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg cursor-pointer">
+                    <option value="TWD">新台幣 (TWD)</option>
+                    <option value="USD">美元 (USD)</option>
+                    <option value="JPY">日圓 (JPY)</option>
+                    <option value="EUR">歐元 (EUR)</option>
+                    <option value="GBP">英鎊 (GBP)</option>
+                    <option value="AUD">澳幣 (AUD)</option>
+                    <option value="CAD">加拿大幣 (CAD)</option>
+                    <option value="CNY">人民幣 (CNY)</option>
+                    <option value="KRW">韓圓 (KRW)</option>
+                    <option value="HKD">港幣 (HKD)</option>
+                    <option value="SGD">新加坡幣 (SGD)</option>
+                    <option value="THB">泰銖 (THB)</option>
+                    <option value="PHP">菲律賓披索 (PHP)</option>
+                    <option value="IDR">印尼盾 (IDR)</option>
+                    <option value="MYR">馬來西亞令吉 (MYR)</option>
+                    <option value="VND">越南盾 (VND)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 交換按鈕 -->
+        <div class="flex justify-center my-4">
+            <button id="swap-button" class="p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <!-- SVG Icon for swap -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- 輸入區塊 - 目標貨幣 -->
+        <div class="flex flex-col md:flex-row items-center w-full">
+            <div class="w-full md:w-1/2 flex items-center md:mr-2 mb-2 md:mb-0">
+                <input type="number" id="target-input" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg" />
+            </div>
+            <div class="w-full md:w-1/2 flex items-center md:ml-2">
+                <label for="target-currency-select" class="sr-only">選擇目標貨幣</label>
+                <select id="target-currency-select" class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg cursor-pointer">
+                    <option value="TWD">新台幣 (TWD)</option>
+                    <option value="USD">美元 (USD)</option>
+                    <option value="JPY">日圓 (JPY)</option>
+                    <option value="EUR">歐元 (EUR)</option>
+                    <option value="GBP">英鎊 (GBP)</option>
+                    <option value="AUD">澳幣 (AUD)</option>
+                    <option value="CAD">加拿大幣 (CAD)</option>
+                    <option value="CNY">人民幣 (CNY)</option>
+                    <option value="KRW">韓圓 (KRW)</option>
+                    <option value="HKD">港幣 (HKD)</option>
+                    <option value="SGD">新加坡幣 (SGD)</option>
+                    <option value="THB">泰銖 (THB)</option>
+                    <option value="PHP">菲律賓披索 (PHP)</option>
+                    <option value="IDR">印尼盾 (IDR)</option>
+                    <option value="MYR">馬來西亞令吉 (MYR)</option>
+                    <option value="VND">越南盾 (VND)</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -82,21 +119,24 @@
 
 <script>
     // 獲取 DOM 元素
-    const selectElement = document.getElementById('currency-select');
+    const baseSelect = document.getElementById('base-currency-select');
+    const targetSelect = document.getElementById('target-currency-select');
     const loadingElement = document.getElementById('loading-message');
     const resultContainer = document.getElementById('result-container');
     const exchangeRateElement = document.getElementById('exchange-rate');
+    const baseCurrencySymbolElement = document.getElementById('base-currency-symbol');
     const targetCurrencySymbolElement = document.getElementById('target-currency-symbol');
     const lastUpdatedElement = document.getElementById('last-updated');
     const refreshButton = document.getElementById('refresh-button');
     const refreshText = document.getElementById('refresh-text');
+    const swapButton = document.getElementById('swap-button');
     
     // 獲取計算器 DOM 元素
-    const twdInput = document.getElementById('twd-input');
-    const foreignOutput = document.getElementById('foreign-output');
+    const baseInput = document.getElementById('base-input');
+    const targetInput = document.getElementById('target-input');
 
-    // API URL
-    const API_URL = 'https://api.exchangerate-api.com/v4/latest/TWD';
+    // API URL 的基礎部分
+    const API_BASE_URL = 'https://api.exchangerate-api.com/v4/latest/';
 
     let currentRate = 0; // 儲存當前匯率以供計算器使用
 
@@ -110,9 +150,23 @@
         refreshButton.disabled = true;
         refreshText.textContent = '載入中...';
 
+        const baseCurrency = baseSelect.value;
+        const targetCurrency = targetSelect.value;
+        
+        // 如果 targetCurrency 未定義或為空字串，則不進行 API 呼叫，避免錯誤。
+        if (!targetCurrency) {
+            console.error("錯誤: 目標貨幣未定義。");
+            loadingElement.textContent = '無法獲取資料，請重新選擇貨幣。';
+            refreshButton.disabled = false;
+            refreshText.textContent = '刷新';
+            return;
+        }
+
+        const apiUrl = API_BASE_URL + baseCurrency;
+
         try {
             // 發送 API 請求
-            const response = await fetch(API_URL);
+            const response = await fetch(apiUrl);
             // 檢查請求是否成功
             if (!response.ok) {
                 throw new Error(`HTTP 錯誤! 狀態: ${response.status}`);
@@ -121,18 +175,17 @@
             const data = await response.json();
             const rates = data.rates;
 
-            // 獲取當前選擇的貨幣
-            const selectedCurrency = selectElement.value;
             // 獲取對應的匯率
-            const rate = rates[selectedCurrency];
+            const rate = rates[targetCurrency];
 
             if (rate) {
                 // 更新當前匯率變數
                 currentRate = rate;
                 
                 // 更新匯率、貨幣符號和更新時間
-                exchangeRateElement.textContent = rate.toFixed(4); // 將匯率取到小數點後四位
-                targetCurrencySymbolElement.textContent = selectedCurrency;
+                exchangeRateElement.textContent = rate.toFixed(4);
+                baseCurrencySymbolElement.textContent = baseCurrency;
+                targetCurrencySymbolElement.textContent = targetCurrency;
                 const date = new Date(data.date);
                 lastUpdatedElement.textContent = `更新時間：${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 
@@ -141,10 +194,10 @@
                 resultContainer.classList.remove('hidden');
 
                 // 在獲取新匯率後更新計算器
-                updateCalculator();
+                updateTargetInput();
             } else {
                 // 如果找不到匯率，顯示錯誤訊息
-                throw new Error(`找不到 ${selectedCurrency} 的匯率。`);
+                throw new Error(`找不到 ${targetCurrency} 的匯率。`);
             }
         } catch (error) {
             // 處理錯誤
@@ -160,27 +213,62 @@
     }
     
     /**
-     * 更新匯率計算器
+     * 更新目標輸入框的金額 (從來源貨幣計算)
      */
-    function updateCalculator() {
-        const amount = parseFloat(twdInput.value) || 0;
+    function updateTargetInput() {
+        const amount = parseFloat(baseInput.value) || 0;
         const convertedAmount = amount * currentRate;
-        foreignOutput.value = convertedAmount.toFixed(4);
+        targetInput.value = convertedAmount.toFixed(4);
+    }
+
+    /**
+     * 更新來源輸入框的金額 (從目標貨幣反向計算)
+     */
+    function updateBaseInput() {
+        const amount = parseFloat(targetInput.value) || 0;
+        const convertedAmount = amount / currentRate;
+        baseInput.value = convertedAmount.toFixed(4);
+    }
+    
+    /**
+     * 交換來源貨幣和目標貨幣
+     */
+    function swapCurrencies() {
+        const tempBase = baseSelect.value;
+        baseSelect.value = targetSelect.value;
+        targetSelect.value = tempBase;
+        fetchExchangeRate();
     }
 
     // 當下拉選單的選項改變時，重新獲取匯率
-    selectElement.addEventListener('change', fetchExchangeRate);
+    baseSelect.addEventListener('change', fetchExchangeRate);
+    targetSelect.addEventListener('change', fetchExchangeRate);
 
     // 當刷新按鈕被點擊時，重新獲取匯率
     refreshButton.addEventListener('click', fetchExchangeRate);
+    
+    // 當交換按鈕被點擊時，交換貨幣
+    swapButton.addEventListener('click', swapCurrencies);
 
-    // 當 TWD 輸入框的值改變時，重新計算
-    twdInput.addEventListener('input', updateCalculator);
+    // 當來源輸入框的值改變時，更新目標輸入框
+    baseInput.addEventListener('input', updateTargetInput);
+
+    // 當目標輸入框的值改變時，反向更新來源輸入框
+    targetInput.addEventListener('input', updateBaseInput);
 
     // 頁面載入時，立即獲取匯率
-    document.addEventListener('DOMContentLoaded', fetchExchangeRate);
+    document.addEventListener('DOMContentLoaded', () => {
+        // 設定初始值，確保 TWD 和 USD 不相同
+        baseSelect.value = 'TWD';
+        targetSelect.value = 'USD';
+        fetchExchangeRate();
+    });
 
 </script>
 
 </body>
+</html>
+
+</body>
+
 </html>
