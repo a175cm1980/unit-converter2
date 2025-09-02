@@ -1,0 +1,282 @@
+DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電容串聯與並聯計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .capacitor-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .capacitor-input-group input {
+            flex-grow: 1;
+        }
+        .capacitor-svg {
+            width: 100%;
+            height: 300px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        path, line {
+            stroke: #2d3748;
+            stroke-width: 2;
+        }
+        text {
+            fill: #4a5568;
+            font-weight: 600;
+        }
+        rect {
+            fill: #edf2f7;
+            stroke: #2d3748;
+            stroke-width: 2;
+        }
+        .capacitor-rect {
+            fill: #4a90e2; /* 藍色電容 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="container mx-auto p-6 bg-white rounded-2xl shadow-xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">電容計算器</h1>
+        <p class="text-center text-gray-500 mb-6">輸入電容容量，選擇連接方式，並查看總電容與電路圖。</p>
+
+        <div class="flex flex-col md:flex-row gap-8 mb-8">
+            <!-- 輸入控制區塊 -->
+            <div class="w-full md:w-1/2 p-6 bg-gray-50 rounded-xl shadow-inner">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">設定電容</h2>
+                
+                <!-- 模式選擇 -->
+                <div class="mb-6">
+                    <label class="block text-gray-600 font-medium mb-2">連接方式</label>
+                    <div class="flex flex-col gap-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="mode" value="parallel" checked class="form-radio text-blue-600 rounded-full" />
+                            <span class="ml-2 text-gray-700">並聯 (總容量相加)</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="mode" value="series" class="form-radio text-blue-600 rounded-full" />
+                            <span class="ml-2 text-gray-700">$$串聯 (1/C_{total} = 1/C_1 + 1/C_2 + ...)$$</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 電容輸入容器 -->
+                <div id="capacitorInputs" class="space-y-4">
+                    <!-- JavaScript 將在這裡動態生成輸入欄位 -->
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button id="addCapacitorBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-colors duration-200">
+                        增加電容
+                    </button>
+                </div>
+
+                <!-- 新增文字大小控制 -->
+                <div class="mt-6 p-4 bg-gray-100 rounded-lg">
+                    <label for="fontSizeSlider" class="block text-gray-600 font-medium mb-2">圖形文字大小</label>
+                    <input type="range" id="fontSizeSlider" min="10" max="30" value="20" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                    <span id="fontSizeValue" class="text-gray-500 text-sm mt-1 block">20px</span>
+                </div>
+
+                <div class="mt-6 p-4 bg-blue-100 rounded-lg border-l-4 border-blue-500">
+                    <p class="text-lg font-bold text-blue-800">總電容 (C_total):</p>
+                    <p id="result" class="text-2xl font-extrabold text-blue-900 mt-1"></p>
+                </div>
+            </div>
+
+            <!-- 圖形顯示區塊 -->
+            <div class="w-full md:w-1/2 p-6 bg-gray-50 rounded-xl shadow-inner flex flex-col items-center justify-center">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">電路圖</h2>
+                <div id="diagramContainer" class="w-full">
+                    <!-- SVG 電路圖將在這裡顯示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 確保 LaTeX 渲染
+        document.addEventListener('DOMContentLoaded', () => {
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+            script.async = true;
+            document.head.appendChild(script);
+        });
+
+        const capacitorInputsDiv = document.getElementById('capacitorInputs');
+        const addCapacitorBtn = document.getElementById('addCapacitorBtn');
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const resultElement = document.getElementById('result');
+        const diagramContainer = document.getElementById('diagramContainer');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+
+        let capacitorCount = 0;
+
+        // 函式：新增一個電容輸入欄位
+        function addCapacitorInput() {
+            capacitorCount++;
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('capacitor-input-group');
+            inputGroup.innerHTML = `
+                <label for="c${capacitorCount}" class="text-gray-700 font-medium">C${capacitorCount}:</label>
+                <input type="number" id="c${capacitorCount}" class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-right" placeholder="0.0">
+                <span class="text-gray-500">μF</span>
+            `;
+            capacitorInputsDiv.appendChild(inputGroup);
+
+            // 監聽新輸入欄位的變化
+            inputGroup.querySelector('input').addEventListener('input', updateCalculation);
+            updateDiagram();
+        }
+
+        // 函式：更新計算結果
+        function updateCalculation() {
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const inputs = document.querySelectorAll('#capacitorInputs input');
+            let totalCapacitance = 0;
+            const values = [];
+
+            inputs.forEach(input => {
+                const value = parseFloat(input.value);
+                if (!isNaN(value) && value > 0) {
+                    values.push(value);
+                }
+            });
+
+            if (mode === 'parallel') {
+                // 並聯：總容量相加
+                totalCapacitance = values.reduce((sum, val) => sum + val, 0);
+            } else { // series
+                // 串聯：$$1/C_{total} = \sum (1/C_i)$$
+                const sumOfReciprocals = values.reduce((sum, val) => sum + (1 / val), 0);
+                totalCapacitance = sumOfReciprocals !== 0 ? 1 / sumOfReciprocals : 0;
+            }
+
+            resultElement.textContent = `${totalCapacitance.toFixed(4)} μF`;
+            updateDiagram(values);
+        }
+
+        // 函式：更新電路圖
+        function updateDiagram(values = []) {
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const count = document.querySelectorAll('#capacitorInputs input').length;
+            const fontSize = fontSizeSlider.value;
+            
+            let svgContent = '';
+            const width = 800;
+            const height = 300;
+            const margin = 50;
+            const componentSpacing = 60;
+            const componentWidth = 30;
+
+            if (mode === 'parallel') {
+                // 並聯圖形
+                let parallelSVG = `<svg viewBox="0 0 ${width} ${height}" class="capacitor-svg">`;
+                parallelSVG += `<path d="M ${margin},${height / 2} L ${width - margin},${height / 2}" stroke-dasharray="8 4" stroke-width="1"/>`; // 參考線
+                
+                const spacing = (width - 2 * margin - count * componentWidth) / (count + 1);
+                
+                // 電池符號
+                parallelSVG += `<line x1="30" y1="${height/2 - 20}" x2="30" y2="${height/2 - 50}" stroke-width="3" stroke-linecap="round"/>`;
+                parallelSVG += `<line x1="30" y1="${height/2 + 20}" x2="30" y2="${height/2 + 50}" stroke-width="1.5" stroke-linecap="round"/>`;
+                parallelSVG += `<text x="15" y="${height/2 + 70}" font-size="${fontSize}px">電源</text>`;
+
+                parallelSVG += `<line x1="30" y1="${height/2 - 50}" x2="${width - 30}" y2="${height/2 - 50}"/>`; // 上方總線
+                parallelSVG += `<line x1="30" y1="${height/2 + 50}" x2="${width - 30}" y2="${height/2 + 50}"/>`; // 下方總線
+
+                for (let i = 0; i < count; i++) {
+                    const xPos = margin + spacing * (i + 1) + componentWidth * i;
+                    // 連接線
+                    parallelSVG += `<line x1="${xPos + componentWidth / 2}" y1="${height / 2 - 50}" x2="${xPos + componentWidth / 2}" y2="${height / 2 - 20}"/>`;
+                    parallelSVG += `<line x1="${xPos + componentWidth / 2}" y1="${height / 2 + 50}" x2="${xPos + componentWidth / 2}" y2="${height / 2 + 20}"/>`;
+                    // 電容符號
+                    parallelSVG += `<line x1="${xPos}" y1="${height / 2 - 20}" x2="${xPos + componentWidth}" y2="${height / 2 - 20}"/>`;
+                    parallelSVG += `<line x1="${xPos}" y1="${height / 2 + 20}" x2="${xPos + componentWidth}" y2="${height / 2 + 20}"/>`;
+                    // 電容標籤
+                    const labelText = `C${i + 1}`;
+                    const valueText = values[i] !== undefined ? `${values[i]}μF` : '';
+                    parallelSVG += `<text x="${xPos + componentWidth/2}" y="${height / 2}" text-anchor="middle" dominant-baseline="middle" font-size="${fontSize}px">${labelText}</text>`;
+                    if (valueText) {
+                        parallelSVG += `<text x="${xPos + componentWidth/2}" y="${height / 2 + 80}" text-anchor="middle" dominant-baseline="middle" font-size="${fontSize}px">${valueText}</text>`;
+                    }
+                }
+
+                parallelSVG += `</svg>`;
+                svgContent = parallelSVG;
+
+            } else { // 串聯圖形
+                let seriesSVG = `<svg viewBox="0 0 ${width} ${height}" class="capacitor-svg">`;
+                seriesSVG += `<path d="M ${margin},${height / 2} L ${width - margin},${height / 2}" stroke-dasharray="8 4" stroke-width="1"/>`; // 參考線
+
+                const totalComponentLength = count * componentSpacing + componentWidth;
+                const startX = (width - totalComponentLength) / 2;
+
+                // 電池符號
+                seriesSVG += `<line x1="${startX - 30}" y1="${height/2 - 20}" x2="${startX - 30}" y2="${height/2 - 50}" stroke-width="3" stroke-linecap="round"/>`;
+                seriesSVG += `<line x1="${startX - 30}" y1="${height/2 + 20}" x2="${startX - 30}" y2="${height/2 + 50}" stroke-width="1.5" stroke-linecap="round"/>`;
+                seriesSVG += `<text x="${startX - 45}" y="${height/2 + 70}" font-size="${fontSize}px">電源</text>`;
+                
+                seriesSVG += `<line x1="${startX - 30}" y1="${height/2 - 50}" x2="${startX-20}" y2="${height/2 - 50}"/>`;
+                seriesSVG += `<line x1="${startX - 30}" y1="${height/2 + 50}" x2="${startX-20}" y2="${height/2 + 50}"/>`;
+                
+                seriesSVG += `<path d="M ${startX-20},${height/2} L ${startX},${height/2}"/>`;
+
+                let currentX = startX;
+                for (let i = 0; i < count; i++) {
+                    // 電容符號
+                    seriesSVG += `<line x1="${currentX}" y1="${height / 2 - 20}" x2="${currentX}" y2="${height / 2 + 20}"/>`;
+                    seriesSVG += `<line x1="${currentX + componentWidth}" y1="${height / 2 - 20}" x2="${currentX + componentWidth}" y2="${height / 2 + 20}"/>`;
+                    // 電容標籤
+                    const labelText = `C${i + 1}`;
+                    const valueText = values[i] !== undefined ? `${values[i]}μF` : '';
+                    seriesSVG += `<text x="${currentX + componentWidth / 2}" y="${height / 2 - 30}" text-anchor="middle" dominant-baseline="middle" font-size="${fontSize}px">${labelText}</text>`;
+                    if (valueText) {
+                        seriesSVG += `<text x="${currentX + componentWidth / 2}" y="${height / 2 + 40}" text-anchor="middle" dominant-baseline="middle" font-size="${fontSize}px">${valueText}</text>`;
+                    }
+                    
+                    // 連接線
+                    seriesSVG += `<path d="M ${currentX + componentWidth},${height / 2} L ${currentX + componentSpacing},${height / 2}"/>`;
+                    currentX += componentSpacing;
+                }
+                seriesSVG += `<path d="M ${currentX - 30},${height/2} L ${width-30},${height/2}"/>`;
+                seriesSVG += `<path d="M ${width-30},${height/2} L ${width-30},${height/2-50}"/>`;
+                seriesSVG += `<path d="M ${width-30},${height/2} L ${width-30},${height/2+50}"/>`;
+                seriesSVG += `</svg>`;
+                svgContent = seriesSVG;
+            }
+
+            diagramContainer.innerHTML = svgContent;
+        }
+
+        // 初始化：預設顯示兩個電容
+        addCapacitorInput();
+        addCapacitorInput();
+
+        // 事件監聽器
+        addCapacitorBtn.addEventListener('click', addCapacitorInput);
+        modeRadios.forEach(radio => radio.addEventListener('change', updateCalculation));
+        fontSizeSlider.addEventListener('input', (event) => {
+            fontSizeValue.textContent = `${event.target.value}px`;
+            updateCalculation();
+        });
+
+        // 初始計算
+        updateCalculation();
+    </script>
+</body>
+</html>
