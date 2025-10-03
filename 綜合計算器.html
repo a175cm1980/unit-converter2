@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>綜合計算器</title>
+    <title data-i18n="app_title">綜合計算器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -42,39 +42,44 @@
 </head>
 <body>
     <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6 transition-all duration-300">
-        <h1 class="text-3xl font-extrabold text-center text-gray-900">綜合計算器</h1>
-        <p class="text-center text-gray-600">請選擇您要執行的計算或單位轉換。</p>
+        
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-3xl font-extrabold text-gray-900" data-i18n="app_title">綜合計算器</h1>
+            <button id="lang-toggle-btn" class="py-1 px-3 text-sm rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition duration-150" data-i18n="lang_toggle_zh">English</button>
+        </div>
+        
+        <p class="text-center text-gray-600" data-i18n="app_subtitle">請選擇您要執行的計算或單位轉換。</p>
         
         <div class="space-y-4">
             <!-- 主要計算功能選擇按鈕 -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">選擇計算模式</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="select_mode">選擇計算模式</label>
                 <div class="mt-1 flex flex-wrap justify-center gap-2">
-                    <button id="calc-power-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">功率 (P)</button>
-                    <button id="calc-voltage-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">電壓 (V)</button>
-                    <button id="calc-current-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">電流 (I)</button>
-                    <button id="calc-torque-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">扭矩 (T)</button>
-                    <button id="calc-conversion-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 active-btn whitespace-nowrap">N/m 轉 kgf/m</button>
-                    <button id="calc-trig-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">三角函數</button>
-                    <button id="calc-hyp-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">直角斜邊</button>
-                    <button id="calc-area-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">面積計算</button>
-                    <button id="calc-non-right-tri-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">非直角斜邊</button>
-                    <button id="calc-arc-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">弧長計算</button>
-                    <button id="calc-line-speed-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">線速度</button>
-                    <button id="calc-inverter-hz-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap">變頻器HZ</button>
+                    <button id="calc-power-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_power">功率 (P)</button>
+                    <button id="calc-voltage-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_voltage">電壓 (V)</button>
+                    <button id="calc-current-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_current">電流 (I)</button>
+                    <button id="calc-torque-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_torque">扭矩 (T)</button>
+                    <button id="calc-conversion-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 active-btn whitespace-nowrap" data-i18n="mode_conversion">N/m 轉 kgf/m</button>
+                    <button id="calc-trig-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_trig">三角函數</button>
+                    <button id="calc-hyp-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_hyp">直角斜邊</button>
+                    <button id="calc-area-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_area">面積計算</button>
+                    <button id="calc-non-right-tri-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_non_right_tri">非直角斜邊</button>
+                    <button id="calc-arc-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_arc">弧長計算</button>
+                    <button id="calc-line-speed-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_line_speed">線速度</button>
+                    <button id="calc-inverter-hz-btn" class="calc-mode-btn flex-1 py-2 px-3 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700 whitespace-nowrap" data-i18n="mode_inverter_hz">變頻器HZ</button>
                 </div>
             </div>
 
             <!-- 單位轉換輸入組 (預設激活) -->
             <div id="input-conversion" class="input-group active">
-                <label for="conversion-type" class="block text-sm font-medium text-gray-700">選擇轉換類型</label>
+                <label for="conversion-type" class="block text-sm font-medium text-gray-700" data-i18n="conversion_select_label">選擇轉換類型</label>
                 <select id="conversion-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <option value="nm_to_kgf">扭矩：N/m 轉換為 kgf/m</option>
-                    <option value="kgf_to_nm">扭矩：kgf/m 轉換為 N/m</option>
+                    <option value="nm_to_kgf" data-i18n="conversion_nm_to_kgf">扭矩：N/m 轉換為 kgf/m</option>
+                    <option value="kgf_to_nm" data-i18n="conversion_kgf_to_nm">扭矩：kgf/m 轉換為 N/m</option>
                 </select>
-                <label for="conversion-input" class="block text-sm font-medium text-gray-700 mt-4">輸入數值</label>
+                <label for="conversion-input" class="block text-sm font-medium text-gray-700 mt-4" data-i18n="conversion_input_label">輸入數值</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="conversion-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="請輸入數值">
+                    <input type="number" id="conversion-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="conversion_input_placeholder" placeholder="請輸入數值">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span id="conversion-unit-label" class="text-gray-500 sm:text-sm">N/m</span>
                     </div>
@@ -83,24 +88,24 @@
 
             <!-- 功率/電壓/電流/RPM 輸入組 (可共用) -->
             <div id="input-power-calc" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">請輸入其中兩項數值來計算第三項。</p>
-                <label for="power-input" class="block text-sm font-medium text-gray-700">功率 (P)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="power_prompt">請輸入其中兩項數值來計算第三項。</p>
+                <label for="power-input" class="block text-sm font-medium text-gray-700" data-i18n="power_P_label">功率 (P)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="power-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="瓦特">
+                    <input type="number" id="power-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="power_input_placeholder" placeholder="瓦特">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">W</span>
                     </div>
                 </div>
-                <label for="voltage-input" class="block text-sm font-medium text-gray-700">電壓 (V)</label>
+                <label for="voltage-input" class="block text-sm font-medium text-gray-700" data-i18n="power_V_label">電壓 (V)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="voltage-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="伏特">
+                    <input type="number" id="voltage-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="voltage_input_placeholder" placeholder="伏特">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">V</span>
                     </div>
                 </div>
-                <label for="current-input" class="block text-sm font-medium text-gray-700">電流 (I)</label>
+                <label for="current-input" class="block text-sm font-medium text-gray-700" data-i18n="power_I_label">電流 (I)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="current-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="安培">
+                    <input type="number" id="current-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="current_input_placeholder" placeholder="安培">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">A</span>
                     </div>
@@ -109,17 +114,17 @@
 
             <!-- 扭矩輸入組 (需要功率 P 和轉速 RPM) -->
             <div id="input-torque-calc" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">請輸入功率和轉速以計算扭矩 (Nm)。</p>
-                <label for="torque-power-input" class="block text-sm font-medium text-gray-700">功率 (P)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="torque_prompt">請輸入功率和轉速以計算扭矩 (Nm)。</p>
+                <label for="torque-power-input" class="block text-sm font-medium text-gray-700" data-i18n="torque_P_label">功率 (P)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="torque-power-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="瓦特">
+                    <input type="number" id="torque-power-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="torque_power_placeholder" placeholder="瓦特">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">W</span>
                     </div>
                 </div>
-                <label for="rpm-input" class="block text-sm font-medium text-gray-700">轉速 (RPM)</label>
+                <label for="rpm-input" class="block text-sm font-medium text-gray-700" data-i18n="torque_RPM_label">轉速 (RPM)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="每分鐘轉數">
+                    <input type="number" id="rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="torque_rpm_placeholder" placeholder="每分鐘轉數">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">RPM</span>
                     </div>
@@ -128,9 +133,9 @@
 
             <!-- 三角函數輸入組 -->
             <div id="input-trig" class="input-group">
-                <label for="angle-input" class="block text-sm font-medium text-gray-700">角度</label>
+                <label for="angle-input" class="block text-sm font-medium text-gray-700" data-i18n="trig_angle_label">角度</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="度數">
+                    <input type="number" id="angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="trig_angle_placeholder" placeholder="度數">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">°</span>
                     </div>
@@ -144,17 +149,17 @@
 
             <!-- 直角三角形斜邊 (畢氏定理) 輸入組 -->
             <div id="input-hyp" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">計算直角三角形斜邊 $c = \sqrt{a^2 + b^2}$</p>
-                <label for="hyp-a-input" class="block text-sm font-medium text-gray-700">直角邊 a (mm)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="hyp_prompt">計算直角三角形斜邊 $c = \sqrt{a^2 + b^2}$</p>
+                <label for="hyp-a-input" class="block text-sm font-medium text-gray-700" data-i18n="hyp_a_label">直角邊 a (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="hyp-a-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="邊長 a">
+                    <input type="number" id="hyp-a-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="hyp_a_placeholder" placeholder="邊長 a">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="hyp-b-input" class="block text-sm font-medium text-gray-700">直角邊 b (mm)</label>
+                <label for="hyp-b-input" class="block text-sm font-medium text-gray-700" data-i18n="hyp_b_label">直角邊 b (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="hyp-b-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="邊長 b">
+                    <input type="number" id="hyp-b-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="hyp_b_placeholder" placeholder="邊長 b">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
@@ -164,24 +169,24 @@
 
             <!-- 非直角三角形斜邊 (餘弦定理) 輸入組 -->
             <div id="input-non-right-tri" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">計算邊 $c$ (餘弦定理): $c^2 = a^2 + b^2 - 2ab \cos(\theta)$</p>
-                <label for="non-right-a-input" class="block text-sm font-medium text-gray-700">邊長 a (mm)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="non_right_prompt">計算邊 $c$ (餘弦定理): $c^2 = a^2 + b^2 - 2ab \cos(\theta)$</p>
+                <label for="non-right-a-input" class="block text-sm font-medium text-gray-700" data-i18n="non_right_a_label">邊長 a (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="non-right-a-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="邊長 a">
+                    <input type="number" id="non-right-a-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="non_right_a_placeholder" placeholder="邊長 a">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="non-right-b-input" class="block text-sm font-medium text-gray-700">邊長 b (mm)</label>
+                <label for="non-right-b-input" class="block text-sm font-medium text-gray-700" data-i18n="non_right_b_label">邊長 b (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="non-right-b-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="邊長 b">
+                    <input type="number" id="non-right-b-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="non_right_b_placeholder" placeholder="邊長 b">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="non-right-angle-input" class="block text-sm font-medium text-gray-700">夾角 &theta; (度)</label>
+                <label for="non-right-angle-input" class="block text-sm font-medium text-gray-700" data-i18n="non_right_angle_label">夾角 &theta; (度)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="non-right-angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="角度">
+                    <input type="number" id="non-right-angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="non_right_angle_placeholder" placeholder="角度">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">°</span>
                     </div>
@@ -191,17 +196,17 @@
 
             <!-- 弧長計算輸入組 -->
             <div id="input-arc" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">計算弧長 $L = R \times \theta \times (\pi / 180)$</p>
-                <label for="radius-input" class="block text-sm font-medium text-gray-700">半徑 (mm)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="arc_prompt">計算弧長 $L = R \times \theta \times (\pi / 180)$</p>
+                <label for="radius-input" class="block text-sm font-medium text-gray-700" data-i18n="arc_radius_label">半徑 (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="radius-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="半徑">
+                    <input type="number" id="radius-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="arc_radius_placeholder" placeholder="半徑">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="arc-angle-input" class="block text-sm font-medium text-gray-700">角度 (度)</label>
+                <label for="arc-angle-input" class="block text-sm font-medium text-gray-700" data-i18n="arc_angle_label">角度 (度)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="arc-angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="度數">
+                    <input type="number" id="arc-angle-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="arc_angle_placeholder" placeholder="度數">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">°</span>
                     </div>
@@ -212,25 +217,25 @@
             <!-- 面積計算輸入組 (包含形狀選擇) -->
             <div id="input-area" class="input-group">
                 <div class="flex flex-wrap justify-center gap-2 mt-4">
-                    <button id="calc-rect-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-blue-600 text-white active-btn">矩形</button>
-                    <button id="calc-tri-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700">三角形</button>
-                    <button id="calc-trap-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700">梯形</button>
-                    <button id="calc-rhombus-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700">菱形</button>
+                    <button id="calc-rect-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-blue-600 text-white active-btn" data-i18n="area_rect">矩形</button>
+                    <button id="calc-tri-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700" data-i18n="area_tri">三角形</button>
+                    <button id="calc-trap-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700" data-i18n="area_trap">梯形</button>
+                    <button id="calc-rhombus-btn" class="area-mode-btn flex-1 py-2 px-4 rounded-md font-medium transition duration-150 ease-in-out text-sm border-2 border-transparent bg-gray-200 text-gray-700" data-i18n="area_rhombus">菱形</button>
                 </div>
 
                 <!-- 矩形輸入 -->
                 <div id="input-rect" class="mt-4">
-                    <p class="text-sm font-semibold text-blue-600 mb-2">矩形面積: $A = L \times W$</p>
-                    <label for="rect-length-input" class="block text-sm font-medium text-gray-700">長度</label>
+                    <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="area_rect_prompt">矩形面積: $A = L \times W$</p>
+                    <label for="rect-length-input" class="block text-sm font-medium text-gray-700" data-i18n="area_rect_L_label">長度</label>
                     <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                        <input type="number" id="rect-length-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="長度">
+                        <input type="number" id="rect-length-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_rect_L_placeholder" placeholder="長度">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
                     </div>
-                    <label for="rect-width-input" class="block text-sm font-medium text-gray-700">寬度</label>
+                    <label for="rect-width-input" class="block text-sm font-medium text-gray-700" data-i18n="area_rect_W_label">寬度</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="number" id="rect-width-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="寬度">
+                        <input type="number" id="rect-width-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_rect_W_placeholder" placeholder="寬度">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
@@ -239,17 +244,17 @@
 
                 <!-- 三角形輸入 -->
                 <div id="input-tri" class="mt-4 hidden">
-                    <p class="text-sm font-semibold text-blue-600 mb-2">三角形面積: $A = (\text{底} \times \text{高}) / 2$</p>
-                    <label for="tri-base-input" class="block text-sm font-medium text-gray-700">底</label>
+                    <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="area_tri_prompt">三角形面積: $A = (\text{底} \times \text{高}) / 2$</p>
+                    <label for="tri-base-input" class="block text-sm font-medium text-gray-700" data-i18n="area_tri_base_label">底</label>
                     <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                        <input type="number" id="tri-base-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="底">
+                        <input type="number" id="tri-base-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_tri_base_placeholder" placeholder="底">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
                     </div>
-                    <label for="tri-height-input" class="block text-sm font-medium text-gray-700">高</label>
+                    <label for="tri-height-input" class="block text-sm font-medium text-gray-700" data-i18n="area_tri_height_label">高</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="number" id="tri-height-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="高">
+                        <input type="number" id="tri-height-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_tri_height_placeholder" placeholder="高">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
@@ -258,24 +263,24 @@
 
                 <!-- 梯形輸入 -->
                 <div id="input-trap" class="mt-4 hidden">
-                    <p class="text-sm font-semibold text-blue-600 mb-2">梯形面積: $A = (\text{上底} + \text{下底}) \times \text{高} / 2$</p>
-                    <label for="trap-base1-input" class="block text-sm font-medium text-gray-700">上底</label>
+                    <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="area_trap_prompt">梯形面積: $A = (\text{上底} + \text{下底}) \times \text{高} / 2$</p>
+                    <label for="trap-base1-input" class="block text-sm font-medium text-gray-700" data-i18n="area_trap_base1_label">上底</label>
                     <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                        <input type="number" id="trap-base1-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="上底">
+                        <input type="number" id="trap-base1-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_trap_base1_placeholder" placeholder="上底">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
                     </div>
-                    <label for="trap-base2-input" class="block text-sm font-medium text-gray-700">下底</label>
+                    <label for="trap-base2-input" class="block text-sm font-medium text-gray-700" data-i18n="area_trap_base2_label">下底</label>
                     <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                        <input type="number" id="trap-base2-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="下底">
+                        <input type="number" id="trap-base2-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_trap_base2_placeholder" placeholder="下底">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
                     </div>
-                    <label for="trap-height-input" class="block text-sm font-medium text-gray-700">高</label>
+                    <label for="trap-height-input" class="block text-sm font-medium text-gray-700" data-i18n="area_trap_height_label">高</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="number" id="trap-height-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="高">
+                        <input type="number" id="trap-height-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_trap_height_placeholder" placeholder="高">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
@@ -284,17 +289,17 @@
 
                 <!-- 菱形輸入 -->
                 <div id="input-rhombus" class="mt-4 hidden">
-                    <p class="text-sm font-semibold text-blue-600 mb-2">菱形面積: $A = (\text{對角線}_1 \times \text{對角線}_2) / 2$</p>
-                    <label for="rhombus-diag1-input" class="block text-sm font-medium text-gray-700">對角線 1</label>
+                    <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="area_rhombus_prompt">菱形面積: $A = (\text{對角線}_1 \times \text{對角線}_2) / 2$</p>
+                    <label for="rhombus-diag1-input" class="block text-sm font-medium text-gray-700" data-i18n="area_rhombus_diag1_label">對角線 1</label>
                     <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                        <input type="number" id="rhombus-diag1-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="對角線 1">
+                        <input type="number" id="rhombus-diag1-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_rhombus_diag1_placeholder" placeholder="對角線 1">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
                     </div>
-                    <label for="rhombus-diag2-input" class="block text-sm font-medium text-gray-700">對角線 2</label>
+                    <label for="rhombus-diag2-input" class="block text-sm font-medium text-gray-700" data-i18n="area_rhombus_diag2_label">對角線 2</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="number" id="rhombus-diag2-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="對角線 2">
+                        <input type="number" id="rhombus-diag2-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="area_rhombus_diag2_placeholder" placeholder="對角線 2">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <span class="text-gray-500 sm:text-sm">mm</span>
                         </div>
@@ -305,17 +310,17 @@
 
             <!-- 線速度輸入組 -->
             <div id="input-line-speed" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">計算線速度: $V = \text{圓周} \times \text{RPM}$</p>
-                <label for="circumference-input" class="block text-sm font-medium text-gray-700">作業圓周 (mm)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="line_speed_prompt">計算線速度: $V = \text{圓周} \times \text{RPM}$</p>
+                <label for="circumference-input" class="block text-sm font-medium text-gray-700" data-i18n="line_speed_circumference_label">作業圓周 (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="circumference-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="圓周長">
+                    <input type="number" id="circumference-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="line_speed_circumference_placeholder" placeholder="圓周長">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="line-speed-rpm-input" class="block text-sm font-medium text-gray-700">轉速 (RPM)</label>
+                <label for="line-speed-rpm-input" class="block text-sm font-medium text-gray-700" data-i18n="line_speed_rpm_label">轉速 (RPM)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="line-speed-rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="每分鐘轉數">
+                    <input type="number" id="line-speed-rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="line_speed_rpm_placeholder" placeholder="每分鐘轉數">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">RPM</span>
                     </div>
@@ -324,31 +329,31 @@
 
             <!-- 變頻器HZ計算輸入組 -->
             <div id="input-inverter-hz" class="input-group">
-                <p class="text-sm font-semibold text-blue-600 mb-2">根據目標速度計算所需變頻器 HZ。</p>
-                <label for="max-hz-input" class="block text-sm font-medium text-gray-700">最高頻率 (HZ)</label>
+                <p class="text-sm font-semibold text-blue-600 mb-2" data-i18n="inverter_hz_prompt">根據目標速度計算所需變頻器 HZ。</p>
+                <label for="max-hz-input" class="block text-sm font-medium text-gray-700" data-i18n="inverter_max_hz_label">最高頻率 (HZ)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="max-hz-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="例如: 60">
+                    <input type="number" id="max-hz-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="inverter_max_hz_placeholder" placeholder="例如: 60">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">HZ</span>
                     </div>
                 </div>
-                <label for="wheel-circumference-input" class="block text-sm font-medium text-gray-700">作業輪圓周 (mm)</label>
+                <label for="wheel-circumference-input" class="block text-sm font-medium text-gray-700" data-i18n="inverter_wheel_label">作業輪圓周 (mm)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="wheel-circumference-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="例如: 314">
+                    <input type="number" id="wheel-circumference-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="inverter_wheel_placeholder" placeholder="例如: 314">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm</span>
                     </div>
                 </div>
-                <label for="motor-rpm-input" class="block text-sm font-medium text-gray-700">馬達轉速 (RPM)</label>
+                <label for="motor-rpm-input" class="block text-sm font-medium text-gray-700" data-i18n="inverter_motor_rpm_label">馬達轉速 (RPM)</label>
                 <div class="mt-1 relative rounded-md shadow-sm mb-3">
-                    <input type="number" id="motor-rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="例如: 1800">
+                    <input type="number" id="motor-rpm-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="inverter_motor_rpm_placeholder" placeholder="例如: 1800">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">RPM</span>
                     </div>
                 </div>
-                <label for="working-speed-input" class="block text-sm font-medium text-gray-700">目標作業速度 (mm/min)</label>
+                <label for="working-speed-input" class="block text-sm font-medium text-gray-700" data-i18n="inverter_speed_label">目標作業速度 (mm/min)</label>
                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" id="working-speed-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="目標速度">
+                    <input type="number" id="working-speed-input" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" data-i18n-placeholder="inverter_speed_placeholder" placeholder="目標速度">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">mm/min</span>
                     </div>
@@ -356,17 +361,330 @@
             </div>
         </div>
         
-        <button id="calculate-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+        <button id="calculate-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" data-i18n="btn_calculate">
             執行計算
         </button>
         
-        <div id="result-message" class="mt-4 text-center p-3 rounded-lg bg-indigo-50 border-2 border-indigo-300 text-xl font-bold text-gray-800 transition duration-300 ease-in-out min-h-[50px]">
+        <div id="result-message" class="mt-4 text-center p-3 rounded-lg bg-indigo-50 border-2 border-indigo-300 text-xl font-bold text-gray-800 transition duration-300 ease-in-out min-h-[50px]" data-i18n="initial_message">
             請選擇一個計算功能並輸入數值。
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 國際化 (i18n) 字典 ---
+            const i18n = {
+                zh: {
+                    // 全域
+                    app_title: '綜合計算器',
+                    app_subtitle: '請選擇您要執行的計算或單位轉換。',
+                    lang_toggle_zh: 'English',
+                    select_mode: '選擇計算模式',
+                    btn_calculate: '執行計算',
+                    initial_message: '請選擇一個計算功能並輸入數值。',
+                    invalid_input: '請輸入有效的數值。',
+                    calculation_error: '計算錯誤，請檢查輸入數值是否正確。',
+                    zero_division_error: '除數不能為零。',
+                    
+                    // 模式按鈕
+                    mode_power: '功率 (P)',
+                    mode_voltage: '電壓 (V)',
+                    mode_current: '電流 (I)',
+                    mode_torque: '扭矩 (T)',
+                    mode_conversion: 'N/m 轉 kgf/m',
+                    mode_trig: '三角函數',
+                    mode_hyp: '直角斜邊',
+                    mode_area: '面積計算',
+                    mode_non_right_tri: '非直角斜邊',
+                    mode_arc: '弧長計算',
+                    mode_line_speed: '線速度',
+                    mode_inverter_hz: '變頻器HZ',
+
+                    // 轉換
+                    conversion_select_label: '選擇轉換類型',
+                    conversion_nm_to_kgf: '扭矩：N/m 轉換為 kgf/m',
+                    conversion_kgf_to_nm: '扭矩：kgf/m 轉換為 N/m',
+                    conversion_input_label: '輸入數值',
+                    conversion_input_placeholder: '請輸入數值',
+                    conversion_result_nm_to_kgf: (v1, v2) => `扭矩: ${v1} N/m = ${v2} kgf/m`,
+                    conversion_result_kgf_to_nm: (v1, v2) => `扭矩: ${v1} kgf/m = ${v2} N/m`,
+                    conversion_positive_error: '請輸入有效的正數值進行轉換。',
+                    
+                    // PVI 計算
+                    power_prompt: '請輸入其中兩項數值來計算第三項。',
+                    power_P_label: '功率 (P)',
+                    power_V_label: '電壓 (V)',
+                    power_I_label: '電流 (I)',
+                    power_input_placeholder: '瓦特',
+                    voltage_input_placeholder: '伏特',
+                    current_input_placeholder: '安培',
+                    power_result: (v, i, p) => `功率 P = V × I = ${v} V × ${i} A = ${p} W`,
+                    voltage_result: (p, i, v) => `電壓 V = P / I = ${p} W / ${i} A = ${v} V`,
+                    current_result: (p, v, i) => `電流 I = P / V = ${p} W / ${v} V = ${i} A`,
+                    power_missing_error: '計算功率需要電壓和電流。',
+                    voltage_missing_error: '計算電壓需要功率和電流。',
+                    current_missing_error: '計算電流需要功率和電壓。',
+                    input_two_required: '請輸入至少兩項數值。',
+
+                    // 扭矩計算
+                    torque_prompt: '請輸入功率和轉速以計算扭矩 (Nm)。',
+                    torque_P_label: '功率 (P)',
+                    torque_RPM_label: '轉速 (RPM)',
+                    torque_power_placeholder: '瓦特',
+                    torque_rpm_placeholder: '每分鐘轉數',
+                    torque_result: (nm, kgfm) => `扭矩 T = ${nm} N/m<br/>約等於 ${kgfm} kgf/m`,
+                    torque_input_error: '計算扭矩需要有效的功率 (W) 和轉速 (RPM > 0)。',
+
+                    // 三角函數
+                    trig_angle_label: '角度',
+                    trig_angle_placeholder: '度數',
+                    trig_result: (func, angle, result) => `${func}(${angle}°): ${result}`,
+
+                    // 直角斜邊
+                    hyp_prompt: '計算直角三角形斜邊 $c = \\sqrt{a^2 + b^2}$',
+                    hyp_a_label: '直角邊 a (mm)',
+                    hyp_b_label: '直角邊 b (mm)',
+                    hyp_a_placeholder: '邊長 a',
+                    hyp_b_placeholder: '邊長 b',
+                    hyp_input_error: '請輸入有效的直角邊長 a 和 b。',
+                    hyp_result: (c) => `斜邊 c = $\\sqrt{a^2 + b^2} = ${c}$ mm`,
+
+                    // 非直角斜邊
+                    non_right_prompt: '計算邊 $c$ (餘弦定理): $c^2 = a^2 + b^2 - 2ab \\cos(\\theta)$',
+                    non_right_a_label: '邊長 a (mm)',
+                    non_right_b_label: '邊長 b (mm)',
+                    non_right_angle_label: '夾角 $\\theta$ (度)',
+                    non_right_a_placeholder: '邊長 a',
+                    non_right_b_placeholder: '邊長 b',
+                    non_right_angle_placeholder: '角度',
+                    non_right_input_error: '請輸入有效的邊長 a、b 和 0° 到 180° 之間的夾角。',
+                    non_right_triangle_error: '無法構成三角形 (計算結果為負)。',
+                    non_right_result: (c) => `第三邊 c (斜邊) = ${c} mm`,
+
+                    // 弧長
+                    arc_prompt: '計算弧長 $L = R \\times \\theta \\times (\\pi / 180)$',
+                    arc_radius_label: '半徑 (mm)',
+                    arc_angle_label: '角度 (度)',
+                    arc_radius_placeholder: '半徑',
+                    arc_angle_placeholder: '度數',
+                    arc_input_error: '請輸入有效的半徑 (>0) 和角度 (>=0)。',
+                    arc_result: (l) => `弧長 L = ${l} mm`,
+                    
+                    // 線速度
+                    line_speed_prompt: '計算線速度: $V = \\text{圓周} \\times \\text{RPM}$',
+                    line_speed_circumference_label: '作業圓周 (mm)',
+                    line_speed_rpm_label: '轉速 (RPM)',
+                    line_speed_circumference_placeholder: '圓周長',
+                    line_speed_rpm_placeholder: '每分鐘轉數',
+                    line_speed_input_error: '請輸入有效的圓周長 (>0) 和轉速 (>=0)。',
+                    line_speed_result: (s) => `線速度 = ${s} mm/min`,
+
+                    // 變頻器HZ
+                    inverter_hz_prompt: '根據目標速度計算所需變頻器 HZ。',
+                    inverter_max_hz_label: '最高頻率 (HZ)',
+                    inverter_wheel_label: '作業輪圓周 (mm)',
+                    inverter_motor_rpm_label: '馬達轉速 (RPM)',
+                    inverter_speed_label: '目標作業速度 (mm/min)',
+                    inverter_max_hz_placeholder: '例如: 60',
+                    inverter_wheel_placeholder: '例如: 314',
+                    inverter_motor_rpm_placeholder: '例如: 1800',
+                    inverter_speed_placeholder: '目標速度',
+                    inverter_input_error: '請輸入所有有效的數值 (必須大於 0)。',
+                    inverter_max_speed: (speed) => `最大線速度: ${speed} mm/min`,
+                    inverter_required_hz: (hz) => `所需 HZ: ${hz} HZ`,
+                    inverter_over_max_hz: (hz, max_hz) => `<span class="text-red-600">所需 HZ: ${hz} HZ (超過最高頻率 ${max_hz} HZ)</span>`,
+
+                    // 面積
+                    area_rect: '矩形',
+                    area_tri: '三角形',
+                    area_trap: '梯形',
+                    area_rhombus: '菱形',
+                    area_rect_prompt: '矩形面積: $A = L \\times W$',
+                    area_tri_prompt: '三角形面積: $A = (\\text{底} \\times \\text{高}) / 2$',
+                    area_trap_prompt: '梯形面積: $A = (\\text{上底} + \\text{下底}) \\times \\text{高} / 2$',
+                    area_rhombus_prompt: '菱形面積: $A = (\\text{對角線}_1 \\times \\text{對角線}_2) / 2$',
+                    area_rect_L_label: '長度',
+                    area_rect_W_label: '寬度',
+                    area_tri_base_label: '底',
+                    area_tri_height_label: '高',
+                    area_trap_base1_label: '上底',
+                    area_trap_base2_label: '下底',
+                    area_trap_height_label: '高',
+                    area_rhombus_diag1_label: '對角線 1',
+                    area_rhombus_diag2_label: '對角線 2',
+                    area_rect_L_placeholder: '長度',
+                    area_rect_W_placeholder: '寬度',
+                    area_tri_base_placeholder: '底',
+                    area_tri_height_placeholder: '高',
+                    area_trap_base1_placeholder: '上底',
+                    area_trap_base2_placeholder: '下底',
+                    area_trap_height_placeholder: '高',
+                    area_rhombus_diag1_placeholder: '對角線 1',
+                    area_rhombus_diag2_placeholder: '對角線 2',
+                    area_input_error: '請輸入有效的長度/寬度 (或底/高/對角線)。',
+                    area_rect_result: (a) => `矩形面積: ${a} $mm^2$`,
+                    area_tri_result: (a) => `三角形面積: ${a} $mm^2$`,
+                    area_trap_result: (a) => `梯形面積: ${a} $mm^2$`,
+                    area_rhombus_result: (a) => `菱形面積: ${a} $mm^2$`,
+                },
+                en: {
+                    // Global
+                    app_title: 'Engineering Calculator',
+                    app_subtitle: 'Select a calculation or unit conversion.',
+                    lang_toggle_zh: '中文',
+                    select_mode: 'Select Mode',
+                    btn_calculate: 'Calculate',
+                    initial_message: 'Please select a function and enter values.',
+                    invalid_input: 'Please enter valid numbers.',
+                    calculation_error: 'Calculation error, please check input values.',
+                    zero_division_error: 'Divisor cannot be zero.',
+
+                    // Mode Buttons
+                    mode_power: 'Power (P)',
+                    mode_voltage: 'Voltage (V)',
+                    mode_current: 'Current (I)',
+                    mode_torque: 'Torque (T)',
+                    mode_conversion: 'N/m to kgf/m',
+                    mode_trig: 'Trigonometry',
+                    mode_hyp: 'Right Hypotenuse',
+                    mode_area: 'Area Calculation',
+                    mode_non_right_tri: 'Non-Right Hyp.',
+                    mode_arc: 'Arc Length',
+                    mode_line_speed: 'Linear Speed',
+                    mode_inverter_hz: 'Inverter HZ',
+
+                    // Conversion
+                    conversion_select_label: 'Select Conversion Type',
+                    conversion_nm_to_kgf: 'Torque: N/m to kgf/m',
+                    conversion_kgf_to_nm: 'Torque: kgf/m to N/m',
+                    conversion_input_label: 'Input Value',
+                    conversion_input_placeholder: 'Enter Value',
+                    conversion_result_nm_to_kgf: (v1, v2) => `Torque: ${v1} N/m = ${v2} kgf/m`,
+                    conversion_result_kgf_to_nm: (v1, v2) => `Torque: ${v1} kgf/m = ${v2} N/m`,
+                    conversion_positive_error: 'Please enter a valid positive value for conversion.',
+                    
+                    // PVI Calculation
+                    power_prompt: 'Enter two values to calculate the third one.',
+                    power_P_label: 'Power (P)',
+                    power_V_label: 'Voltage (V)',
+                    power_I_label: 'Current (I)',
+                    power_input_placeholder: 'Watts',
+                    voltage_input_placeholder: 'Volts',
+                    current_input_placeholder: 'Amps',
+                    power_result: (v, i, p) => `Power P = V × I = ${v} V × ${i} A = ${p} W`,
+                    voltage_result: (p, i, v) => `Voltage V = P / I = ${p} W / ${i} A = ${v} V`,
+                    current_result: (p, v, i) => `Current I = P / V = ${p} W / ${v} V = ${i} A`,
+                    power_missing_error: 'Voltage and Current are required for Power.',
+                    voltage_missing_error: 'Power and Current are required for Voltage.',
+                    current_missing_error: 'Power and Voltage are required for Current.',
+                    input_two_required: 'Please enter at least two values.',
+
+                    // Torque Calculation
+                    torque_prompt: 'Enter Power and RPM to calculate Torque (Nm).',
+                    torque_P_label: 'Power (P)',
+                    torque_RPM_label: 'Speed (RPM)',
+                    torque_power_placeholder: 'Watts',
+                    torque_rpm_placeholder: 'Revolutions Per Minute',
+                    torque_result: (nm, kgfm) => `Torque T = ${nm} N/m<br/>Approx ${kgfm} kgf/m`,
+                    torque_input_error: 'Valid Power (W) and Speed (RPM > 0) are required for Torque.',
+
+                    // Trigonometry
+                    trig_angle_label: 'Angle',
+                    trig_angle_placeholder: 'Degrees',
+                    trig_result: (func, angle, result) => `${func}(${angle}°): ${result}`,
+
+                    // Right Hypotenuse
+                    hyp_prompt: 'Calculate right triangle hypotenuse $c = \\sqrt{a^2 + b^2}$',
+                    hyp_a_label: 'Leg a (mm)',
+                    hyp_b_label: 'Leg b (mm)',
+                    hyp_a_placeholder: 'Side length a',
+                    hyp_b_placeholder: 'Side length b',
+                    hyp_input_error: 'Please enter valid lengths for legs a and b.',
+                    hyp_result: (c) => `Hypotenuse c = $\\sqrt{a^2 + b^2} = ${c}$ mm`,
+
+                    // Non-Right Hypotenuse
+                    non_right_prompt: 'Calculate side $c$ (Law of Cosines): $c^2 = a^2 + b^2 - 2ab \\cos(\\theta)$',
+                    non_right_a_label: 'Side a (mm)',
+                    non_right_b_label: 'Side b (mm)',
+                    non_right_angle_label: 'Included Angle $\\theta$ (Deg)',
+                    non_right_a_placeholder: 'Side length a',
+                    non_right_b_placeholder: 'Side length b',
+                    non_right_angle_placeholder: 'Angle',
+                    non_right_input_error: 'Please enter valid side lengths a, b, and an angle between 0° and 180°.',
+                    non_right_triangle_error: 'Cannot form a triangle (result is negative).',
+                    non_right_result: (c) => `Third side c (Hypotenuse) = ${c} mm`,
+
+                    // Arc Length
+                    arc_prompt: 'Calculate arc length $L = R \\times \\theta \\times (\\pi / 180)$',
+                    arc_radius_label: 'Radius (mm)',
+                    arc_angle_label: 'Angle (Deg)',
+                    arc_radius_placeholder: 'Radius',
+                    arc_angle_placeholder: 'Degrees',
+                    arc_input_error: 'Please enter a valid radius (>0) and angle (>=0).',
+                    arc_result: (l) => `Arc Length L = ${l} mm`,
+                    
+                    // Linear Speed
+                    line_speed_prompt: 'Calculate Linear Speed: $V = \\text{Circumference} \\times \\text{RPM}$',
+                    line_speed_circumference_label: 'Working Circumference (mm)',
+                    line_speed_rpm_label: 'Speed (RPM)',
+                    line_speed_circumference_placeholder: 'Circumference',
+                    line_speed_rpm_placeholder: 'Revolutions Per Minute',
+                    line_speed_input_error: 'Please enter a valid circumference (>0) and speed (>=0).',
+                    line_speed_result: (s) => `Linear Speed = ${s} mm/min`,
+
+                    // Inverter HZ
+                    inverter_hz_prompt: 'Calculate required Inverter HZ based on target speed.',
+                    inverter_max_hz_label: 'Max Frequency (HZ)',
+                    inverter_wheel_label: 'Wheel Circumference (mm)',
+                    inverter_motor_rpm_label: 'Motor Speed (RPM)',
+                    inverter_speed_label: 'Target Working Speed (mm/min)',
+                    inverter_max_hz_placeholder: 'e.g.: 60',
+                    inverter_wheel_placeholder: 'e.g.: 314',
+                    inverter_motor_rpm_placeholder: 'e.g.: 1800',
+                    inverter_speed_placeholder: 'Target Speed',
+                    inverter_input_error: 'Please enter all valid values (must be greater than 0).',
+                    inverter_max_speed: (speed) => `Max Linear Speed: ${speed} mm/min`,
+                    inverter_required_hz: (hz) => `Required HZ: ${hz} HZ`,
+                    inverter_over_max_hz: (hz, max_hz) => `<span class="text-red-600">Required HZ: ${hz} HZ (Exceeds Max Frequency ${max_hz} HZ)</span>`,
+
+                    // Area
+                    area_rect: 'Rectangle',
+                    area_tri: 'Triangle',
+                    area_trap: 'Trapezoid',
+                    area_rhombus: 'Rhombus',
+                    area_rect_prompt: 'Rectangle Area: $A = L \\times W$',
+                    area_tri_prompt: 'Triangle Area: $A = (\\text{Base} \\times \\text{Height}) / 2$',
+                    area_trap_prompt: 'Trapezoid Area: $A = (\\text{Base}_1 + \\text{Base}_2) \\times \\text{Height} / 2$',
+                    area_rhombus_prompt: 'Rhombus Area: $A = (\\text{Diagonal}_1 \\times \\text{Diagonal}_2) / 2$',
+                    area_rect_L_label: 'Length',
+                    area_rect_W_label: 'Width',
+                    area_tri_base_label: 'Base',
+                    area_tri_height_label: 'Height',
+                    area_trap_base1_label: 'Base 1 (Top)',
+                    area_trap_base2_label: 'Base 2 (Bottom)',
+                    area_trap_height_label: 'Height',
+                    area_rhombus_diag1_label: 'Diagonal 1',
+                    area_rhombus_diag2_label: 'Diagonal 2',
+                    area_rect_L_placeholder: 'Length',
+                    area_rect_W_placeholder: 'Width',
+                    area_tri_base_placeholder: 'Base',
+                    area_tri_height_placeholder: 'Height',
+                    area_trap_base1_placeholder: 'Top Base',
+                    area_trap_base2_placeholder: 'Bottom Base',
+                    area_trap_height_placeholder: 'Height',
+                    area_rhombus_diag1_placeholder: 'Diagonal 1',
+                    area_rhombus_diag2_placeholder: 'Diagonal 2',
+                    area_input_error: 'Please enter valid lengths/widths (or base/height/diagonals).',
+                    area_rect_result: (a) => `Rectangle Area: ${a} $mm^2$`,
+                    area_tri_result: (a) => `Triangle Area: ${a} $mm^2$`,
+                    area_trap_result: (a) => `Trapezoid Area: ${a} $mm^2$`,
+                    area_rhombus_result: (a) => `Rhombus Area: ${a} $mm^2$`,
+                }
+            };
+
+            // --- 狀態管理 ---
+            let currentLang = 'zh'; 
+            
             // --- 常數定義 ---
             const NM_TO_KGFM = 0.101971621; // 1 Nm ≈ 0.10197 kgf·m
             const KGFM_TO_NM = 9.80665;    // 1 kgf·m = 9.80665 Nm
@@ -374,23 +692,18 @@
             // --- 元素獲取 ---
             const resultMessage = document.getElementById('result-message');
             const calculateBtn = document.getElementById('calculate-btn');
+            const langToggleBtn = document.getElementById('lang-toggle-btn');
             const calcButtons = document.querySelectorAll('.calc-mode-btn');
             const inputGroups = document.querySelectorAll('.input-group');
             const canvases = document.querySelectorAll('canvas');
 
             // 獲取所有按鈕 (簡化獲取過程)
-            const calcPowerBtn = document.getElementById('calc-power-btn');
-            const calcVoltageBtn = document.getElementById('calc-voltage-btn');
-            const calcCurrentBtn = document.getElementById('calc-current-btn');
-            const calcTorqueBtn = document.getElementById('calc-torque-btn');
-            const calcConversionBtn = document.getElementById('calc-conversion-btn');
-            const calcTrigBtn = document.getElementById('calc-trig-btn');
-            const calcAreaBtn = document.getElementById('calc-area-btn');
-            const calcHypBtn = document.getElementById('calc-hyp-btn');
-            const calcNonRightTriBtn = document.getElementById('calc-non-right-tri-btn');
-            const calcArcBtn = document.getElementById('calc-arc-btn');
-            const calcLineSpeedBtn = document.getElementById('calc-line-speed-btn');
-            const calcInverterHzBtn = document.getElementById('calc-inverter-hz-btn');
+            const calcButtonsMap = {
+                'calc-power-btn': 'power', 'calc-voltage-btn': 'voltage', 'calc-current-btn': 'current',
+                'calc-torque-btn': 'torque', 'calc-conversion-btn': 'conversion', 'calc-trig-btn': 'trig',
+                'calc-hyp-btn': 'hyp', 'calc-area-btn': 'area', 'calc-non-right-tri-btn': 'non-right-tri',
+                'calc-arc-btn': 'arc', 'calc-line-speed-btn': 'line-speed', 'calc-inverter-hz-btn': 'inverter-hz'
+            };
 
             // 獲取所有輸入組
             const inputPowerCalcGroup = document.getElementById('input-power-calc');
@@ -424,8 +737,6 @@
             const wheelCircumferenceInput = document.getElementById('wheel-circumference-input');
             const motorRpmInput = document.getElementById('motor-rpm-input');
             const workingSpeedInput = document.getElementById('working-speed-input');
-            
-            // ** 修正：補上三角形輸入框的變數宣告 **
             const triBaseInput = document.getElementById('tri-base-input'); 
             const triHeightInput = document.getElementById('tri-height-input');
 
@@ -461,26 +772,40 @@
 
             // --- 輔助函數：數字格式化和錯誤處理 ---
             function formatNumber(num) {
-                if (num === null || isNaN(num) || !isFinite(num)) return '無效數值';
+                if (num === null || isNaN(num) || !isFinite(num)) return i18n[currentLang].invalid_input;
                 return num.toFixed(4).replace(/\.?0+$/, "");
             }
+            
+            // --- 國際化核心功能 ---
+            function setLanguage(lang) {
+                currentLang = lang;
+                const dictionary = i18n[lang];
 
-            function clearInputs() {
-                inputGroups.forEach(group => {
-                    const inputs = group.querySelectorAll('input[type="number"], select');
-                    inputs.forEach(input => input.value = '');
+                // 1. 翻譯所有 data-i18n 屬性
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dictionary[key]) {
+                        el.textContent = dictionary[key];
+                    }
                 });
-            }
 
-            function showCanvas(canvasElement) {
-                canvases.forEach(c => c.style.display = 'none');
-                if (canvasElement) {
-                    canvasElement.style.display = 'block';
-                    // 確保 Canvas 在顯示時大小正確
-                    const containerWidth = canvasElement.parentNode.clientWidth;
-                    canvasElement.width = containerWidth;
-                    canvasElement.height = Math.min(containerWidth * 0.5, 200); // 設置最大高度
-                }
+                // 2. 翻譯所有 data-i18n-placeholder 屬性
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (dictionary[key]) {
+                        el.setAttribute('placeholder', dictionary[key]);
+                    }
+                });
+
+                // 3. 翻譯特定元素，如 Select Options
+                document.getElementById('conversion-type').options[0].textContent = dictionary.conversion_nm_to_kgf;
+                document.getElementById('conversion-type').options[1].textContent = dictionary.conversion_kgf_to_nm;
+                
+                // 4. 更新語言切換按鈕文字 (顯示切換後的語言名稱)
+                langToggleBtn.textContent = dictionary.lang_toggle_zh;
+
+                // 5. 重新執行一次計算，以更新結果訊息的語言
+                calculate();
             }
 
             // --- UI 狀態切換函數 ---
@@ -493,7 +818,7 @@
                 // 隱藏所有輸入組和 Canvas
                 inputGroups.forEach(group => group.classList.remove('active'));
                 showCanvas(null); 
-                resultMessage.textContent = '點擊「執行計算」查看結果。';
+                resultMessage.textContent = i18n[currentLang].initial_message;
 
                 // 顯示對應的輸入組
                 switch (type) {
@@ -507,6 +832,12 @@
                         break;
                     case 'conversion':
                         inputConversionGroup.classList.add('active');
+                        // 確保單位標籤語言正確
+                        if (conversionTypeSelect.value === 'nm_to_kgf') {
+                            conversionUnitLabel.textContent = 'N/m';
+                        } else {
+                            conversionUnitLabel.textContent = 'kgf/m';
+                        }
                         break;
                     case 'trig':
                         inputTrigGroup.classList.add('active');
@@ -554,6 +885,7 @@
                 inputRhombusGroup.classList.add('hidden');
                 document.getElementById(`input-${area}`).classList.remove('hidden');
                 drawAreaShape();
+                resultMessage.textContent = i18n[currentLang].initial_message;
             }
 
             function setActiveTrig(func, btnId) {
@@ -562,11 +894,20 @@
                 trigButtons.forEach(btn => btn.classList.add('bg-gray-200', 'text-gray-700'));
                 document.getElementById(btnId).classList.remove('bg-gray-200', 'text-gray-700');
                 document.getElementById(btnId).classList.add('active-btn', 'bg-blue-600', 'text-white');
-                resultMessage.textContent = '點擊「執行計算」查看結果。';
+                resultMessage.textContent = i18n[currentLang].initial_message;
             }
 
-            // --- 繪圖函數 ---
-            
+            // --- Canvas & Drawing Functions (省略，與原程式碼相同，僅保留調用) ---
+            function showCanvas(canvasElement) {
+                canvases.forEach(c => c.style.display = 'none');
+                if (canvasElement) {
+                    canvasElement.style.display = 'block';
+                    const containerWidth = canvasElement.parentNode.clientWidth;
+                    canvasElement.width = containerWidth;
+                    canvasElement.height = Math.min(containerWidth * 0.5, 200);
+                }
+            }
+
             function drawShape(canvas, drawCallback, inputs) {
                 const width = canvas.width;
                 const height = canvas.height;
@@ -604,23 +945,25 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // 90 degree mark
                     ctx.fillStyle = '#4b5563';
                     ctx.fillRect(startX, startY - 10, 10, 10);
 
-                    // Labels
                     ctx.font = '12px Inter';
                     ctx.fillStyle = '#1f2937';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('a=' + formatNumber(a) + 'mm', startX - 10, startY - scaledA / 2);
-                    ctx.fillText('b=' + formatNumber(b) + 'mm', startX + scaledB / 2, startY + 15);
-                    ctx.fillText('c?', startX + scaledB / 2 + 10, startY - scaledA / 2 + 10);
+                    const langDict = i18n[currentLang];
+                    const sideALabel = currentLang === 'zh' ? '直角邊 a' : 'Leg a';
+                    const sideBLabel = currentLang === 'zh' ? '直角邊 b' : 'Leg b';
+                    
+                    ctx.fillText(sideALabel + '=' + formatNumber(a) + 'mm', startX - 10, startY - scaledA / 2);
+                    ctx.fillText(sideBLabel + '=' + formatNumber(b) + 'mm', startX + scaledB / 2, startY + 15);
+                    ctx.fillText(currentLang === 'zh' ? '斜邊 c?' : 'Hyp c?', startX + scaledB / 2 + 10, startY - scaledA / 2 + 10);
                 });
             }
 
             function drawNonRightTriangle() {
-                drawShape(nonRightTriCanvas, (ctx, w, h, inputs) => {
+                 drawShape(nonRightTriCanvas, (ctx, w, h, inputs) => {
                     const a = parseFloat(nonRightAInput.value) || 45;
                     const b = parseFloat(nonRightBInput.value) || 55;
                     const angle = parseFloat(nonRightAngleInput.value) || 60;
@@ -629,14 +972,13 @@
                     const angleRad = angle * Math.PI / 180;
                     const c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(angleRad));
                     const maxDim = Math.max(a, b, c);
-                    const scale = (Math.min(w, h) - 40) / maxDim * 0.8; // 0.8 to give some space
+                    const scale = (Math.min(w, h) - 40) / maxDim * 0.8; 
 
                     const Bx = b * scale;
                     const By = 0;
                     const Cx = a * Math.cos(angleRad) * scale;
                     const Cy = -a * Math.sin(angleRad) * scale;
                     
-                    // Center the triangle
                     const minX = Math.min(0, Bx, Cx);
                     const maxX = Math.max(0, Bx, Cx);
                     const minY = Math.min(0, By, Cy);
@@ -645,9 +987,9 @@
                     ctx.translate(-(minX + maxX) / 2, -(minY + maxY) / 2);
 
                     ctx.beginPath();
-                    ctx.moveTo(0, 0); // Point A
-                    ctx.lineTo(Bx, By); // Point C
-                    ctx.lineTo(Cx, Cy); // Point B
+                    ctx.moveTo(0, 0); 
+                    ctx.lineTo(Bx, By); 
+                    ctx.lineTo(Cx, Cy); 
                     ctx.closePath();
 
                     ctx.strokeStyle = '#ef4444';
@@ -656,36 +998,30 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // Angle arc
                     ctx.beginPath();
                     ctx.arc(0, 0, 15, -angleRad, 0);
                     ctx.strokeStyle = '#374151';
                     ctx.stroke();
 
-                    // Labels
                     ctx.font = '12px Inter';
                     ctx.fillStyle = '#1f2937';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
 
-                    // Side a
                     const midAX = (Cx + Bx) / 2;
                     const midAY = (Cy + By) / 2;
+                    const sideCLabel = currentLang === 'zh' ? '邊 c?' : 'Side c?';
+
                     ctx.fillText('a=' + formatNumber(a) + 'mm', midAX + 5, midAY - 5);
-                    
-                    // Side b
                     ctx.fillText('b=' + formatNumber(b) + 'mm', Bx / 2, By + 15);
+                    ctx.fillText(sideCLabel, Cx / 2 - 10, Cy / 2 - 5);
                     
-                    // Side c (unknown)
-                    ctx.fillText('c?', Cx / 2 - 10, Cy / 2 - 5);
-                    
-                    // Angle label
                     ctx.fillText(formatNumber(angle) + '°', 25 * Math.cos(angleRad / 2), -25 * Math.sin(angleRad / 2));
                 });
             }
 
             function drawArcSector() {
-                drawShape(arcCanvas, (ctx, w, h, inputs) => {
+                 drawShape(arcCanvas, (ctx, w, h, inputs) => {
                     const radius = parseFloat(radiusInput.value) || 50;
                     const angle = parseFloat(arcAngleInput.value) || 90;
                     if (radius <= 0 || angle <= 0 || angle > 360) return;
@@ -704,21 +1040,20 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // Mark arc length
                     ctx.beginPath();
                     ctx.arc(0, 0, scaledR * 1.05, 0, angle * Math.PI / 180);
                     ctx.strokeStyle = '#f97316';
                     ctx.lineWidth = 3;
                     ctx.stroke();
                     
-                    // Radius line label
                     ctx.font = '12px Inter';
                     ctx.fillStyle = '#1f2937';
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'bottom';
-                    ctx.fillText('R=' + formatNumber(radius) + 'mm', 5, -5);
 
-                    // Angle arc
+                    const radiusLabel = currentLang === 'zh' ? '半徑 R' : 'Radius R';
+                    ctx.fillText(radiusLabel + '=' + formatNumber(radius) + 'mm', 5, -5);
+
                     ctx.beginPath();
                     ctx.arc(0, 0, scaledR / 4, 0, angle * Math.PI / 180);
                     ctx.strokeStyle = '#374151';
@@ -729,7 +1064,6 @@
 
             function drawAreaShape() {
                 drawShape(areaCanvas, (ctx, w, h, inputs) => {
-                    // Reset canvas for drawing area shapes
                     ctx.clearRect(-w/2, -h/2, w, h);
                     
                     ctx.font = '12px Inter';
@@ -738,6 +1072,15 @@
                     ctx.lineWidth = 2;
                     ctx.textBaseline = 'middle';
                     ctx.textAlign = 'center';
+                    
+                    const L_label = currentLang === 'zh' ? '長' : 'L';
+                    const W_label = currentLang === 'zh' ? '寬' : 'W';
+                    const Base_label = currentLang === 'zh' ? '底' : 'Base';
+                    const Height_label = currentLang === 'zh' ? '高' : 'H';
+                    const TopBase_label = currentLang === 'zh' ? '上底' : 'B1';
+                    const BottomBase_label = currentLang === 'zh' ? '下底' : 'B2';
+                    const D1_label = currentLang === 'zh' ? 'D1' : 'D1';
+                    const D2_label = currentLang === 'zh' ? 'D2' : 'D2';
                     
                     switch (areaType) {
                         case 'rectangle':
@@ -755,14 +1098,13 @@
                             ctx.fill();
                             ctx.stroke();
                             
-                            ctx.fillText('長: ' + formatNumber(rectL) + 'mm', 0, -scaledRectW / 2 - 10);
+                            ctx.fillText(L_label + ': ' + formatNumber(rectL) + 'mm', 0, -scaledRectW / 2 - 10);
                             ctx.save();
                             ctx.rotate(-Math.PI / 2);
-                            ctx.fillText('寬: ' + formatNumber(rectW) + 'mm', 0, -scaledRectL / 2 - 10);
+                            ctx.fillText(W_label + ': ' + formatNumber(rectW) + 'mm', 0, -scaledRectL / 2 - 10);
                             ctx.restore();
                             break;
                         case 'triangle':
-                            // 注意：這裡使用宣告好的 triBaseInput 和 triHeightInput 變數
                             const triBase = parseFloat(triBaseInput.value) || 60;
                             const triHeight = parseFloat(triHeightInput.value) || 40;
                             if (triBase <= 0 || triHeight <= 0) return;
@@ -780,8 +1122,8 @@
                             ctx.fill();
                             ctx.stroke();
                             
-                            ctx.fillText('底: ' + formatNumber(triBase) + 'mm', 0, scaledTriHeight / 2 + 15);
-                            ctx.fillText('高: ' + formatNumber(triHeight) + 'mm', -scaledTriBase / 2 - 20, 0);
+                            ctx.fillText(Base_label + ': ' + formatNumber(triBase) + 'mm', 0, scaledTriHeight / 2 + 15);
+                            ctx.fillText(Height_label + ': ' + formatNumber(triHeight) + 'mm', -scaledTriBase / 2 - 20, 0);
                             break;
                         case 'trap':
                             const trapB1 = parseFloat(document.getElementById('trap-base1-input').value) || 30;
@@ -805,9 +1147,9 @@
                             ctx.fill();
                             ctx.stroke();
 
-                            ctx.fillText('上底: ' + formatNumber(trapB1) + 'mm', 0, -scaledH / 2 - 10);
-                            ctx.fillText('下底: ' + formatNumber(trapB2) + 'mm', 0, scaledH / 2 + 15);
-                            ctx.fillText('高: ' + formatNumber(trapH) + 'mm', -maxB * trapScale / 2 - 10, 0);
+                            ctx.fillText(TopBase_label + ': ' + formatNumber(trapB1) + 'mm', 0, -scaledH / 2 - 10);
+                            ctx.fillText(BottomBase_label + ': ' + formatNumber(trapB2) + 'mm', 0, scaledH / 2 + 15);
+                            ctx.fillText(Height_label + ': ' + formatNumber(trapH) + 'mm', -maxB * trapScale / 2 - 10, 0);
                             break;
                         case 'rhombus':
                             const diag1 = parseFloat(document.getElementById('rhombus-diag1-input').value) || 80;
@@ -828,8 +1170,8 @@
                             ctx.fill();
                             ctx.stroke();
                             
-                            ctx.fillText('D1: ' + formatNumber(diag1) + 'mm', scaledD1 / 4, 0);
-                            ctx.fillText('D2: ' + formatNumber(diag2) + 'mm', 0, scaledD2 / 2 + 15);
+                            ctx.fillText(D1_label + ': ' + formatNumber(diag1) + 'mm', scaledD1 / 4, 0);
+                            ctx.fillText(D2_label + ': ' + formatNumber(diag2) + 'mm', 0, scaledD2 / 2 + 15);
                             break;
                     }
                 });
@@ -840,6 +1182,7 @@
             function calculate() {
                 let result = '';
                 let isValid = true;
+                const dict = i18n[currentLang];
 
                 try {
                     switch (calculationType) {
@@ -848,13 +1191,13 @@
                             const conversionType = conversionTypeSelect.value;
                             if (isNaN(conversionValue) || conversionValue < 0) {
                                 isValid = false;
-                                result = '請輸入有效的正數值進行轉換。';
+                                result = dict.conversion_positive_error;
                             } else if (conversionType === 'nm_to_kgf') {
                                 const kgfm = conversionValue * NM_TO_KGFM;
-                                result = `扭矩: ${formatNumber(conversionValue)} N/m = ${formatNumber(kgfm)} kgf/m`;
+                                result = dict.conversion_result_nm_to_kgf(formatNumber(conversionValue), formatNumber(kgfm));
                             } else if (conversionType === 'kgf_to_nm') {
                                 const nm = conversionValue * KGFM_TO_NM;
-                                result = `扭矩: ${formatNumber(conversionValue)} kgf/m = ${formatNumber(nm)} N/m`;
+                                result = dict.conversion_result_kgf_to_nm(formatNumber(conversionValue), formatNumber(nm));
                             }
                             break;
 
@@ -868,18 +1211,18 @@
 
                             if (count < 2) {
                                 isValid = false;
-                                result = '請輸入功率 (W)、電壓 (V)、電流 (A) 中的任兩項。';
+                                result = dict.input_two_required;
                             } else if (calculationType === 'power') {
-                                if (isNaN(V) || isNaN(I)) { isValid = false; result = '計算功率需要電壓和電流。'; }
-                                else { const P_calc = V * I; result = `功率 P = V × I = ${formatNumber(V)} V × ${formatNumber(I)} A = ${formatNumber(P_calc)} W`; }
+                                if (isNaN(V) || isNaN(I)) { isValid = false; result = dict.power_missing_error; }
+                                else { const P_calc = V * I; result = dict.power_result(formatNumber(V), formatNumber(I), formatNumber(P_calc)); }
                             } else if (calculationType === 'voltage') {
-                                if (isNaN(P) || isNaN(I)) { isValid = false; result = '計算電壓需要功率和電流。'; }
-                                else if (I === 0) { isValid = false; result = '電流不能為零。'; }
-                                else { const V_calc = P / I; result = `電壓 V = P / I = ${formatNumber(P)} W / ${formatNumber(I)} A = ${formatNumber(V_calc)} V`; }
+                                if (isNaN(P) || isNaN(I)) { isValid = false; result = dict.voltage_missing_error; }
+                                else if (I === 0) { isValid = false; result = dict.zero_division_error; }
+                                else { const V_calc = P / I; result = dict.voltage_result(formatNumber(P), formatNumber(I), formatNumber(V_calc)); }
                             } else if (calculationType === 'current') {
-                                if (isNaN(P) || isNaN(V)) { isValid = false; result = '計算電流需要功率和電壓。'; }
-                                else if (V === 0) { isValid = false; result = '電壓不能為零。'; }
-                                else { const I_calc = P / V; result = `電流 I = P / V = ${formatNumber(P)} W / ${formatNumber(V)} V = ${formatNumber(I_calc)} A`; }
+                                if (isNaN(P) || isNaN(V)) { isValid = false; result = dict.current_missing_error; }
+                                else if (V === 0) { isValid = false; result = dict.zero_division_error; }
+                                else { const I_calc = P / V; result = dict.current_result(formatNumber(P), formatNumber(V), formatNumber(I_calc)); }
                             }
                             break;
                             
@@ -888,14 +1231,11 @@
                             const N_rpm = parseFloat(rpmInput.value);
                             if (isNaN(P_torque) || isNaN(N_rpm) || P_torque < 0 || N_rpm <= 0) {
                                 isValid = false;
-                                result = '計算扭矩需要有效的功率 (W) 和轉速 (RPM > 0)。';
+                                result = dict.torque_input_error;
                             } else {
-                                // 扭矩 T (Nm) = 功率 P (W) / 角速度 ω (rad/s)
-                                // ω = N_rpm * (2π / 60)
-                                // T = (P * 60) / (2π * N_rpm)
                                 const T_nm = (P_torque * 60) / (2 * Math.PI * N_rpm);
                                 const T_kgfm = T_nm * NM_TO_KGFM;
-                                result = `扭矩 T = ${formatNumber(T_nm)} N/m<br/>約等於 ${formatNumber(T_kgfm)} kgf/m`;
+                                result = dict.torque_result(formatNumber(T_nm), formatNumber(T_kgfm));
                             }
                             break;
 
@@ -903,22 +1243,18 @@
                             const angle = parseFloat(angleInput.value);
                             if (isNaN(angle)) {
                                 isValid = false;
-                                result = '請輸入有效的角度數值 (度)。';
+                                result = dict.invalid_input;
                             } else {
                                 const radians = angle * Math.PI / 180;
                                 let calcResult;
-                                let formula = '';
                                 if (trigFunction === 'sin') {
                                     calcResult = Math.sin(radians);
-                                    formula = `$$\\sin(${formatNumber(angle)}^\circ) \\approx ${formatNumber(calcResult)}$$`;
                                 } else if (trigFunction === 'cos') {
                                     calcResult = Math.cos(radians);
-                                    formula = `$$\\cos(${formatNumber(angle)}^\circ) \\approx ${formatNumber(calcResult)}$$`;
                                 } else if (trigFunction === 'tan') {
                                     calcResult = Math.tan(radians);
-                                    formula = `$$\\tan(${formatNumber(angle)}^\circ) \\approx ${formatNumber(calcResult)}$$`;
                                 }
-                                result = `${trigFunction}(${formatNumber(angle)}°): ${formatNumber(calcResult)}`;
+                                result = dict.trig_result(trigFunction, formatNumber(angle), formatNumber(calcResult));
                             }
                             break;
 
@@ -927,10 +1263,10 @@
                             const b = parseFloat(hypBInput.value);
                             if (isNaN(a) || isNaN(b) || a < 0 || b < 0) {
                                 isValid = false;
-                                result = '請輸入有效的直角邊長 a 和 b。';
+                                result = dict.hyp_input_error;
                             } else {
                                 const c = Math.sqrt(a * a + b * b);
-                                result = `斜邊 c = $\\sqrt{a^2 + b^2} = ${formatNumber(c)}$ mm`;
+                                result = dict.hyp_result(formatNumber(c));
                                 drawHypTriangle();
                             }
                             break;
@@ -941,16 +1277,16 @@
                             const nAngle = parseFloat(nonRightAngleInput.value);
                             if (isNaN(na) || isNaN(nb) || isNaN(nAngle) || na <= 0 || nb <= 0 || nAngle <= 0 || nAngle >= 180) {
                                 isValid = false;
-                                result = '請輸入有效的邊長 a、b 和 0° 到 180° 之間的夾角。';
+                                result = dict.non_right_input_error;
                             } else {
                                 const angleRad = nAngle * Math.PI / 180;
                                 const nc2 = na * na + nb * nb - 2 * na * nb * Math.cos(angleRad);
                                 if (nc2 < 0) {
                                     isValid = false;
-                                    result = '無法構成三角形 (計算結果為負)。';
+                                    result = dict.non_right_triangle_error;
                                 } else {
                                     const nc = Math.sqrt(nc2);
-                                    result = `第三邊 c (斜邊) = ${formatNumber(nc)} mm`;
+                                    result = dict.non_right_result(formatNumber(nc));
                                     drawNonRightTriangle();
                                 }
                             }
@@ -961,11 +1297,10 @@
                             const arcAngle = parseFloat(arcAngleInput.value);
                             if (isNaN(radius) || isNaN(arcAngle) || radius <= 0 || arcAngle < 0) {
                                 isValid = false;
-                                result = '請輸入有效的半徑 (>0) 和角度 (>=0)。';
+                                result = dict.arc_input_error;
                             } else {
-                                // 弧長 L = R * θ (弧度)
                                 const arcLength = radius * (arcAngle * Math.PI / 180);
-                                result = `弧長 L = ${formatNumber(arcLength)} mm`;
+                                result = dict.arc_result(formatNumber(arcLength));
                                 drawArcSector();
                             }
                             break;
@@ -975,11 +1310,10 @@
                             const lineRpm = parseFloat(lineSpeedRpmInput.value);
                             if (isNaN(circumference) || isNaN(lineRpm) || circumference <= 0 || lineRpm < 0) {
                                 isValid = false;
-                                result = '請輸入有效的圓周長 (>0) 和轉速 (>=0)。';
+                                result = dict.line_speed_input_error;
                             } else {
-                                // 線速度 (mm/min) = 圓周 (mm) * 轉速 (RPM)
                                 const speed = circumference * lineRpm;
-                                result = `線速度 = ${formatNumber(speed)} mm/min`;
+                                result = dict.line_speed_result(formatNumber(speed));
                             }
                             break;
 
@@ -991,62 +1325,54 @@
 
                             if (isNaN(maxHz) || isNaN(wheelCircumference) || isNaN(motorRpm) || isNaN(workingSpeed) || maxHz <= 0 || wheelCircumference <= 0 || motorRpm <= 0 || workingSpeed < 0) {
                                 isValid = false;
-                                result = '請輸入所有有效的數值 (必須大於 0)。';
+                                result = dict.inverter_input_error;
                             } else {
-                                // 最大線速度 (mm/min) = 作業輪圓周 * 馬達轉速
                                 const maxSpeed = wheelCircumference * motorRpm;
-                                
-                                // 所需 HZ = (目標速度 / 最大速度) * 最大 HZ
                                 const requiredHz = (workingSpeed / maxSpeed) * maxHz;
+                                let hzResult = dict.inverter_required_hz(formatNumber(requiredHz));
 
                                 if (requiredHz > maxHz) {
-                                     result = `<span class="text-red-600">所需 HZ: ${formatNumber(requiredHz)} HZ (超過最高頻率 ${formatNumber(maxHz)} HZ)</span>`;
-                                } else {
-                                     result = `所需 HZ: ${formatNumber(requiredHz)} HZ`;
+                                     hzResult = dict.inverter_over_max_hz(formatNumber(requiredHz), formatNumber(maxHz));
                                 }
-                                result += `<br/>最大線速度: ${formatNumber(maxSpeed)} mm/min`;
+                                result = `${hzResult}<br/>${dict.inverter_max_speed(formatNumber(maxSpeed))}`;
                             }
                             break;
                             
                         case 'area':
                             drawAreaShape(); // Update drawing before calculation
-                            switch (areaType) {
-                                case 'rectangle':
-                                    const rectL = parseFloat(document.getElementById('rect-length-input').value);
-                                    const rectW = parseFloat(document.getElementById('rect-width-input').value);
-                                    if (isNaN(rectL) || isNaN(rectW) || rectL < 0 || rectW < 0) { isValid = false; result = '請輸入有效的長度和寬度。'; }
-                                    else { const area = rectL * rectW; result = `矩形面積: ${formatNumber(area)} $mm^2$`; }
-                                    break;
-                                case 'triangle':
-                                    const triBase = parseFloat(triBaseInput.value); // 使用已宣告的變數
-                                    const triHeight = parseFloat(triHeightInput.value); // 使用已宣告的變數
-                                    if (isNaN(triBase) || isNaN(triHeight) || triBase < 0 || triHeight < 0) { isValid = false; result = '請輸入有效的底和高。'; }
-                                    else { const area = (triBase * triHeight) / 2; result = `三角形面積: ${formatNumber(area)} $mm^2$`; }
-                                    break;
-                                case 'trap':
-                                    const trapB1 = parseFloat(document.getElementById('trap-base1-input').value);
-                                    const trapB2 = parseFloat(document.getElementById('trap-base2-input').value);
-                                    const trapH = parseFloat(document.getElementById('trap-height-input').value);
-                                    if (isNaN(trapB1) || isNaN(trapB2) || isNaN(trapH) || trapB1 < 0 || trapB2 < 0 || trapH < 0) { isValid = false; result = '請輸入有效的上底、下底和高。'; }
-                                    else { const area = ((trapB1 + trapB2) * trapH) / 2; result = `梯形面積: ${formatNumber(area)} $mm^2$`; }
-                                    break;
-                                case 'rhombus':
-                                    const diag1 = parseFloat(document.getElementById('rhombus-diag1-input').value);
-                                    const diag2 = parseFloat(document.getElementById('rhombus-diag2-input').value);
-                                    if (isNaN(diag1) || isNaN(diag2) || diag1 < 0 || diag2 < 0) { isValid = false; result = '請輸入有效的兩條對角線長度。'; }
-                                    else { const area = (diag1 * diag2) / 2; result = `菱形面積: ${formatNumber(area)} $mm^2$`; }
-                                    break;
+                            let area;
+                            if (areaType === 'rectangle') {
+                                const rectL = parseFloat(document.getElementById('rect-length-input').value);
+                                const rectW = parseFloat(document.getElementById('rect-width-input').value);
+                                if (isNaN(rectL) || isNaN(rectW) || rectL < 0 || rectW < 0) { isValid = false; result = dict.area_input_error; }
+                                else { area = rectL * rectW; result = dict.area_rect_result(formatNumber(area)); }
+                            } else if (areaType === 'triangle') {
+                                const triBase = parseFloat(triBaseInput.value);
+                                const triHeight = parseFloat(triHeightInput.value);
+                                if (isNaN(triBase) || isNaN(triHeight) || triBase < 0 || triHeight < 0) { isValid = false; result = dict.area_input_error; }
+                                else { area = (triBase * triHeight) / 2; result = dict.area_tri_result(formatNumber(area)); }
+                            } else if (areaType === 'trap') {
+                                const trapB1 = parseFloat(document.getElementById('trap-base1-input').value);
+                                const trapB2 = parseFloat(document.getElementById('trap-base2-input').value);
+                                const trapH = parseFloat(document.getElementById('trap-height-input').value);
+                                if (isNaN(trapB1) || isNaN(trapB2) || isNaN(trapH) || trapB1 < 0 || trapB2 < 0 || trapH < 0) { isValid = false; result = dict.area_input_error; }
+                                else { area = ((trapB1 + trapB2) * trapH) / 2; result = dict.area_trap_result(formatNumber(area)); }
+                            } else if (areaType === 'rhombus') {
+                                const diag1 = parseFloat(document.getElementById('rhombus-diag1-input').value);
+                                const diag2 = parseFloat(document.getElementById('rhombus-diag2-input').value);
+                                if (isNaN(diag1) || isNaN(diag2) || diag1 < 0 || diag2 < 0) { isValid = false; result = dict.area_input_error; }
+                                else { area = (diag1 * diag2) / 2; result = dict.area_rhombus_result(formatNumber(area)); }
                             }
                             break;
 
                         default:
                             isValid = false;
-                            result = '請選擇要執行的計算項目。';
+                            result = dict.initial_message;
                             break;
                     }
                 } catch (error) {
                     isValid = false;
-                    result = '計算錯誤，請檢查輸入數值是否正確。';
+                    result = dict.calculation_error;
                     console.error(error);
                 }
 
@@ -1060,10 +1386,21 @@
 
             // --- 事件監聽器設定 ---
 
+            // 語言切換
+            langToggleBtn.addEventListener('click', () => {
+                const newLang = currentLang === 'zh' ? 'en' : 'zh';
+                setLanguage(newLang);
+                // 重新繪製 Canvas (因為繪圖中的文字也需要更新)
+                if (calculationType === 'hyp') drawHypTriangle();
+                if (calculationType === 'non-right-tri') drawNonRightTriangle();
+                if (calculationType === 'arc') drawArcSector();
+                if (calculationType === 'area') drawAreaShape();
+            });
+
             // 模式切換
             calcButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const type = btn.id.replace('calc-', '').replace('-btn', '');
+                    const type = calcButtonsMap[btn.id];
                     setActiveMode(btn.id, type);
                 });
             });
@@ -1075,7 +1412,7 @@
                 } else {
                     conversionUnitLabel.textContent = 'kgf/m';
                 }
-                calculate(); // 自動計算
+                calculate(); 
             });
 
             // 三角函數模式切換
@@ -1093,9 +1430,8 @@
             [nonRightAInput, nonRightBInput, nonRightAngleInput].forEach(input => input.addEventListener('input', drawNonRightTriangle));
             [radiusInput, arcAngleInput].forEach(input => input.addEventListener('input', drawArcSector));
             
-            // ** 修正：確保所有變數都已宣告，再加入監聽器 **
             [document.getElementById('rect-length-input'), document.getElementById('rect-width-input'), triBaseInput, triHeightInput, document.getElementById('trap-base1-input'), document.getElementById('trap-base2-input'), document.getElementById('trap-height-input'), document.getElementById('rhombus-diag1-input'), document.getElementById('rhombus-diag2-input')].forEach(input => {
-                if(input) { // 安全檢查，確保元素存在
+                if(input) { 
                     input.addEventListener('input', drawAreaShape);
                 }
             });
@@ -1103,9 +1439,9 @@
             // 計算按鈕
             calculateBtn.addEventListener('click', calculate);
 
-            // 首次載入時，設定預設模式 (單位轉換)
+            // 首次載入時，設定預設語言和模式
+            setLanguage(currentLang);
             setActiveMode('calc-conversion-btn', 'conversion');
-            conversionUnitLabel.textContent = 'N/m';
         });
 
         // 確保 Canvas 在視窗大小改變時重設大小
