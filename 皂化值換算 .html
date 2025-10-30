@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手工皂皂化值計算器</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soap-primary': '#a7f3d0', // Light green/mint
+                        'soap-secondary': '#10b981', // Darker green
+                    }
+                },
+                fontFamily: {
+                    sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                }
+            }
+        }
+    </script>
+    <style>
+        .card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+        /* Style for the safety guide tables */
+        .safety-table th, .safety-table td {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .safety-table th {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-8 font-sans">
+
+    <div id="app" class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-soap-secondary mb-2">
+                手工皂皂化值 (SV) 計算器
+            </h1>
+            <p class="text-gray-600 text-lg mb-4">
+                請輸入您的油脂配方和重量，程式將計算所需的氫氧化鈉 (NaOH) 用量。
+            </p>
+            
+            <!-- 新增安全指南按鈕 -->
+            <button onclick="toggleSafetyGuide(true)" class="px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                氫氧化鈉（NaOH）安全指南
+            </button>
+        </header>
+
+        <!-- 主計算器卡片 -->
+        <div class="bg-white card p-6 sm:p-10">
+
+            <!-- 超脂率和水比例設定 -->
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-6 pb-6 border-b border-gray-200">
+                <div class="flex-1">
+                    <label for="superfat" class="block text-sm font-medium text-gray-700 mb-1">超脂率 (Superfat %)</label>
+                    <input type="number" id="superfat" value="5" min="0" max="20" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-soap-secondary focus:ring-soap-secondary p-2.5 text-lg transition duration-150 ease-in-out" oninput="calculate()">
+                    <p class="text-xs text-gray-500 mt-1">一般建議 5%~8%。</p>
+                </div>
+                <div class="flex-1">
+                    <label for="waterRatio" class="block text-sm font-medium text-gray-700 mb-1">水重量佔油脂比例 (%)</label>
+                    <input type="number" id="waterRatio" value="30" min="20" max="40" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-soap-secondary focus:ring-soap-secondary p-2.5 text-lg transition duration-150 ease-in-out" oninput="calculate()">
+                    <p class="text-xs text-gray-500 mt-1">一般建議 28%~38%。</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">配方油脂列表</h2>
+            
+            <!-- 油脂輸入表單 -->
+            <div id="oil-input" class="space-y-4 mb-8">
+                <!-- 動態生成的油脂行將在此處 -->
+            </div>
+
+            <!-- 新增油脂按鈕 -->
+            <div class="mb-8">
+                <button onclick="addOilRow()" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-soap-secondary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary transition duration-150 ease-in-out">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    新增油脂
+                </button>
+            </div>
+
+            <!-- 結果顯示區 -->
+            <div id="results-area" class="mt-8 pt-6 border-t border-soap-secondary/50">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">計算結果</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    
+                    <!-- 總油脂重量 -->
+                    <div class="bg-soap-primary/30 p-4 rounded-xl">
+                        <p class="text-sm font-medium text-gray-600">總油脂重量 (g)</p>
+                        <p id="totalOilWeight" class="text-3xl font-extrabold text-soap-secondary">0</p>
+                    </div>
+
+                    <!-- 所需 NaOH (氫氧化鈉) -->
+                    <div class="bg-red-100 p-4 rounded-xl">
+                        <p class="text-sm font-medium text-gray-600">所需 NaOH 重量 (g)</p>
+                        <p id="requiredLye" class="text-3xl font-extrabold text-red-600">0.00</p>
+                        <p class="text-xs text-red-500 mt-1">(已扣除超脂率)</p>
+                    </div>
+
+                    <!-- 建議水量 -->
+                    <div class="bg-blue-100 p-4 rounded-xl">
+                        <p class="text-sm font-medium text-gray-600">建議水重量 (g)</p>
+                        <p id="requiredWater" class="text-3xl font-extrabold text-blue-600">0.00</p>
+                        <p class="text-xs text-blue-500 mt-1">(依照水比例)</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-gray-100 rounded-lg">
+                    <p class="text-sm font-medium text-gray-700">注意：</p>
+                    <ul class="text-xs text-gray-600 list-disc list-inside">
+                        <li>本計算使用 NaOH 皂化值，適用於製作硬皂。</li>
+                        <li>計算結果已根據您設定的超脂率進行調整。</li>
+                        <li>水中可包含牛奶、花水等液體成分。</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NaOH 安全指南 Modal (彈出視窗) -->
+    <div id="safety-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden" onclick="toggleSafetyGuide(false)">
+        <div class="relative top-4 sm:top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-xl bg-white" onclick="event.stopPropagation()">
+            
+            <div class="mt-3 text-center">
+                <h3 class="text-3xl leading-6 font-extrabold text-red-600 mb-4">
+                    氫氧化鈉 (NaOH) 安全操作指南
+                </h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    氫氧化鈉 (苛性鈉/燒鹼) 具高腐蝕性，操作時請務必遵循以下規範。
+                </p>
+
+                <div class="mt-2 text-left space-y-6 text-gray-700 max-h-[70vh] overflow-y-auto pr-4">
+                    
+                    <!-- Section 1: PPE -->
+                    <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-red-700 mb-3">1. 個人防護裝備 (PPE)</h4>
+                        <p class="text-sm mb-3">在處理 NaOH 顆粒、溶液或尚未皂化的皂液時，請**全程**穿戴以下裝備：</p>
+                        <table class="w-full safety-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/4">裝備</th>
+                                    <th>說明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>**護目鏡**</td>
+                                    <td>必備！防止溶液噴濺到眼睛。請勿使用一般眼鏡代替。</td>
+                                </tr>
+                                <tr>
+                                    <td>**橡膠手套**</td>
+                                    <td>必備！保護手部皮膚。建議使用長度及腕的耐鹼手套。</td>
+                                </tr>
+                                <tr>
+                                    <td>**長袖衣物**</td>
+                                    <td>覆蓋所有皮膚，防止意外噴濺。</td>
+                                </tr>
+                                <tr>
+                                    <td>**口罩**</td>
+                                    <td>建議在量測或攪拌時佩戴，以避免吸入細小顆粒或產生的高溫蒸氣。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 2: Environment -->
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3">2. 操作環境與準備</h4>
+                        <h5 class="font-semibold mt-2">空間要求</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>**通風良好：** 必須在通風極佳的環境下操作（例如：抽風機下、戶外、或打開窗戶）。NaOH 溶於水會產生熱量和有刺激性的蒸氣。</li>
+                            <li>**清理工作區：** 移除所有食物、飲料、寵物或兒童。工作檯面應平穩、乾燥且乾淨。</li>
+                        </ul>
+                        <h5 class="font-semibold mt-3">器材要求</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>**容器：** 必須使用耐熱、耐強鹼的容器，例如：**PP 塑料**（5號塑膠）、**不鏽鋼**或**厚實玻璃**（但須小心熱衝擊）。</li>
+                            <li>**攪拌：** 建議使用不鏽鋼長柄湯匙或耐熱矽膠刮刀。</li>
+                            <li>**量測：** 使用精確的電子秤。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section 3: Mixing -->
+                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-blue-700 mb-3">3. 正確的混合步驟（重中之重）</h4>
+                        <p class="text-sm font-bold mb-2">黃金法則：永遠是「鹼入水」，而非「水入鹼」。</p>
+                        <ol class="list-decimal list-inside space-y-2 text-sm ml-4">
+                            <li>**量測：** 準確量測計算器得出的 NaOH 重量和所需水重量。</li>
+                            <li>**水準備：** 將定量冷水或冰塊/冰水放入耐熱容器中。</li>
+                            <li>**緩慢加入：** **緩慢地**將 NaOH 顆粒分多次、少量地加入水中，同時輕輕攪拌。
+                                <ul class="list-none ml-6 text-xs text-red-500 italic mt-1">
+                                    <li>*錯誤操作：* 快速傾倒會導致劇烈反應、溫度驟升，可能使溶液噴濺。</li>
+                                </ul>
+                            </li>
+                            <li>**冷卻：** 混合後的水溫會迅速升高至 $90^{\circ}C$ 或更高。將鹼水容器放在通風處，或使用冰浴/冷水浴加速降溫。</li>
+                            <li>**觀察：** 鹼水必須完全清澈且冷卻至配方要求的溫度（通常在 $40^{\circ}C$ - $50^{\circ}C$ 之間）後，才能與油脂混合。</li>
+                        </ol>
+                    </div>
+
+                    <!-- Section 4: Storage & Disposal -->
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3">4. 儲存與廢棄</h4>
+                        <h5 class="font-semibold mt-2">儲存：</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>將 NaOH 存放在原裝的密閉容器中，並放置在兒童和寵物無法觸及的高處或上鎖處。</li>
+                            <li>遠離濕氣和酸性物質。</li>
+                        </ul>
+                        <h5 class="font-semibold mt-3">廢棄：</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>任何剩餘的 NaOH 溶液或鹼水，在製作完成後應中和處理或稀釋大量清水後排放。</li>
+                            <li>*切勿*將未使用的 NaOH 顆粒直接倒入水槽或垃圾桶。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section 5: First Aid -->
+                    <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-red-700 mb-3">5. 緊急處理與急救</h4>
+                        <p class="text-sm mb-3">如果發生意外，請立即採取以下行動：</p>
+                        <table class="w-full safety-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/4">意外狀況</th>
+                                    <th>緊急處理方式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>**皮膚接觸**</td>
+                                    <td>立即脫下被污染的衣物，用**大量冷水**沖洗接觸部位至少 15 分鐘。</td>
+                                </tr>
+                                <tr>
+                                    <td>**眼睛接觸**</td>
+                                    <td>**立即用大量清水持續沖洗眼睛 15-20 分鐘**，並儘快就醫。</td>
+                                </tr>
+                                <tr>
+                                    <td>**吸入蒸氣**</td>
+                                    <td>立即離開作業區到新鮮空氣處，保持休息，必要時就醫。</td>
+                                </tr>
+                                <tr>
+                                    <td>**誤食**</td>
+                                    <td>立即飲用大量清水或牛奶稀釋，**切勿催吐**，並立即送醫。</td>
+                                </tr>
+                                <tr>
+                                    <td>**地面灑落**</td>
+                                    <td>用酸性物質（如白醋）中和後，用大量水稀釋並清理。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="items-center px-4 py-3">
+                    <button onclick="toggleSafetyGuide(false)" class="mt-4 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-soap-secondary text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary sm:text-sm">
+                        關閉並理解風險
+                    </button>
+                    <p class="text-xs text-center text-gray-500 mt-2 font-bold">安全第一！請永遠保持謹慎與專注。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // 常用油脂的皂化值 (Saponification Value, SV)
+        const OIL_SVS = {
+            '橄欖油 (Olive Oil)': { sv_naoh: 0.134, sv_koh: 0.188 },
+            '椰子油 (Coconut Oil)': { sv_naoh: 0.190, sv_koh: 0.266 },
+            '棕櫚油 (Palm Oil)': { sv_naoh: 0.141, sv_koh: 0.198 },
+            '蓖麻油 (Castor Oil)': { sv_naoh: 0.128, sv_koh: 0.180 },
+            '酪梨油 (Avocado Oil)': { sv_naoh: 0.133, sv_koh: 0.187 },
+            '甜杏仁油 (Sweet Almond Oil)': { sv_naoh: 0.136, sv_koh: 0.191 },
+            '荷荷巴油 (Jojoba Oil)': { sv_naoh: 0.066, sv_koh: 0.092 },
+            '乳木果油 (Shea Butter)': { sv_naoh: 0.128, sv_koh: 0.179 },
+            '可可脂 (Cocoa Butter)': { sv_naoh: 0.137, sv_koh: 0.193 },
+            '米糠油 (Rice Bran Oil)': { sv_naoh: 0.131, sv_koh: 0.184 },
+            '其他 (請手動輸入 SV)': { sv_naoh: 0, sv_koh: 0 }
+        };
+
+        const oilInputContainer = document.getElementById('oil-input');
+        let rowIdCounter = 0;
+
+        /**
+         * 建立一個下拉選單的 HTML 字串
+         * @param {string} currentOilName - 當前選中的油脂名稱
+         * @param {string} id - 下拉選單的 ID
+         * @returns {string} - 下拉選單的 HTML
+         */
+        function createOilSelect(currentOilName, id) {
+            let options = '';
+            for (const name in OIL_SVS) {
+                const selected = name === currentOilName ? 'selected' : '';
+                options += `<option value="${name}" ${selected}>${name}</option>`;
+            }
+
+            return `
+                <select id="oil-select-${id}" onchange="updateCustomSVField(${id}); calculate()"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-soap-secondary focus:ring-soap-secondary p-2.5 transition duration-150 ease-in-out">
+                    ${options}
+                </select>
+            `;
+        }
+
+        /**
+         * 動態新增一行油脂輸入欄位
+         * @param {string} initialOil - 初始選中的油脂名稱
+         * @param {number} initialWeight - 初始重量
+         */
+        function addOilRow(initialOil = '橄欖油 (Olive Oil)', initialWeight = 300) {
+            const id = rowIdCounter++;
+            const rowDiv = document.createElement('div');
+            rowDiv.id = `row-${id}`;
+            rowDiv.className = 'flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 items-end';
+
+            const selectHtml = createOilSelect(initialOil, id);
+
+            rowDiv.innerHTML = `
+                <!-- 油脂選擇 -->
+                <div class="flex-1 w-full">
+                    <label for="oil-select-${id}" class="block text-xs font-medium text-gray-500 mb-1">油脂名稱</label>
+                    ${selectHtml}
+                </div>
+                
+                <!-- 重量輸入 -->
+                <div class="w-full sm:w-1/4">
+                    <label for="oil-weight-${id}" class="block text-xs font-medium text-gray-500 mb-1">重量 (g)</label>
+                    <input type="number" id="oil-weight-${id}" value="${initialWeight}" min="1" oninput="calculate()"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-soap-secondary focus:ring-soap-secondary p-2.5 text-right transition duration-150 ease-in-out">
+                </div>
+
+                <!-- 自定義 SV (僅當選擇「其他」時顯示) -->
+                <div class="w-full sm:w-1/4" id="custom-sv-div-${id}" style="display: none;">
+                    <label for="custom-sv-${id}" class="block text-xs font-medium text-gray-500 mb-1">自定義 NaOH SV (g/g)</label>
+                    <input type="number" step="0.001" id="custom-sv-${id}" value="0.134" min="0.01" oninput="calculate()"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-soap-secondary focus:ring-soap-secondary p-2.5 text-right transition duration-150 ease-in-out">
+                </div>
+
+                <!-- 刪除按鈕 -->
+                <button onclick="removeOilRow(${id})" class="w-full sm:w-auto p-2.5 text-sm font-medium text-white bg-red-500 rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            `;
+            oilInputContainer.appendChild(rowDiv);
+            
+            // 初始檢查是否顯示自定義 SV 欄位
+            updateCustomSVField(id); 
+            calculate();
+        }
+
+        /**
+         * 根據選中的油脂，切換自定義 SV 輸入欄位的顯示狀態
+         * @param {number} id - 行 ID
+         */
+        function updateCustomSVField(id) {
+            const selectElement = document.getElementById(`oil-select-${id}`);
+            const customSvDiv = document.getElementById(`custom-sv-div-${id}`);
+            
+            if (selectElement.value === '其他 (請手動輸入 SV)') {
+                customSvDiv.style.display = 'block';
+            } else {
+                customSvDiv.style.display = 'none';
+            }
+        }
+
+        /**
+         * 刪除一行油脂輸入欄位
+         * @param {number} id - 行 ID
+         */
+        function removeOilRow(id) {
+            const rowDiv = document.getElementById(`row-${id}`);
+            if (rowDiv) {
+                oilInputContainer.removeChild(rowDiv);
+                calculate();
+            }
+        }
+
+        /**
+         * 主要計算函數
+         */
+        function calculate() {
+            let totalOilWeight = 0;
+            let theoreticalLyeNeeded = 0; // 理論所需的 NaOH 重量 (g)
+
+            const superfat = parseFloat(document.getElementById('superfat').value) || 0;
+            const waterRatio = parseFloat(document.getElementById('waterRatio').value) || 0;
+            const sfFactor = (100 - superfat) / 100; // 超脂率係數
+
+            const rows = oilInputContainer.children;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const id = row.id.split('-')[1];
+
+                const oilSelect = document.getElementById(`oil-select-${id}`);
+                const weightInput = document.getElementById(`oil-weight-${id}`);
+                const customSvInput = document.getElementById(`custom-sv-${id}`);
+
+                const oilName = oilSelect ? oilSelect.value : null;
+                const oilWeight = parseFloat(weightInput ? weightInput.value : 0) || 0;
+
+                if (oilName && oilWeight > 0) {
+                    let sv_naoh;
+
+                    if (oilName === '其他 (請手動輸入 SV)') {
+                        // 使用自定義 SV
+                        sv_naoh = parseFloat(customSvInput ? customSvInput.value : 0) || 0;
+                    } else {
+                        // 使用預設 SV
+                        sv_naoh = OIL_SVS[oilName] ? OIL_SVS[oilName].sv_naoh : 0;
+                    }
+                    
+                    // Lye needed for this oil = Oil Weight * NaOH SV (g/g)
+                    const lyeForThisOil = oilWeight * sv_naoh;
+
+                    totalOilWeight += oilWeight;
+                    theoreticalLyeNeeded += lyeForThisOil;
+                }
+            }
+            
+            // 實際所需的 NaOH (考慮超脂率)
+            const actualLyeNeeded = theoreticalLyeNeeded * sfFactor;
+
+            // 建議所需的水量
+            const requiredWater = totalOilWeight * (waterRatio / 100);
+
+            // 更新結果顯示
+            document.getElementById('totalOilWeight').textContent = totalOilWeight.toFixed(0);
+            document.getElementById('requiredLye').textContent = actualLyeNeeded.toFixed(2);
+            document.getElementById('requiredWater').textContent = requiredWater.toFixed(2);
+        }
+
+        /**
+         * 切換安全指南 Modal 的顯示狀態
+         * @param {boolean} show - 決定顯示或隱藏
+         */
+        function toggleSafetyGuide(show) {
+            const modal = document.getElementById('safety-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // 初始化：新增三行預設油脂
+        document.addEventListener('DOMContentLoaded', () => {
+            addOilRow('橄欖油 (Olive Oil)', 300);
+            addOilRow('椰子油 (Coconut Oil)', 200);
+            addOilRow('棕櫚油 (Palm Oil)', 100);
+            // 初始計算會在 addOilRow 內部觸發
+        });
+    </script>
+</body>
+</html>
