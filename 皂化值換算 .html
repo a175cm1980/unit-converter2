@@ -35,6 +35,18 @@
         .safety-table th {
             background-color: #f3f4f6;
         }
+        /* Ensure the modal content scrollbar looks good */
+        .modal-content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content-area::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 4px;
+        }
+        /* Style for all modals */
+        .modal-base {
+            fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-8 font-sans">
@@ -42,19 +54,32 @@
     <div id="app" class="max-w-4xl mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-soap-secondary mb-2">
-                手工皂皂化值 (SV) 計算器
+                手工皂皂化值計算器
             </h1>
             <p class="text-gray-600 text-lg mb-4">
-                請輸入您的油脂配方和重量，程式將計算所需的氫氧化鈉 (NaOH) 用量。
+                請輸入您的油脂配方和重量，程式將計算所需的氫氧化鈉 (NaOH) 用量及預估皂液體積。
             </p>
             
-            <!-- 新增安全指南按鈕 -->
-            <button onclick="toggleSafetyGuide(true)" class="px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
-                氫氧化鈉（NaOH）安全指南
-            </button>
+            <!-- 【修改點 1: 三個說明開關平均分佈】 -->
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center">
+                <!-- 原有的 NaOH 安全指南 -->
+                <button onclick="toggleModal('safety-modal', true)" class="flex-1 px-4 py-2 border border-transparent text-base font-medium rounded-full text-white bg-red-500 hover:bg-red-600 transition duration-150 ease-in-out">
+                    NaOH 安全指南
+                </button>
+                <!-- 新增的超脂率說明 -->
+                <button onclick="toggleModal('superfat-modal', true)" class="flex-1 px-4 py-2 border border-transparent text-base font-medium rounded-full text-white bg-soap-secondary hover:bg-green-700 transition duration-150 ease-in-out">
+                    超脂率說明
+                </button>
+                <!-- 新增的水比例說明 -->
+                <button onclick="toggleModal('water-ratio-modal', true)" class="flex-1 px-4 py-2 border border-transparent text-base font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 transition duration-150 ease-in-out">
+                    水比例說明
+                </button>
+            </div>
+            <!-- 【修改點 1 結束】 -->
+
         </header>
 
-        <!-- 主計算器卡片 -->
+        <!-- 主計算器卡片 (與原有程式碼相同) -->
         <div class="bg-white card p-6 sm:p-10">
 
             <!-- 超脂率和水比例設定 -->
@@ -90,7 +115,8 @@
             <div id="results-area" class="mt-8 pt-6 border-t border-soap-secondary/50">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">計算結果</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <!-- 調整為 2x2 佈局 (sm: 2欄, md: 4欄) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     
                     <!-- 總油脂重量 -->
                     <div class="bg-soap-primary/30 p-4 rounded-xl">
@@ -111,6 +137,13 @@
                         <p id="requiredWater" class="text-3xl font-extrabold text-blue-600">0.00</p>
                         <p class="text-xs text-blue-500 mt-1">(依照水比例)</p>
                     </div>
+
+                    <!-- 預估總體積 (新增) -->
+                    <div class="bg-purple-100 p-4 rounded-xl">
+                        <p class="text-sm font-medium text-gray-600">預估總體積 (mL)</p>
+                        <p id="estimatedTotalVolume" class="text-3xl font-extrabold text-purple-600">0.00</p>
+                        <p class="text-xs text-gray-500 mt-1">(油脂體積 + 水體積)</p>
+                    </div>
                 </div>
 
                 <div class="mt-6 p-4 bg-gray-100 rounded-lg">
@@ -119,6 +152,7 @@
                         <li>本計算使用 NaOH 皂化值，適用於製作硬皂。</li>
                         <li>計算結果已根據您設定的超脂率進行調整。</li>
                         <li>水中可包含牛奶、花水等液體成分。</li>
+                        <li>**預估體積為皂液的初步體積，可作為選擇模具大小的參考。**</li>
                     </ul>
                 </div>
             </div>
@@ -126,8 +160,12 @@
         </div>
     </div>
 
-    <!-- NaOH 安全指南 Modal (彈出視窗) -->
-    <div id="safety-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden" onclick="toggleSafetyGuide(false)">
+    <!-- --------------------------------------- -->
+    <!-- 【修改點 2: 三個 Modals】 -->
+    <!-- --------------------------------------- -->
+
+    <!-- Modal 1: NaOH 安全指南 (保留原有內容，修改 ID 和 onclick) -->
+    <div id="safety-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden" onclick="toggleModal('safety-modal', false)">
         <div class="relative top-4 sm:top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-xl bg-white" onclick="event.stopPropagation()">
             
             <div class="mt-3 text-center">
@@ -138,7 +176,7 @@
                     氫氧化鈉 (苛性鈉/燒鹼) 具高腐蝕性，操作時請務必遵循以下規範。
                 </p>
 
-                <div class="mt-2 text-left space-y-6 text-gray-700 max-h-[70vh] overflow-y-auto pr-4">
+                <div class="mt-2 text-left space-y-6 text-gray-700 max-h-[70vh] overflow-y-auto pr-4 modal-content-area">
                     
                     <!-- Section 1: PPE -->
                     <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
@@ -259,7 +297,7 @@
                 </div>
 
                 <div class="items-center px-4 py-3">
-                    <button onclick="toggleSafetyGuide(false)" class="mt-4 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-soap-secondary text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary sm:text-sm">
+                    <button onclick="toggleModal('safety-modal', false)" class="mt-4 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-soap-secondary text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary sm:text-sm">
                         關閉並理解風險
                     </button>
                     <p class="text-xs text-center text-gray-500 mt-2 font-bold">安全第一！請永遠保持謹慎與專注。</p>
@@ -269,20 +307,139 @@
     </div>
 
 
+    <!-- Modal 2: 超脂率說明 -->
+    <div id="superfat-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden" onclick="toggleModal('superfat-modal', false)">
+        <div class="relative top-4 sm:top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-xl bg-white" onclick="event.stopPropagation()">
+            
+            <div class="mt-3 text-center">
+                <h3 class="text-3xl leading-6 font-extrabold text-soap-secondary mb-4">
+                    超脂率 (Superfat) 說明
+                </h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    超脂是手工皂製程中，為了安全、溫和度及滋潤度而刻意保留的未皂化油脂。
+                </p>
+
+                <div class="mt-2 text-left space-y-4 text-gray-700 max-h-[70vh] overflow-y-auto pr-4 modal-content-area">
+                    
+                    <div class="p-4 border border-soap-primary bg-soap-primary/30 rounded-lg">
+                        <h4 class="text-xl font-bold text-soap-secondary mb-3">什麼是超脂？</h4>
+                        <p class="text-sm">
+                            超脂率（Superfat %）指的是在計算理論所需氫氧化鈉 (NaOH) 用量後，**刻意減少 NaOH 用量，使配方中保留一定比例油脂不被皂化**。
+                        </p>
+                        <h5 class="font-semibold mt-3 text-sm">主要目的：</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm ml-4">
+                            <li>**安全考量：** 確保所有鹼性物質 (NaOH) 都被油脂消耗，防止成品中殘留過多苛性鹼造成皮膚灼傷。</li>
+                            <li>**溫和滋潤：** 未被皂化的油脂能增加肥皂的溫和性、滋潤度和保濕效果。</li>
+                            <li>**配方誤差緩衝：** 彌補油脂品質或秤重時可能出現的微小誤差。</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3">超脂率的計算方式</h4>
+                        <p class="text-sm">
+                            本計算器透過以下公式計算實際所需的 NaOH 用量：
+                        </p>
+                        <div class="bg-gray-100 p-3 rounded-md mt-2 text-center text-sm font-mono">
+                            所需 NaOH = 理論總 NaOH $\times (100\% - \text{超脂率}\%)$
+                        </div>
+                        <h5 class="font-semibold mt-3 text-sm">常見建議範圍：</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm ml-4">
+                            <li>**一般肌膚：** 5% - 8%</li>
+                            <li>**敏感或乾燥肌膚：** 8% - 10% (通常不建議超過 10% 以避免皂體容易酸敗)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="items-center px-4 py-3">
+                    <button onclick="toggleModal('superfat-modal', false)" class="mt-4 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-soap-secondary text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary sm:text-sm">
+                        關閉說明
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal 3: 水比例說明 -->
+    <div id="water-ratio-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 hidden" onclick="toggleModal('water-ratio-modal', false)">
+        <div class="relative top-4 sm:top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-xl bg-white" onclick="event.stopPropagation()">
+            
+            <div class="mt-3 text-center">
+                <h3 class="text-3xl leading-6 font-extrabold text-blue-600 mb-4">
+                    水重量佔油脂比例說明
+                </h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    水的用量會影響皂液的濃稠度、混合速度和皂體完成後的硬度。
+                </p>
+
+                <div class="mt-2 text-left space-y-4 text-gray-700 max-h-[70vh] overflow-y-auto pr-4 modal-content-area">
+                    
+                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-blue-700 mb-3">水比例的意義</h4>
+                        <p class="text-sm">
+                            水重量佔油脂比例（Water Ratio %）指的是**水總重佔油脂總重量的百分比**。
+                        </p>
+                        <h5 class="font-semibold mt-3 text-sm">水的計算公式：</h5>
+                        <div class="bg-gray-100 p-3 rounded-md mt-2 text-center text-sm font-mono">
+                            所需水重量 = 總油脂重量 $\times (\text{水比例}\% / 100)$
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            請注意，這個比例與鹼水濃度不同。鹼水濃度是 NaOH/水 的比例，而這裡的水比例是配方總體積的參考。
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3">不同比例的影響</h4>
+                        <table class="w-full safety-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/4">水比例</th>
+                                    <th>影響與建議</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>**低水 (25% 或更低)**</td>
+                                    <td>加速皂化反應 (Trace 速度快)，成品硬度高。但操作時間短，不易渲染。</td>
+                                </tr>
+                                <tr>
+                                    <td>**標準水 (28% - 35%)**</td>
+                                    <td>最常見的比例。反應速度適中，給予足夠的操作時間。</td>
+                                </tr>
+                                <tr>
+                                    <td>**高水 (38% 或更高)**</td>
+                                    <td>減緩皂化反應，有較長的渲染時間。但脫模需較長時間，成品較軟。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="items-center px-4 py-3">
+                    <button onclick="toggleModal('water-ratio-modal', false)" class="mt-4 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-soap-secondary text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-soap-secondary sm:text-sm">
+                        關閉說明
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 【修改點 2 結束】 -->
+
     <script>
-        // 常用油脂的皂化值 (Saponification Value, SV)
+        // 常用油脂的皂化值 (Saponification Value, SV) **已新增密度 (density)**
         const OIL_SVS = {
-            '橄欖油 (Olive Oil)': { sv_naoh: 0.134, sv_koh: 0.188 },
-            '椰子油 (Coconut Oil)': { sv_naoh: 0.190, sv_koh: 0.266 },
-            '棕櫚油 (Palm Oil)': { sv_naoh: 0.141, sv_koh: 0.198 },
-            '蓖麻油 (Castor Oil)': { sv_naoh: 0.128, sv_koh: 0.180 },
-            '酪梨油 (Avocado Oil)': { sv_naoh: 0.133, sv_koh: 0.187 },
-            '甜杏仁油 (Sweet Almond Oil)': { sv_naoh: 0.136, sv_koh: 0.191 },
-            '荷荷巴油 (Jojoba Oil)': { sv_naoh: 0.066, sv_koh: 0.092 },
-            '乳木果油 (Shea Butter)': { sv_naoh: 0.128, sv_koh: 0.179 },
-            '可可脂 (Cocoa Butter)': { sv_naoh: 0.137, sv_koh: 0.193 },
-            '米糠油 (Rice Bran Oil)': { sv_naoh: 0.131, sv_koh: 0.184 },
-            '其他 (請手動輸入 SV)': { sv_naoh: 0, sv_koh: 0 }
+            // 密度 D (g/mL) 用於體積估算。水密度 D_water 約為 1.0 g/mL。
+            '橄欖油 (Olive Oil)': { sv_naoh: 0.134, sv_koh: 0.188, density: 0.915 },
+            '椰子油 (Coconut Oil)': { sv_naoh: 0.190, sv_koh: 0.266, density: 0.924 },
+            '棕櫚油 (Palm Oil)': { sv_naoh: 0.141, sv_koh: 0.198, density: 0.915 },
+            '蓖麻油 (Castor Oil)': { sv_naoh: 0.128, sv_koh: 0.180, density: 0.957 },
+            '酪梨油 (Avocado Oil)': { sv_naoh: 0.133, sv_koh: 0.187, density: 0.919 },
+            '甜杏仁油 (Sweet Almond Oil)': { sv_naoh: 0.136, sv_koh: 0.191, density: 0.918 },
+            '荷荷巴油 (Jojoba Oil)': { sv_naoh: 0.066, sv_koh: 0.092, density: 0.863 },
+            '乳木果油 (Shea Butter)': { sv_naoh: 0.128, sv_koh: 0.179, density: 0.918 },
+            '可可脂 (Cocoa Butter)': { sv_naoh: 0.137, sv_koh: 0.193, density: 0.900 },
+            '米糠油 (Rice Bran Oil)': { sv_naoh: 0.131, sv_koh: 0.184, density: 0.922 },
+            '其他 (請手動輸入 SV)': { sv_naoh: 0, sv_koh: 0, density: 0.92 } // 使用平均密度
         };
 
         const oilInputContainer = document.getElementById('oil-input');
@@ -383,11 +540,12 @@
         }
 
         /**
-         * 主要計算函數
+         * 主要計算函數 (與原有程式碼相同)
          */
         function calculate() {
             let totalOilWeight = 0;
             let theoreticalLyeNeeded = 0; // 理論所需的 NaOH 重量 (g)
+            let totalOilVolume = 0;       // NEW: 總油脂體積 (mL)
 
             const superfat = parseFloat(document.getElementById('superfat').value) || 0;
             const waterRatio = parseFloat(document.getElementById('waterRatio').value) || 0;
@@ -404,21 +562,31 @@
                 const customSvInput = document.getElementById(`custom-sv-${id}`);
 
                 const oilName = oilSelect ? oilSelect.value : null;
+                // 確保輸入的重量是有效數字
                 const oilWeight = parseFloat(weightInput ? weightInput.value : 0) || 0;
 
                 if (oilName && oilWeight > 0) {
                     let sv_naoh;
+                    let oilDensity; // 油脂密度 (g/mL)
 
                     if (oilName === '其他 (請手動輸入 SV)') {
                         // 使用自定義 SV
                         sv_naoh = parseFloat(customSvInput ? customSvInput.value : 0) || 0;
+                        oilDensity = OIL_SVS[oilName].density; // 使用預設平均密度
                     } else {
-                        // 使用預設 SV
-                        sv_naoh = OIL_SVS[oilName] ? OIL_SVS[oilName].sv_naoh : 0;
+                        // 使用預設 SV 和密度
+                        const oilData = OIL_SVS[oilName];
+                        sv_naoh = oilData ? oilData.sv_naoh : 0;
+                        oilDensity = oilData ? oilData.density : 0.92; // 預防性檢查
                     }
                     
                     // Lye needed for this oil = Oil Weight * NaOH SV (g/g)
                     const lyeForThisOil = oilWeight * sv_naoh;
+
+                    // Volume for this oil = Oil Weight / Oil Density
+                    if (oilDensity > 0) {
+                        totalOilVolume += oilWeight / oilDensity;
+                    }
 
                     totalOilWeight += oilWeight;
                     theoreticalLyeNeeded += lyeForThisOil;
@@ -428,25 +596,35 @@
             // 實際所需的 NaOH (考慮超脂率)
             const actualLyeNeeded = theoreticalLyeNeeded * sfFactor;
 
-            // 建議所需的水量
+            // 建議所需的水量 (水密度約 1 g/mL, 所以重量=體積)
             const requiredWater = totalOilWeight * (waterRatio / 100);
+            const requiredWaterVolume = requiredWater; // 1 g/mL
+
+            // 預估總體積 (mL) = 油脂總體積 + 水總體積
+            const estimatedTotalVolume = totalOilVolume + requiredWaterVolume;
+
 
             // 更新結果顯示
             document.getElementById('totalOilWeight').textContent = totalOilWeight.toFixed(0);
             document.getElementById('requiredLye').textContent = actualLyeNeeded.toFixed(2);
             document.getElementById('requiredWater').textContent = requiredWater.toFixed(2);
+            document.getElementById('estimatedTotalVolume').textContent = estimatedTotalVolume.toFixed(2); // NEW UPDATE
         }
 
         /**
-         * 切換安全指南 Modal 的顯示狀態
+         * 【修改點 3: 通用型 Modal 開關函數】
+         * 切換任何 Modal 的顯示狀態
+         * @param {string} modalId - Modal 的 ID (e.g., 'safety-modal')
          * @param {boolean} show - 決定顯示或隱藏
          */
-        function toggleSafetyGuide(show) {
-            const modal = document.getElementById('safety-modal');
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
             if (show) {
                 modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
             } else {
                 modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
             }
         }
 
