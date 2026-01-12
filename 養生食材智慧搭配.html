@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>養生食材智慧搭配分析器 - 職人工藝全方位版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
+        .result-section { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .method-btn.active { background-color: #166534; color: white; border-color: #166534; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .target-btn.active-target { border-color: #166534; background-color: #f0fdf4; box-shadow: 0 0 0 2px #166534; }
+        .chef-card { background: white; border: 1px solid #e2e8f0; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; border-radius: 1rem; overflow: hidden; }
+        .chef-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: #b45309; }
+        .craft-detail-item { border-left: 3px solid #fbbf24; padding-left: 1rem; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-green-800 mb-2">🌿 養生食材智慧搭配分析器</h1>
+            <p class="text-gray-600">職人深度工藝 • 五臟六腑全方位 • 筋骨肌肉強化</p>
+        </header>
+
+        <!-- Step 1: Target Selection -->
+        <div class="mb-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-green-900 mb-4 flex items-center">
+                <span class="mr-2 text-xl">🎯</span> 第一步：選擇保養目標（點擊自動帶入精選食材）
+            </h2>
+            <div class="flex flex-wrap gap-2">
+                <!-- 筋骨肌肉 -->
+                <button onclick="setTarget('筋')" class="target-btn bg-orange-50 text-orange-700 px-4 py-2 rounded-xl border border-orange-200 hover:bg-orange-100 transition">強筋（骨質）</button>
+                <button onclick="setTarget('肌')" class="target-btn bg-lime-50 text-lime-700 px-4 py-2 rounded-xl border border-lime-200 hover:bg-lime-100 transition">舒肌（緩解）</button>
+                <!-- 精氣神 -->
+                <button onclick="setTarget('精')" class="target-btn bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl border border-indigo-200 hover:bg-indigo-100 transition">補精（腎水）</button>
+                <button onclick="setTarget('氣')" class="target-btn bg-blue-50 text-blue-700 px-4 py-2 rounded-xl border border-blue-200 hover:bg-blue-100 transition">補氣（肺脾）</button>
+                <button onclick="setTarget('神')" class="target-btn bg-purple-50 text-purple-700 px-4 py-2 rounded-xl border border-purple-200 hover:bg-purple-100 transition">安神（心腦）</button>
+                <!-- 五臟 -->
+                <button onclick="setTarget('心')" class="target-btn bg-red-50 text-red-700 px-4 py-2 rounded-xl border border-red-200 hover:bg-red-100 transition">護心（活血）</button>
+                <button onclick="setTarget('肺')" class="target-btn bg-slate-100 text-slate-700 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-200 transition">潤肺（止咳）</button>
+                <button onclick="setTarget('脾')" class="target-btn bg-yellow-50 text-yellow-700 px-4 py-2 rounded-xl border border-yellow-200 hover:bg-yellow-100 transition">健脾（胃氣）</button>
+                <button onclick="setTarget('肝')" class="target-btn bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition">養肝（明目）</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Dish Style -->
+        <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-green-900 mb-4 flex items-center">
+                <span class="mr-2 text-xl">🍲</span> 第二步：選擇料理樣式
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <button onclick="setMethod('滋補藥膳')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">滋補藥膳</button>
+                <button onclick="setMethod('慢熬精華粥')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">慢熬精華粥</button>
+                <button onclick="setMethod('漢方燉補湯')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">漢方燉補湯</button>
+                <button onclick="setMethod('舒壓溫泡茶')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">舒壓溫泡茶</button>
+                <button onclick="setMethod('元氣家常炒')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">元氣家常炒</button>
+                <button onclick="setMethod('潤澤燉甜湯')" class="method-btn border border-gray-300 py-2 text-sm rounded-lg hover:border-green-500 transition">潤澤燉甜湯</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Left Panel -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-green-600">
+                    <h3 class="font-bold text-gray-700 text-sm mb-4">食材清單：</h3>
+                    <div id="ingredient-inputs" class="space-y-3"></div>
+                    <div class="mt-4 flex gap-2">
+                        <button onclick="addInput()" class="flex-1 py-2 text-xs text-green-700 border border-dashed border-green-300 rounded-lg hover:bg-green-50">增加</button>
+                        <button onclick="clearInputs()" class="flex-1 py-2 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50">清空</button>
+                    </div>
+                    <button onclick="analyzeIngredients(true)" class="w-full mt-6 bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-xl shadow-lg transition">🔍 啟動分析</button>
+                </div>
+            </div>
+
+            <!-- Right Results -->
+            <div id="results-anchor" class="lg:col-span-3">
+                <div id="results" class="hidden result-section space-y-6">
+                    <!-- Craft Guide -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-amber-200">
+                        <div class="bg-gradient-to-r from-amber-700 to-amber-600 px-8 py-5 text-white flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold">🍲 職人工藝深度指南</h3>
+                                <p class="text-amber-100 text-xs mt-1">傳承匠心火候，將食材轉化為藥食同源之粹</p>
+                            </div>
+                            <div class="text-right">
+                                <span id="title-method-name" class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">滋補藥膳</span>
+                            </div>
+                        </div>
+                        <div id="craft-content" class="p-8"></div>
+                    </div>
+
+                    <!-- Chef Dishes -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                        <div class="bg-slate-800 px-8 py-5 text-white font-bold">✨ 主廚推薦：深度保養食譜（全系統詳細版）</div>
+                        <div id="chef-dish-list" class="p-8 space-y-8 bg-slate-50/50"></div>
+                    </div>
+                </div>
+                
+                <div id="placeholder" class="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-20 text-center text-gray-400">
+                    <p class="text-6xl mb-4">🥗</p>
+                    <p class="text-lg font-medium">選擇上方保養目標以展開全方位分析</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTarget = '';
+        let currentMethod = '';
+
+        const craftDetails = {
+            '滋補藥膳': {
+                flavor: '醇厚回甘，層次分明',
+                soul: '引藥入經，溫潤不燥',
+                selection: '針對筋骨與臟腑，選用帶骨肉或膠質豐富部位。骨髓能釋放鈣質，助藥性傳遞。',
+                heat: '文火煨燉。沸騰後維持「魚眼泡」狀（約 95°C），防止高溫破壞微量元素。',
+                secret: '藥材須先冷水浸泡使組織舒張。若要強筋，杜仲等木質藥材須「斷絲」後熬煮。',
+                taboo: '忌全程大火，會使湯色渾濁且風味乾澀。'
+            },
+            '慢熬精華粥': {
+                flavor: '綿軟柔滑，米香撲鼻',
+                soul: '米油化露，極致滋陰',
+                selection: '選用新米混搭圓糯米。加入薏仁或芡實可幫助排除臟腑與關節間的濕氣。',
+                heat: '「先武後文」。大火擊碎米粒表面，再轉微火慢熬至米油（粥膜）析出。',
+                secret: '攪拌須朝「同一方向」慢攪。若含肉類，應先滷後粥，確保精華融入米湯。',
+                taboo: '忌中途加冷水，會使粥水分離，口感全失。'
+            },
+            '漢方燉補湯': {
+                flavor: '清甜透亮，入喉生津',
+                soul: '氣血運行，清補合一',
+                selection: '選用油脂少的放山雞或瘦牛肉。針對筋骨痠痛，建議加入牛膝作為下行導引。',
+                heat: '隔水燉煮（最推）。維持恆溫，利用飽和蒸氣慢壓，湯汁不滾動則湯色清如茶。',
+                secret: '藥材過水洗塵。重質藥材先入，輕質及芳香舒筋藥材最後 5 分鐘才下。',
+                taboo: '忌提早放鹽，鹽分會使肉質纖維緊縮，藥味無法滲透。'
+            },
+            '舒壓溫泡茶': {
+                flavor: '芳香輕盈，韻味優雅',
+                soul: '舒肝理氣，香氣療法',
+                selection: '花草需乾燥度高。舒筋類（如伸筋草）需煮沸，花朵類（玫瑰）僅需悶泡。',
+                heat: '精確控溫。花卉類 85°C，草木類建議 100°C 沸水煮過。',
+                secret: '沖泡後務必「加蓋」悶泡，防止有效芳香精油成分隨蒸氣散失。',
+                taboo: '忌用鐵製容器，草本單寧與鐵易反應導致湯色變黑。'
+            },
+            '元氣家常炒': {
+                flavor: '鮮嫩爽脆，鑊氣十足',
+                soul: '鎖住元氣，快速成菜',
+                selection: '食材切大小一致。針對肌肉，選用富含鉀（菠菜）與蛋白質（牛肉）之食材。',
+                heat: '「熱鍋冷油」。大火加熱至冒微煙，倒入油後立即下料，縮短受熱時間。',
+                secret: '起鍋前噴入薑汁酒，薑辣素能促進局部氣血循環，輔助肌肉放鬆。',
+                taboo: '忌頻繁翻動，會導致鍋溫下降使食材「吐水」變軟。'
+            },
+            '潤澤燉甜湯': {
+                flavor: '晶瑩濃厚，甜而不膩',
+                soul: '潤燥生津，以柔克剛',
+                selection: '膠質類（銀耳、桃膠）需徹底泡發。銀耳需撕成極小片以利出膠。',
+                heat: '微火慢熬。銀耳需燉至湯汁拉絲，這才是潤肺生津的核心成分。',
+                secret: '糖類（冰糖）必須「最後一刻」放入，否則久煮會產生酸味。',
+                taboo: '忌用果酸重食材與膠質久燉。'
+            }
+        };
+
+        const chefRecipes = [
+            // 筋與肌 (New)
+            { 
+                name: "伸展柔筋杜仲豬蹄湯", 
+                target: "筋", 
+                match: ["豬蹄", "杜仲", "牛膝"], 
+                ingredients: ["黑豬前蹄1隻", "杜仲20g", "懷牛膝15g", "紅棗5顆"], 
+                steps: ["【膠原活化】豬蹄冷水入鍋加薑片汆燙，撈起後立即沖冰水使組織縮緊。","【藥引製備】杜仲入乾鍋小火微炒至斷絲，藥效釋放更完全。","【長時慢煨】豬蹄與藥材共入砂鍋，小火燉煮2.5小時至膠質釋放。"] 
+            },
+            { 
+                name: "活絡舒肌菠菜牛肉片", 
+                target: "肌", 
+                match: ["牛肉", "菠菜", "芍藥"], 
+                ingredients: ["菲力牛柳200g", "嫩菠菜1把", "芍藥甘草水30cc"], 
+                steps: ["【藥汁醃漬】將牛肉切薄片，加入芍藥甘草濃縮汁與澱粉抓勻醃15分鐘。","【快速封漿】大火快炒牛肉，變色即刻撈出維持嫩度。","【菠菜墊底】菠菜速炒後鋪於盤底，再蓋上牛肉利用餘溫熟成。"] 
+            },
+            // 精氣神 (Classic)
+            { 
+                name: "黑鑽杜仲強腎排骨湯", 
+                target: "精", 
+                match: ["排骨", "黑豆", "杜仲"], 
+                ingredients: ["排骨300g", "黑豆50g", "杜仲15g"], 
+                steps: ["【豆香洗煉】黑豆洗淨瀝乾，入平底鍋中小火乾炒至豆皮裂開散發豆香。","【肉質純化】排骨冷水下鍋，加入米酒去腥，滾後撈起洗淨。","【慢火淬煉】黑豆、排骨、杜仲同煮，文火慢煨90分鐘。"] 
+            },
+            { 
+                name: "宮廷黃耆補氣鮮雞盅", 
+                target: "氣", 
+                match: ["雞肉", "黃耆"], 
+                ingredients: ["土雞腿2隻", "北黃耆20g", "紅棗6顆"], 
+                steps: ["【氣水打底】黃耆先以1000cc水煮20分鐘作為底湯。","【分次入料】將雞塊放入底湯，加入去核紅棗。","【隔水蒸燉】放入蒸鍋，隔水加熱50分鐘，保持湯頭清澈。"] 
+            },
+            { 
+                name: "桂圓百合安神甜湯", 
+                target: "神", 
+                match: ["桂圓", "百合"], 
+                ingredients: ["龍眼乾12顆", "鮮百合1顆", "蓮子20g"], 
+                steps: ["【蓮子預煮】蓮子冷水入鍋煮25分鐘至微鬆軟。","【桂圓增味】加入龍眼乾熬煮出琥珀色湯汁。","【鮮片入味】最後5分鐘加入鮮百合，煮至半透明即可。"] 
+            },
+            // 五臟 (Core)
+            { 
+                name: "番茄木耳活血舒心煲", 
+                target: "心", 
+                match: ["番茄", "黑木耳"], 
+                ingredients: ["牛腱300g", "大番茄3顆", "黑木耳2朵"], 
+                steps: ["【封汁焦化】牛腱切塊煎至表面金黃鎖住肉汁。","【化茄為紅】番茄炒至軟爛出汁，釋放茄紅素。","【清淤慢燉】木耳撕片入鍋，微火煲煮2小時。"] 
+            },
+            { 
+                name: "川貝雪耳潤肺盅", 
+                target: "肺", 
+                match: ["水梨", "銀耳"], 
+                ingredients: ["雪梨1顆", "乾銀耳1/4朵", "川貝粉3g"], 
+                steps: ["【銀耳化膠】銀耳泡發後「手撕極碎」以利膠質溢出。","【水梨鑲嵌】梨頂切開挖心，放入川貝粉與冰糖。","【層次蒸燉】外碗鋪碎銀耳，置入梨球，大火蒸60分鐘。"] 
+            },
+            { 
+                name: "四神健脾粥", 
+                target: "脾", 
+                match: ["山藥", "蓮子", "白茯苓"], 
+                ingredients: ["米1杯", "山藥100g", "茯苓、芡實各15g"], 
+                steps: ["【硬材預泡】芡實與茯苓先泡2小時。","【米油養成】大火煮米5分鐘攪拌至米粒崩解，再轉小火。","【生鮮點睛】最後加入新鮮山藥塊，煮15分鐘至綿軟。"] 
+            },
+            { 
+                name: "翡翠枸杞清炒豬肝片", 
+                target: "肝", 
+                match: ["豬肝", "菠菜", "枸杞"], 
+                ingredients: ["粉肝200g", "菠菜1把", "枸杞1大匙"], 
+                steps: ["【鮮奶除羶】豬肝切片沖水，用鮮奶浸泡15分鐘極致去腥。","【精準醃漬】加米酒、太白粉、麻油抓勻鎖水。","【秒速火候】大火快炒僅45秒，變色即關火，確保脆香。"] 
+            }
+        ];
+
+        const recMap = {
+            '筋': ['豬蹄', '雞爪', '黑豆', '杜仲', '牛膝', '續斷', '花生'],
+            '肌': ['牛肉', '菠菜', '芍藥', '甘草', '香蕉', '伸筋草'],
+            '精': ['排骨', '黑豆', '桑葚', '杜仲', '核桃', '何首烏'],
+            '氣': ['雞肉', '黃耆', '西洋參', '紅棗', '黨參', '大米'],
+            '神': ['小米', '桂圓', '百合', '蓮子', '酸棗仁', '茯神'],
+            '心': ['牛肉', '番茄', '洋蔥', '黑木耳', '丹參', '紅麴'],
+            '肺': ['水梨', '銀耳', '南杏', '枇杷', '羅漢果', '百合'],
+            '脾': ['山藥', '蓮子', '陳皮', '芡實', '茯苓', '白朮'],
+            '肝': ['豬肝', '菠菜', '決明子', '枸杞', '五味子', '菊花']
+        };
+
+        function addInput(val = '') {
+            const container = document.getElementById('ingredient-inputs');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.innerHTML = `<input type="text" value="${val}" placeholder="食材名稱..." class="ingredient-input flex-1 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-green-500 outline-none">
+                             <button onclick="removeInput(this)" class="text-slate-300 hover:text-red-500">✕</button>`;
+            container.appendChild(div);
+        }
+
+        function removeInput(btn) { 
+            btn.parentElement.remove(); 
+            if(document.querySelectorAll('.ingredient-input').length === 0) addInput(); 
+        }
+
+        function clearInputs() { 
+            document.getElementById('ingredient-inputs').innerHTML = ''; 
+            addInput(); 
+        }
+
+        function setTarget(t) {
+            currentTarget = t;
+            document.querySelectorAll('.target-btn').forEach(btn => btn.classList.toggle('active-target', btn.innerText.includes(t)));
+            const container = document.getElementById('ingredient-inputs');
+            container.innerHTML = '';
+            (recMap[t] || []).forEach(ing => addInput(ing));
+            analyzeIngredients(false);
+        }
+
+        function setMethod(m) {
+            currentMethod = m;
+            document.querySelectorAll('.method-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === m));
+            analyzeIngredients(false);
+        }
+
+        function analyzeIngredients(shouldScroll = false) {
+            const inputs = Array.from(document.querySelectorAll('.ingredient-input'));
+            const ingredients = inputs.map(i => i.value.trim()).filter(v => v !== '');
+            if (ingredients.length === 0 && !currentTarget) return;
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+
+            document.getElementById('title-method-name').innerText = currentMethod || '深度烹飪';
+            const g = craftDetails[currentMethod] || { 
+                flavor: '平衡原味', soul: '回歸純粹', selection: '挑選時令鮮食。', heat: '穩定加熱。', secret: '少鹽少油。', taboo: '忌過度加工。' 
+            };
+            
+            document.getElementById('craft-content').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div class="craft-detail-item">
+                            <h4 class="text-amber-800 font-bold text-sm mb-1 italic">【 匠心核心 】</h4>
+                            <p class="text-slate-700 text-sm leading-relaxed"><span class="font-bold">味型：</span>${g.flavor}</p>
+                            <p class="text-slate-700 text-sm leading-relaxed"><span class="font-bold">靈魂：</span>${g.soul}</p>
+                        </div>
+                        <div class="craft-detail-item">
+                            <h4 class="text-amber-800 font-bold text-sm mb-1 italic">【 選材之要 】</h4>
+                            <p class="text-slate-700 text-sm leading-relaxed">${g.selection}</p>
+                        </div>
+                        <div class="craft-detail-item">
+                            <h4 class="text-amber-800 font-bold text-sm mb-1 italic">【 火候秘傳 】</h4>
+                            <p class="text-slate-700 text-sm leading-relaxed">${g.heat}</p>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 h-full">
+                        <div class="mb-4">
+                            <h4 class="text-amber-900 font-bold text-base flex items-center">
+                                <span class="bg-amber-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] mr-2">㊙️</span> 職人私藏工法
+                            </h4>
+                            <p class="text-amber-800 text-sm mt-2 leading-relaxed">${g.secret}</p>
+                        </div>
+                        <hr class="border-amber-200 my-4">
+                        <div>
+                            <h4 class="text-red-900 font-bold text-sm flex items-center">
+                                <span class="text-lg mr-2">⚠️</span> 烹飪禁忌
+                            </h4>
+                            <p class="text-red-800 text-xs mt-2 leading-relaxed">${g.taboo}</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            const chefDiv = document.getElementById('chef-dish-list');
+            chefDiv.innerHTML = '';
+            
+            let matched = chefRecipes.filter(r => r.match.some(m => ingredients.some(i => i.includes(m))));
+            if (matched.length < 4 && currentTarget) {
+                const targetMatched = chefRecipes.filter(r => r.target === currentTarget && !matched.includes(r));
+                matched = matched.concat(targetMatched);
+            }
+            if (matched.length < 4) {
+                matched = matched.concat(chefRecipes.filter(r => !matched.includes(r)));
+            }
+            
+            const finalFour = Array.from(new Set(matched)).slice(0, 4);
+
+            finalFour.forEach(recipe => {
+                chefDiv.innerHTML += `
+                    <div class="chef-card">
+                        <div class="bg-white p-6">
+                            <div class="flex flex-col md:flex-row gap-8">
+                                <div class="md:w-1/3">
+                                    <h4 class="text-xl font-bold text-slate-900 mb-2">${recipe.name}</h4>
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] rounded font-bold mb-4 uppercase">Craft Recipe</span>
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <h5 class="text-[10px] font-bold text-slate-400 mb-2 uppercase">食材 (Ingredients)</h5>
+                                        <ul class="text-xs text-slate-600 space-y-1">
+                                            ${recipe.ingredients.map(ing => `<li>• ${ing}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="md:w-2/3 md:border-l md:border-slate-100 md:pl-8">
+                                    <h5 class="text-[10px] font-bold text-amber-600 mb-3 uppercase tracking-widest">職人製作程序</h5>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        ${recipe.steps.map((s, idx) => `
+                                            <div class="flex gap-4">
+                                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold mt-1">${idx+1}</div>
+                                                <p class="text-sm text-slate-700 leading-relaxed">${s}</p>
+                                            </div>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            if (shouldScroll) document.getElementById('results-anchor').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = () => { addInput(); addInput(); };
+    </script>
+</body>
+</html>
