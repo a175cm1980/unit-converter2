@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中醫青春痘互動調理指南 (進階版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .acne-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .acne-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+        .active-card {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+        .sub-tab {
+            transition: all 0.2s;
+        }
+        .sub-tab.active {
+            background-color: #10b981;
+            color: white;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-emerald-900 mb-4">🌿 中醫青春痘全方位調理指南</h1>
+            <p class="text-gray-600 max-w-3xl mx-auto text-lg">系統性分析四大痘痘體質，提供多元化的內服、外敷與茶飲方案。點擊下方圖卡開始探索。</p>
+        </header>
+
+        <!-- Selection Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div onclick="selectType('lung')" id="card-lung" class="acne-card bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl mb-3">🌬️</div>
+                <h3 class="font-bold text-xl text-emerald-800">肺經風熱型</h3>
+                <p class="text-sm text-gray-500 mt-2">丘疹色紅、癢痛，分佈於額頭與鼻週。</p>
+            </div>
+            <div onclick="selectType('stomach')" id="card-stomach" class="acne-card bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl mb-3">🔥</div>
+                <h3 class="font-bold text-xl text-orange-800">脾胃濕熱型</h3>
+                <p class="text-sm text-gray-500 mt-2">紅腫膿皰明顯，面部油膩，常伴口乾。</p>
+            </div>
+            <div onclick="selectType('blood')" id="card-blood" class="acne-card bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl mb-3">🩸</div>
+                <h3 class="font-bold text-xl text-red-900">血瘀痰結型</h3>
+                <p class="text-sm text-gray-500 mt-2">暗紫硬塊、結節，觸感堅硬，易留疤。</p>
+            </div>
+            <div onclick="selectType('stress')" id="card-stress" class="acne-card bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl mb-3">🌊</div>
+                <h3 class="font-bold text-xl text-blue-800">肝鬱氣滯型</h3>
+                <p class="text-sm text-gray-500 mt-2">與壓力、生理期密切相關，情緒起伏大。</p>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-area" class="hidden fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+                <!-- Main Category Tabs -->
+                <div class="flex flex-wrap border-b bg-gray-50">
+                    <button onclick="switchCategory('medicine')" id="cat-medicine" class="flex-1 py-5 text-center font-bold text-emerald-700 border-b-4 border-emerald-600 bg-white">💊 內服藥方</button>
+                    <button onclick="switchCategory('ointment')" id="cat-ointment" class="flex-1 py-5 text-center font-bold text-gray-500 hover:bg-gray-100">🧴 外敷藥膏</button>
+                    <button onclick="switchCategory('tea')" id="cat-tea" class="flex-1 py-5 text-center font-bold text-gray-500 hover:bg-gray-100">☕ 抗痘茶飲</button>
+                </div>
+
+                <!-- Content Area -->
+                <div class="p-6 md:p-10">
+                    <!-- Option Switcher (Secondary Tabs) -->
+                    <div class="flex space-x-2 mb-8 justify-center">
+                        <button onclick="switchOption(0)" id="opt-0" class="sub-tab px-6 py-2 rounded-full border border-emerald-200 text-emerald-700 active font-medium">選項一 (基礎推薦)</button>
+                        <button onclick="switchOption(1)" id="opt-1" class="sub-tab px-6 py-2 rounded-full border border-emerald-200 text-emerald-700 font-medium">選項二 (加強/進階)</button>
+                    </div>
+
+                    <div id="dynamic-content" class="fade-in">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-sm text-gray-400 border-t pt-8">
+            <p>※ 醫療免責聲明：本程式所提供之藥方與建議僅供學術參考，不具備處方效力。藥材劑量需因個人體質（體重、年齡、寒熱屬性）調整，使用前請務必諮詢合格中醫師。 ※</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentType = '';
+        let currentCategory = 'medicine';
+        let currentOption = 0;
+
+        const acneData = {
+            lung: {
+                medicine: [
+                    {
+                        name: "枇杷清肺飲",
+                        effect: "清泄肺熱，適用於散在性、色紅的風熱粉刺。",
+                        ingredients: ["枇杷葉 12g", "桑白皮 12g", "黃芩 10g", "連翹 12g", "生石膏 20g (先煎)", "甘草 5g"],
+                        method: "生石膏先煮 20 分鐘，再放其餘藥材，水淹過藥材，小火煮 30 分鐘，日服一劑，早晚分服。"
+                    },
+                    {
+                        name: "瀉白散加減",
+                        effect: "清熱化痰，適用於伴有痰熱、氣喘或呼吸道敏感的青春痘。",
+                        ingredients: ["地骨皮 15g", "桑白皮 15g", "粳米 10g", "金銀花 12g", "野菊花 10g"],
+                        method: "所有藥材加入 800ml 水，浸泡 20 分鐘後，大火煮沸轉小火煎煮 25 分鐘，濾渣飲用。"
+                    }
+                ],
+                ointment: [
+                    {
+                        name: "三黃洗劑",
+                        effect: "清熱涼血，適合大面積紅癢。製作簡易且收斂效果佳。",
+                        ingredients: ["黃芩粉 10g", "黃柏粉 10g", "大黃粉 10g", "硫磺粉 2g"],
+                        method: "將粉末混合均勻，使用時加入少許溫水調成稀漿，用棉花蘸取塗抹患處，每日 2-3 次。"
+                    },
+                    {
+                        name: "枇杷葉蛋清面膜",
+                        effect: "消腫、控油，適合皮膚偏油且容易紅癢者。",
+                        ingredients: ["乾枇杷葉粉 20g", "蛋白 1 個"],
+                        method: "將枇杷葉粉與蛋白充分攪拌均勻，敷於面部約 15 分鐘，待乾後以溫水洗淨，每週 2 次。"
+                    }
+                ],
+                tea: [
+                    {
+                        name: "桑菊抗痘茶",
+                        effect: "清熱解毒，適合額頭痘痘多者。",
+                        ingredients: ["桑葉 6g", "菊花 6g", "薄荷 3g (最後放)", "連翹 3g"],
+                        method: "藥材放入杯中，用 500ml 沸水沖泡，悶 10 分鐘，薄荷於最後 2 分鐘放入，避免精油揮發。"
+                    },
+                    {
+                        name: "金銀花連翹飲",
+                        effect: "強力清熱解毒，預防發炎加劇。",
+                        ingredients: ["金銀花 10g", "連翹 10g", "甘草 3g"],
+                        method: "以 600ml 水煎煮至沸騰後 5 分鐘即可，代茶飲，適合天氣悶熱時飲用。"
+                    }
+                ]
+            },
+            stomach: {
+                medicine: [
+                    {
+                        name: "茵陳蒿湯",
+                        effect: "清熱利濕，改善便秘與紅腫膿皰。",
+                        ingredients: ["茵陳蒿 18g", "梔子 12g", "大黃 6g (後下)"],
+                        method: "先煎茵陳與梔子 20 分鐘，最後加入大黃煮 5 分鐘。注意：若排便次數過多請減輕大黃用量。"
+                    },
+                    {
+                        name: "清胃散",
+                        effect: "清胃火、涼血，適合牙齦腫、口臭、膿皰密集者。",
+                        ingredients: ["黃連 6g", "生地 12g", "丹皮 10g", "當歸 10g", "升麻 6g"],
+                        method: "加水 1000ml，煎至 400ml，分兩次溫服。脾胃虛寒者慎用。"
+                    }
+                ],
+                ointment: [
+                    {
+                        name: "黃連珍珠膏",
+                        effect: "極強的殺菌消炎作用，適合已有膿頭的痘痘。",
+                        ingredients: ["黃連粉 5g", "珍珠粉 2g", "凡士林 20g"],
+                        method: "將藥粉與凡士林在乾淨容器中徹底拌勻。清潔患部後局部點塗在紅腫處。"
+                    },
+                    {
+                        name: "綠豆泥敷劑",
+                        effect: "深層清潔與清熱，改善毛孔堵塞。",
+                        ingredients: ["綠豆粉 30g", "生甘草粉 5g", "蒸餾水"],
+                        method: "調成糊狀敷全臉 20 分鐘，重點加強鼻翼與下巴。注意保持濕潤不要乾透到裂開。"
+                    }
+                ],
+                tea: [
+                    {
+                        name: "薏仁荷葉茶",
+                        effect: "祛濕利尿，減少皮膚出油。",
+                        ingredients: ["生薏仁 15g", "乾荷葉 6g", "茯苓 10g"],
+                        method: "薏仁先泡水一小時，加入茯苓煎煮 20 分鐘，熄火前放入荷葉悶泡 10 分鐘。"
+                    },
+                    {
+                        name: "苦瓜乾降火茶",
+                        effect: "清胃降火，解決口臭型痘痘。",
+                        ingredients: ["苦瓜乾 5-8 片", "甘草 2 片"],
+                        method: "用開水沖泡，靜置 10 分鐘，微苦後回甘，適合飯後飲用。"
+                    }
+                ]
+            },
+            blood: {
+                medicine: [
+                    {
+                        name: "桃紅四物湯",
+                        effect: "活血化瘀，針對暗紫色、長期不退的硬塊。",
+                        ingredients: ["當歸 10g", "熟地 12g", "川芎 8g", "赤芍 10g", "桃仁 10g", "紅花 6g"],
+                        method: "常規煎煮法，加水 800ml 煎至 300ml，空腹服用效果佳，但女性經期間請暫停。"
+                    },
+                    {
+                        name: "二陳湯合海藻玉壺湯",
+                        effect: "化痰軟堅，專門針對囊腫型與結節型痘痘。",
+                        ingredients: ["陳皮 10g", "法半夏 10g", "茯苓 12g", "海藻 15g", "昆布 15g", "浙貝母 10g"],
+                        method: "海藻與昆布需漂洗去鹽份。加水煎煮 40 分鐘，藥汁較濃稠，分三次溫服。"
+                    }
+                ],
+                ointment: [
+                    {
+                        name: "大黃蟄蟲面膜 (現代簡易版)",
+                        effect: "強力破除血瘀，幫助硬塊軟化吸收。",
+                        ingredients: ["大黃粉 10g", "田七粉 5g", "白芷粉 5g", "蜂蜜"],
+                        method: "以蜂蜜調和藥粉，敷在結節硬塊處。蜂蜜能幫助藥效滲透並保濕，敷 30 分鐘。"
+                    },
+                    {
+                        name: "丹參潤膚油",
+                        effect: "活血淡疤，適合痘痘後期留下的暗沈疤痕。",
+                        ingredients: ["丹參 20g", "橄欖油或甜杏仁油 100ml"],
+                        method: "丹參切碎泡入油中 2 週（避光）。使用時取 1-2 滴輕輕按摩疤痕處，促進局部循環。"
+                    }
+                ],
+                tea: [
+                    {
+                        name: "丹參玫瑰飲",
+                        effect: "活血化瘀但不傷氣，氣色會變好。",
+                        ingredients: ["丹參 5g", "玫瑰花 5 朵", "紅棗 2 枚 (去核)"],
+                        method: "所有材料放入保溫瓶，加入熱水悶 20 分鐘。可反覆沖泡至味淡。"
+                    },
+                    {
+                        name: "山楂陳皮消導茶",
+                        effect: "助消化、化痰濁，適合體態較豐腴且痘痘暗沈者。",
+                        ingredients: ["山楂乾 10g", "陳皮 5g", "茯苓 5g"],
+                        method: "放入鍋中煮沸 15 分鐘。山楂酸性能軟化瘀點，陳皮則能理氣化痰。"
+                    }
+                ]
+            },
+            stress: {
+                medicine: [
+                    {
+                        name: "丹梔逍遙散",
+                        effect: "疏肝解鬱，解決月經前爆痘與情緒緊張。",
+                        ingredients: ["柴胡 10g", "白芍 12g", "茯苓 12g", "白朮 10g", "當歸 10g", "梔子 6g", "丹皮 6g"],
+                        method: "藥材先浸泡 20 分鐘，大火煮沸後改小火煎 30 分鐘。建議月經前 7 天開始服用。"
+                    },
+                    {
+                        name: "龍膽瀉肝湯",
+                        effect: "清瀉肝經實火，適合痘痘極紅、伴有情緒暴躁與睡眠不佳者。",
+                        ingredients: ["龍膽草 6g", "黃芩 10g", "梔子 10g", "木通 6g", "澤瀉 12g", "生地 15g"],
+                        method: "此方藥力較強，不可久服。煎煮 30 分鐘，中病即止（情況改善即停）。"
+                    }
+                ],
+                ointment: [
+                    {
+                        name: "薰衣草綠茶面膜",
+                        effect: "鎮靜舒緩，降低皮膚受壓力產生的發熱紅腫。",
+                        ingredients: ["綠茶粉 10g", "薰衣草精油 1 滴 (選配)", "蘆薈膠 20g"],
+                        method: "混合後均勻塗抹全臉。綠茶抗氧化，蘆薈鎮靜。對於壓力大導致的微發炎效果顯著。"
+                    },
+                    {
+                        name: "珍珠白芷膏",
+                        effect: "美白、舒緩神經感官，對付色偏紅的壓力痘。",
+                        ingredients: ["珍珠粉 3g", "白芷粉 10g", "純鮮乳少許"],
+                        method: "鮮乳逐次加入粉末中調成濃稠狀，局部加強在壓力痘位置。乳酸也有助於溫和去角質。"
+                    }
+                ],
+                tea: [
+                    {
+                        name: "薄荷疏肝茶",
+                        effect: "理氣、解熱，瞬間舒緩緊繃情緒。",
+                        ingredients: ["薄荷 3g", "合歡皮 6g", "甘草 2g"],
+                        method: "開水沖泡，加蓋悶 5 分鐘。合歡皮具「安神解鬱」之效，能讓人心情平靜。"
+                    },
+                    {
+                        name: "茉莉花理氣飲",
+                        effect: "香氣撲鼻，通暢肝氣，改善經前憂鬱爆痘。",
+                        ingredients: ["茉莉花 6g", "佛手柑 3g", "杞子 5g"],
+                        method: "茉莉花與佛手柑皆能理氣。用 85 度左右溫水沖泡，避免燙壞花瓣香氣。"
+                    }
+                ]
+            }
+        };
+
+        function selectType(type) {
+            currentType = type;
+            document.querySelectorAll('.acne-card').forEach(c => c.classList.remove('active-card'));
+            document.getElementById(`card-${type}`).classList.add('active-card');
+            document.getElementById('result-area').classList.remove('hidden');
+            renderContent();
+        }
+
+        function switchCategory(cat) {
+            currentCategory = cat;
+            const cats = ['medicine', 'ointment', 'tea'];
+            const names = {medicine:'💊 內服藥方', ointment:'🧴 外敷藥膏', tea:'☕ 抗痘茶飲'};
+            
+            cats.forEach(c => {
+                const btn = document.getElementById(`cat-${c}`);
+                if (c === cat) {
+                    btn.classList.add('text-emerald-700', 'border-emerald-600', 'bg-white', 'border-b-4');
+                    btn.classList.remove('text-gray-500', 'hover:bg-gray-100');
+                } else {
+                    btn.classList.remove('text-emerald-700', 'border-emerald-600', 'bg-white', 'border-b-4');
+                    btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+                }
+            });
+            renderContent();
+        }
+
+        function switchOption(opt) {
+            currentOption = opt;
+            document.querySelectorAll('.sub-tab').forEach((t, i) => {
+                if (i === opt) t.classList.add('active');
+                else t.classList.remove('active');
+            });
+            renderContent();
+        }
+
+        function renderContent() {
+            if (!currentType) return;
+            const data = acneData[currentType][currentCategory][currentOption];
+            const contentDiv = document.getElementById('dynamic-content');
+            
+            let colorClass = "emerald";
+            if (currentCategory === 'ointment') colorClass = "blue";
+            if (currentCategory === 'tea') colorClass = "amber";
+
+            contentDiv.innerHTML = `
+                <div class="fade-in">
+                    <div class="flex items-center mb-6">
+                        <div class="h-10 w-2 bg-${colorClass}-500 rounded-full mr-4"></div>
+                        <h2 class="text-3xl font-bold text-gray-800">${data.name}</h2>
+                    </div>
+                    
+                    <div class="bg-${colorClass}-50 border border-${colorClass}-100 p-5 rounded-2xl mb-8">
+                        <p class="text-gray-800 leading-relaxed"><span class="font-bold text-${colorClass}-800">🎯 針對功效：</span>${data.effect}</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <h4 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                                <span class="mr-2">📝</span> 藥材清單
+                            </h4>
+                            <ul class="space-y-2">
+                                ${data.ingredients.map(i => `
+                                    <li class="flex items-center text-gray-600">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-${colorClass}-400 mr-3"></div>
+                                        ${i}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <h4 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                                <span class="mr-2">👨‍🍳</span> 製作與使用方法
+                            </h4>
+                            <p class="text-gray-600 leading-loose text-sm">
+                                ${data.method}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
