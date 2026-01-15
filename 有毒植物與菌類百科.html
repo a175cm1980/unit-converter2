@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 有毒植物與菌類百科 - 影像修復版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f7f4; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .plant-img-container { position: relative; min-height: 300px; background: #e2e8f0; border-radius: 1.5rem; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <header class="bg-emerald-900 text-white py-10 px-4 shadow-xl mb-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-4xl font-bold mb-3">🌿 有毒植物與菌類互動百科</h1>
+            <p class="text-emerald-200 text-lg">AI 視覺辨識與真實影像備案系統</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4">
+        <!-- Search Section -->
+        <section class="mb-10">
+            <div class="glass-card p-8 rounded-3xl shadow-lg border border-emerald-100">
+                <h2 class="text-xl font-bold mb-4 text-emerald-800 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    智慧物種查詢
+                </h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="searchInput" placeholder="輸入物種名稱，例如：夾竹桃、毒蠅傘..." 
+                        class="flex-1 px-6 py-4 rounded-2xl border-2 border-emerald-50 focus:border-emerald-500 outline-none transition-all text-lg shadow-sm">
+                    <button id="searchBtn" onclick="searchPlant()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-2xl transition-all font-bold text-lg shadow-md flex items-center justify-center gap-2">
+                        <span id="btnText">啟動 AI 搜尋</span>
+                        <div id="loader" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    </button>
+                </div>
+                <div id="searchResult" class="mt-8 hidden p-8 bg-white rounded-3xl border border-emerald-100 shadow-inner"></div>
+            </div>
+        </section>
+
+        <!-- Reference Grid -->
+        <section>
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <span class="bg-emerald-100 p-2 rounded-lg text-emerald-700 text-xl">📖</span>
+                    常見危險物種
+                </h2>
+            </div>
+            <div id="plantGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </section>
+    </main>
+
+    <script>
+        const apiKey = "AIzaSyBBSzGH5JOGkGRezckcBDnVu8BVlWqdDCM";
+
+        const plantData = [
+            { name: "夾竹桃", category: "plant", toxicity: "極高", symptom: "心臟毒性、嘔吐" },
+            { name: "毒蠅傘", category: "fungi", toxicity: "高", symptom: "幻覺、肌肉抽搐" },
+            { name: "曼陀羅", category: "plant", toxicity: "高", symptom: "意識不清、瞳孔放大" },
+            { name: "烏頭", category: "plant", toxicity: "極高", symptom: "呼吸衰竭、致命" }
+        ];
+
+        // 影像來源備案：先試 AI，失敗就試維基百科
+        async function fetchImage(plantName) {
+            const prompt = `A highly detailed, professional botanical scientific illustration of ${plantName}, centered, sharp focus, white background.`;
+            
+            // 第一步：嘗試 AI 生成 (Imagen)
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instances: [{ prompt: prompt }],
+                        parameters: { sampleCount: 1 }
+                    })
+                });
+                const data = await response.json();
+                if (data.predictions && data.predictions[0].bytesBase64Encoded) {
+                    return `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+                }
+            } catch (e) {
+                console.warn("AI 生成失敗，嘗試維基百科影像備案...");
+            }
+
+            // 第二步：嘗試從 Wikipedia 取得真實照片 (備案機制)
+            try {
+                const wikiUrl = `https://zh.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(plantName)}`;
+                const response = await fetch(wikiUrl);
+                const data = await response.json();
+                if (data.thumbnail && data.thumbnail.source) {
+                    return data.thumbnail.source;
+                }
+                if (data.originalimage && data.originalimage.source) {
+                    return data.originalimage.source;
+                }
+            } catch (e) {
+                console.error("Wikipedia 影像獲取失敗");
+            }
+            
+            return null;
+        }
+
+        async function searchPlant(queryName) {
+            const input = document.getElementById('searchInput');
+            const query = queryName || input.value.trim();
+            if (!query) return;
+
+            const resultArea = document.getElementById('searchResult');
+            const loader = document.getElementById('loader');
+            const btnText = document.getElementById('btnText');
+            const searchBtn = document.getElementById('searchBtn');
+
+            resultArea.classList.remove('hidden');
+            resultArea.innerHTML = `
+                <div class="flex flex-col items-center py-16">
+                    <div class="w-full max-w-lg h-80 shimmer rounded-3xl mb-8"></div>
+                    <div class="space-y-3 w-full max-w-2xl text-center">
+                        <div class="h-6 w-1/3 bg-gray-100 rounded shimmer mx-auto"></div>
+                        <div class="h-4 w-full bg-gray-100 rounded shimmer"></div>
+                        <p class="mt-8 text-emerald-700 font-bold animate-pulse text-lg">AI 正在搜尋真實影像並生成報告...</p>
+                    </div>
+                </div>
+            `;
+            loader.classList.remove('hidden');
+            btnText.textContent = "搜尋中";
+            searchBtn.disabled = true;
+
+            try {
+                // 文字內容請求
+                const textResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `請詳細介紹「${query}」：包含學名、外觀特徵、中毒症狀與救護建議。請使用繁體中文，格式清晰美觀。` }] }],
+                        tools: [{ "google_search": {} }]
+                    })
+                });
+
+                const textData = await textResponse.json();
+                const aiText = textData.candidates?.[0]?.content?.parts?.[0]?.text || "暫無詳細資料。";
+                
+                // 異步獲取影像 (AI 或 Wiki)
+                const imgUrl = await fetchImage(query);
+
+                const formattedText = aiText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-900">$1</strong>');
+                const imageContent = imgUrl 
+                    ? `<img src="${imgUrl}" class="w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-500 hover:scale-105" onerror="this.parentElement.innerHTML='影像載入錯誤'">`
+                    : `<div class="text-emerald-300 italic text-lg text-center p-8">抱歉，目前無法獲取該物種的影像</div>`;
+
+                resultArea.innerHTML = `
+                    <div class="flex flex-col lg:flex-row gap-10 items-start">
+                        <div class="lg:w-2/5 w-full">
+                            <div class="plant-img-container shadow-inner border-4 border-white bg-white">
+                                ${imageContent}
+                            </div>
+                            <div class="mt-4 p-4 bg-emerald-50 rounded-2xl text-xs text-emerald-800 border border-emerald-100">
+                                💡 <b>辨識提示：</b> 本影像可能為 AI 生成或維基百科提供之示意圖，僅供辨識參考。
+                            </div>
+                        </div>
+                        <div class="lg:w-3/5 w-full">
+                            <h3 class="text-4xl font-extrabold text-emerald-950 mb-6 flex items-center gap-3">
+                                ${query}
+                                <span class="text-sm bg-red-600 text-white px-3 py-1 rounded-lg uppercase tracking-widest font-bold shadow-md">Danger</span>
+                            </h3>
+                            <div class="prose max-w-none text-gray-700 leading-loose text-lg">
+                                ${formattedText}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                resultArea.innerHTML = `<div class="p-8 bg-red-50 text-red-700 rounded-3xl border border-red-200 shadow-sm font-bold">連線異常：${error.message}</div>`;
+            } finally {
+                loader.classList.add('hidden');
+                btnText.textContent = "啟動 AI 搜尋";
+                searchBtn.disabled = false;
+            }
+        }
+
+        function renderPlants() {
+            const grid = document.getElementById('plantGrid');
+            grid.innerHTML = '';
+            plantData.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'glass-card p-6 rounded-3xl border border-white hover:border-emerald-500 hover:shadow-2xl transition-all cursor-pointer group';
+                card.onclick = () => {
+                    document.getElementById('searchInput').value = p.name;
+                    searchPlant(p.name);
+                };
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">百科參考</span>
+                        <span class="text-xs font-bold text-red-600">毒性：${p.toxicity}</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-gray-800 mb-2 group-hover:text-emerald-700 transition-colors">${p.name}</h3>
+                    <p class="text-sm text-gray-500 line-clamp-2">${p.symptom}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.onload = renderPlants;
+    </script>
+</body>
+</html>
