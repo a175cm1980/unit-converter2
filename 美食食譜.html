@@ -1,0 +1,3002 @@
+
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美味互動食譜指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+        .recipe-enter-active, .recipe-leave-active { transition: all 0.3s ease; }
+        .recipe-enter-from, .recipe-leave-to { opacity: 0; transform: translateY(-10px); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div id="app" v-cloak>
+        <!-- 標題欄 -->
+        <header class="bg-orange-500 text-white p-6 shadow-lg sticky top-0 z-20">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+                    <h1 class="text-2xl font-bold">美味互動食譜指南</h1>
+                </div>
+                <div class="relative w-full md:w-64 text-gray-800">
+                    <input
+                        type="text"
+                        placeholder="搜尋料理..."
+                        class="w-full py-2 px-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-300"
+                        v-model="searchQuery"
+                    >
+                    <div class="absolute right-3 top-2.5 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8">
+            <!-- 左側分類選單 -->
+            <aside class="w-full md:w-56 shrink-0">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    料理分類
+                </h2>
+                <nav class="flex md:flex-col gap-2 overflow-x-auto pb-4 md:pb-0">
+                    <button
+                        v-for="cat in categories"
+                        :key="cat"
+                        @click="selectCategory(cat)"
+                        :class="['px-4 py-3 rounded-xl text-left whitespace-nowrap transition-all border-2', 
+                                selectedCategory === cat ? 'bg-orange-500 text-white border-orange-500 shadow-md' : 'bg-white hover:bg-orange-50 border-transparent shadow-sm']"
+                    >
+                        <div class="font-bold">{{ cat }}</div>
+                        <div :class="['text-xs', selectedCategory === cat ? 'text-orange-100' : 'text-gray-400']">
+                            推薦 {{ recipesData[cat].length }} 道料理
+                        </div>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- 右側清單 -->
+            <section class="flex-1">
+                <div class="space-y-4">
+                    <div 
+                        v-for="(recipe, idx) in filteredRecipes" 
+                        :key="idx"
+                        :class="['bg-white rounded-2xl shadow-sm border border-gray-100 transition-all overflow-hidden', 
+                                expandedRecipeIdx === idx ? 'ring-2 ring-orange-500 ring-opacity-50' : 'hover:shadow-md']"
+                    >
+                        <!-- 卡片標題區域 -->
+                        <div 
+                            @click="toggleExpand(idx)"
+                            class="p-5 flex justify-between items-center cursor-pointer select-none"
+                        >
+                            <div>
+                                <h3 class="text-lg font-extrabold">{{ recipe.name }}</h3>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <div class="flex items-center gap-1 text-xs text-orange-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span>{{ recipe.time }}</span>
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        {{ recipe.ingredients.length }} 種食材
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-400">
+                                <svg v-if="expandedRecipeIdx === idx" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- 展開的詳細介紹 -->
+                        <transition name="recipe">
+                            <div v-if="expandedRecipeIdx === idx" class="p-5 pt-0 border-t border-gray-50 bg-white">
+                                <div class="flex flex-col lg:flex-row gap-8 mt-4">
+                                    <!-- 食材 -->
+                                    <div class="lg:w-1/3 bg-orange-50 rounded-xl p-4">
+                                        <h4 class="font-bold text-orange-600 mb-2 flex items-center gap-1 text-sm">
+                                            <span class="w-1 h-4 bg-orange-400 rounded-full"></span>
+                                            所需食材
+                                        </h4>
+                                        <ul class="space-y-1.5 text-gray-700 text-sm">
+                                            <li v-for="(ing, i) in recipe.ingredients" :key="i" class="flex items-start gap-1">
+                                                <span class="text-orange-400">•</span>
+                                                {{ ing }}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 步驟 -->
+                                    <div class="lg:w-2/3">
+                                        <h4 class="font-bold text-orange-600 mb-3 flex items-center gap-1 text-sm">
+                                            <span class="w-1 h-4 bg-orange-400 rounded-full"></span>
+                                            詳細步驟
+                                        </h4>
+                                        <div class="space-y-3">
+                                            <div v-for="(step, i) in recipe.steps" :key="i" class="flex gap-3">
+                                                <div class="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xs font-black">
+                                                    {{ i + 1 }}
+                                                </div>
+                                                <p class="text-gray-700 text-sm leading-relaxed">
+                                                    {{ step }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex justify-end">
+                                    <button 
+                                        @click="expandedRecipeIdx = null"
+                                        class="text-xs text-orange-500 hover:underline font-bold"
+                                    >
+                                        收合介紹
+                                    </button>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
+
+                    <div v-if="filteredRecipes.length === 0" class="text-center py-20 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
+                        找不到相關料理，換個關鍵字試試吧！
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center py-10 text-gray-400 text-sm">
+            <p class="mb-1">© 2025 美味互動食譜指南 - 傳遞料理的溫度</p>
+            <p>用心做菜，生活更有滋味</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const selectedCategory = ref('粥');
+                const expandedRecipeIdx = ref(null);
+                const searchQuery = ref('');
+
+                const recipesData = {
+                    '粥': [
+                            { 
+                             name: '皮蛋瘦肉粥', 
+                             ingredients: ['白米 1杯', '皮蛋 2顆', '豬里肌肉 100g', '薑絲 少許', '蔥花 適量', '白胡椒粉', '鹽'], 
+                             steps: [
+                                     '白米洗淨後浸泡30分鐘，瀝乾水份拌入少許油備用。',
+                                     '豬里肌肉切絲，用少許鹽、米酒及太白粉醃製15分鐘。',
+                                     '皮蛋一顆切碎（煮進粥裡化開），另一顆切丁（最後加入增加口感）。',
+                                     '鍋中放入10倍水燒開，放入白米大火煮10分鐘後轉中小火熬煮20分鐘至米粒開花。',
+                                     '放入切碎的皮蛋與薑絲，持續攪拌煮至濃稠。',
+                                     '轉大火放入肉絲撥散煮熟，再放入皮蛋丁、鹽、胡椒粉調味。',
+                                     '熄火盛碗，撒上蔥花即可。'
+                                   ], 
+                             time: '45分鐘' 
+                            },
+
+                            { 
+                             name: '生滾魚片粥', 
+                             ingredients: ['白米 1杯', '鯛魚片 150g', '薑絲', '米酒', '白胡椒', '芹菜末'], 
+                             steps: [
+                                     '將白米熬煮成綿密的基底白粥備用。',
+                                     '魚片切成0.5公分薄片，用薑絲、米酒、白胡椒粉和少許油輕輕抓醃。',
+                                     '將白粥大火煮滾，保持沸騰狀態。',
+                                     '迅速鋪入魚片並撥散，立刻關火，利用餘溫悶煮2分鐘。',
+                                     '撒上芹菜末與白胡椒粉增香。'
+                                    ], 
+                             time: '35分鐘' 
+                            },
+
+                            { 
+                             name: '香菇雞肉粥',
+                             ingredients: ['白米 1杯', '雞腿肉 150g', '乾香菇 5朵', '薑片'],
+                             steps: ['香菇泡軟切絲炒香。', '雞肉切塊汆燙去血水。', '米與食材同煮成粥。', '加鹽調味即可。'],
+                             time: '40分鐘' 
+                            },
+
+                            { 
+                             name: '南瓜山藥粥',
+                             ingredients: ['白米 1杯', '南瓜 150g', '山藥 100g', '枸杞'],
+                             steps: ['南瓜切塊，米洗淨同煮。', '粥濃稠時加入山藥丁煮熟。', '最後撒上枸杞微悶。'],
+                             time: '35分鐘'
+                            },
+
+                            { 
+                             name: '海鮮砂鍋粥',
+                             ingredients: ['白米 1杯', '蝦子 6隻', '蛤蜊 10顆', '蟹腿肉', '冬菜'],
+                             steps: ['米入砂鍋大火煮開。', '下海鮮料煮至變色。', '放入冬菜增鮮。', '撒胡椒粉與芹菜。'],
+                             time: '50分鐘'
+                            },
+
+                            { 
+                             name: '滑雞生菜粥', 
+                             ingredients: ['白米 1杯', '雞柳 100g', '生菜絲', '薑片'],
+                             steps: ['白粥煮好。', '雞柳醃過下鍋煮至滑嫩。', '熄火前撒入生菜絲拌勻。'],
+                             time: '30分鐘'
+                            },
+
+                            { 
+                             name: '蓮子百合紅棗粥',
+                             ingredients: ['白米 1杯', '蓮子', '百合', '紅棗', '冰糖'],
+                             steps: ['蓮子、百合浸泡。', '所有食材大火煮開轉小火熬爛。', '加入冰糖調味。'],
+                             time: '60分鐘'
+                            },
+
+                            { 
+                             name: '皮蛋玉米肉片粥',
+                             ingredients: ['白米 1杯', '玉米粒', '豬肉片', '皮蛋', '薑'],
+                             steps: ['白粥底煮好。', '放入玉米與皮蛋碎煮滾。', '肉片入鍋燙熟，調味完成。'],
+                             time: '35分鐘'
+                            },
+
+                            {
+                             name: '金銀蛋菜心粥',
+                             ingredients: ['白米 1杯', '鹹蛋 1顆', '皮蛋 1顆', '菜心丁'],
+                             steps: ['雙蛋切丁。', '粥底煮好放入雙蛋與菜心。', '煮至菜心斷生即可。'],
+                             time: '35分鐘'
+                            },
+
+                            { 
+                             name: '狀元及第粥',
+                             ingredients: ['白米 1杯', '豬肝', '豬肚', '粉腸', '肉丸'],
+                             steps: ['處理豬雜並汆燙。', '滾粥底，依次放入食材煮熟。', '撒上脆炸油條碎食用。'],
+                             time: '55分鐘'
+                            },
+
+                            {
+                             name: '瑤柱排骨粥',
+                             ingredients: ['白米 1杯', '干貝 5顆', '小排骨 200g', '薑片'],
+                             steps: ['干貝泡軟撕絲，排骨汆燙。', '所有材料入鍋熬至排骨軟爛。', '加鹽提鮮。'],
+                             time: '90分鐘'
+                            },
+
+                            { 
+                             name: '黑米核桃粥',
+                             ingredients: ['白米 1/2杯', '黑米 1/2杯', '核桃仁', '紅糖'],
+                             steps: ['黑米浸泡4小時。', '混合白米與核桃熬煮成濃粥。', '拌入紅糖即可。'],
+                             time: '80分鐘'
+                            },
+
+                            {
+                             name: '地瓜粥',
+                             ingredients: ['白米 1杯', '地瓜 1條'],
+                             steps: ['地瓜去皮切大塊。', '與米、水同煮至地瓜軟糯。', '最純粹的古早味。'],
+                             time: '30分鐘'
+                            },
+
+                            {
+                             name: '銀耳燕麥粥',
+                             ingredients: ['燕麥片 1杯', '銀耳', '枸杞', '蜂蜜'],
+                             steps: ['銀耳泡發去蒂。', '與燕麥煮成濃稠狀。', '稍涼後拌入蜂蜜。'],
+                             time: '20分鐘'
+                            },
+
+                            {
+                             name: '桂圓蓮子粥',
+                             ingredients: ['糯米 1杯', '桂圓乾', '蓮子', '冰糖'],
+                             steps: ['糯米浸泡。', '桂圓與蓮子同煮。', '熬至軟爛加糖。'],
+                             time: '50分鐘'
+                            },
+
+                            {
+                             name: '冬瓜薏仁粥',
+                             ingredients: ['白米 1杯', '冬瓜 200g', '薏仁 30g'],
+                             steps: ['薏仁先煮半小時。', '放入米與冬瓜塊煮成粥。', '清熱解暑良品。'],
+                             time: '60分鐘'
+                            },
+
+                            {
+                             name: '蟹黃粥',
+                             ingredients: ['白米 1杯', '螃蟹 1隻', '鹹蛋黃 2顆', '薑'],
+                             steps: ['螃蟹切塊，鹹蛋黃壓碎。', '炒香蛋黃，與粥底、螃蟹同煮。', '鮮香濃郁。'],
+                             time: '45分鐘'
+                            },
+
+                            {
+                             name: '牛奶水果粥',
+                             ingredients: ['白米 1/2杯', '鮮奶 200ml', '草莓', '奇異果'],
+                             steps: ['米煮成厚粥。', '倒入鮮奶煮熱。', '放入水果塊即食。'],
+                             time: '25分鐘'
+                            },
+
+                            {
+                             name: '扁豆茯苓粥',
+                             ingredients: ['白米 1杯', '白扁豆', '茯苓', '淮山'],
+                             steps: ['藥膳食材洗淨。', '與米同煮至熟爛。', '溫潤補氣。'],
+                             time: '70分鐘'
+                            },
+
+                            {
+                             name: '香油菠菜蛋花粥',
+                             ingredients: ['白米 1杯', '菠菜', '雞蛋 1顆', '香油'],
+                             steps: ['白粥煮好。', '放入菠菜葉煮軟。', '淋入蛋液攪散，點香油。'],
+                             time: '20分鐘'
+                            }
+
+                            ],
+                    '肉': [
+                            {
+                            name: '秘製紅燒肉',
+                            ingredients: ['五花肉 600g', '冰糖 30g', '醬油 4大勺', '八角 2顆', '薑片 5片', '米酒 2勺', '蔥結 1個'],
+                            steps: ['五花肉切成3公分方塊，冷水下鍋加薑片、米酒煮沸燙去血水撈出瀝乾。', '熱鍋不放油，下肉塊中小火煸炒出油脂，至肉表面金黃後盛出。', '利用剩餘豬油小火炒冰糖，待融化呈深紅色焦糖狀。', '倒入肉塊快速翻炒上色。', '加入醬油、米酒、八角、蔥結。', '倒入足量熱水沒過肉塊，大火燒開後轉小火燉煮50分鐘。', '最後大火收汁至濃稠亮澤即可。'],
+                            time: '75分鐘'
+                            },
+                            {
+                            name: '經典宮保雞丁',
+                            ingredients: ['雞胸肉 300g', '乾辣椒 15g', '炸花生米 50g', '花椒 1小匙', '薑片/蒜片', '蔥段', '調味料(生抽/老抽/糖/醋/澱粉)'],
+                            steps: ['雞胸肉切丁，用少許鹽、生抽、太白粉醃漬15分鐘。', '調醬汁：碗中放入生抽、老抽、糖、醋、水澱粉比例為2:1:2:2:1。', '熱鍋涼油，下雞丁快速滑散至變色盛出。', '留底油，小火爆香花椒、乾辣椒至棕紅色。', '加入蔥薑蒜爆香，回鍋雞丁。', '倒入調好的醬汁大火快炒均勻。', '最後拌入花生米即可出鍋。'],
+                            time: '25分鐘'
+                            },
+                            {
+                            name: '蘇式東坡肉',
+                            ingredients: ['五花肉塊 500g', '紹興酒 200ml', '生抽/老抽', '冰糖 50g', '小蔥', '生薑'],
+                            steps: ['五花肉汆燙切成5公分正方形，用棉繩十字綁好。', '砂鍋底部鋪滿蔥段與厚薑片防止黏底。', '肉皮朝下整齊碼放，倒入紹興酒、生抽、老抽、冰糖。', '大火燒開後轉極小火悶煮1.5小時。', '將肉塊翻面皮朝上，繼續悶煮30分鐘至軟爛。', '最後放入蒸籠蒸20分鐘，瀝出油脂使肉質更Q軟。'],
+                            time: '150分鐘'
+                            },
+                            {
+                            name: '馬鈴薯燉牛肉',
+                            ingredients: ['牛肋條 500g', '馬鈴薯 2個', '胡蘿蔔 1根', '洋蔥 半個', '醬油', '冰糖', '薑片'],
+                            steps: ['牛肉切塊汆燙。馬鈴薯、胡蘿蔔、洋蔥切塊。', '熱鍋下油炒香洋蔥與牛肉。', '加入醬油、冰糖、薑片及熱水，小火燉煮40分鐘。', '放入馬鈴薯與胡蘿蔔。', '繼續燉煮20分鐘至蔬菜變軟，湯汁收濃。'],
+                            time: '70分鐘'
+                            },
+                            {
+                            name: '回鍋肉',
+                            ingredients: ['五花肉 300g', '蒜苗 2根', '豆瓣醬 1勺', '豆豉 少許', '甜麵醬 1小勺', '青椒'],
+                            steps: ['五花肉冷水入鍋加薑片、花椒煮至8分熟（筷子可穿透）。', '撈出冷卻後切成薄片。', '熱鍋下少許油，下肉片煸炒至呈「燈盞窩」狀。', '加入豆瓣醬、豆豉、甜麵醬炒出紅油。', '放入青椒與蒜苗段，大火快速翻炒至斷生即可。'],
+                            time: '35分鐘'
+                            },
+                            {
+                            name: '家常獅子頭',
+                            ingredients: ['豬絞肉(肥3瘦7) 500g', '大白菜 半顆', '荸薺 5個', '雞蛋 1顆', '生粉', '醬油'],
+                            steps: ['絞肉加荸薺末、蛋液、鹽、生粉，朝同一方向攪打至上勁。', '將肉團揉成大球狀。', '熱鍋下油，將肉丸表面炸至金黃定型。', '砂鍋底鋪白菜，放上肉丸，加水與醬油調味。', '中小火悶煮40分鐘至肉丸入口即化。'],
+                            time: '60分鐘'
+                            },
+                            {
+                            name: '蒜泥白肉',
+                            ingredients: ['帶皮五花肉 400g', '蒜末 2大勺', '辣油 1大勺', '生抽/醋/糖/香油', '小黃瓜絲'],
+                            steps: ['五花肉加蔥薑酒煮至全熟撈出沖涼。', '切成超薄片。', '盤底鋪上黃瓜絲。', '調製醬汁：蒜泥中混入生抽、醋、糖、辣油、香油。', '肉片整齊鋪好，淋上足量醬汁。'],
+                            time: '30分鐘'
+                            },
+                            {
+                            name: '糖醋排骨',
+                            ingredients: ['小排骨 500g', '白芝麻', '糖/醋/醬油/料酒', '薑片'],
+                            steps: ['排骨汆燙。', '鍋中加油炒香薑片，下排骨翻炒。', '按比例加入調味：1勺酒、2勺醬油、3勺糖、4勺醋。', '加水沒過排骨，中火煮30分鐘。', '大火收汁使排骨掛滿深紅芡汁，撒芝麻。'],
+                            time: '45分鐘'
+                            },
+                            {
+                            name: '蔥爆羊肉',
+                            ingredients: ['羊肉片 300g', '大蔥 2根', '生抽/老抽/料酒', '孜然粉', '薑絲'],
+                            steps: ['羊肉用生抽、料酒、孜然粉醃製。', '大蔥斜切厚片。', '熱鍋旺油，下羊肉快速炒至變色盛出。', '留底油炒香大蔥。', '倒入羊肉，加鹽、胡椒粉，大火翻炒10秒即可。'],
+                            time: '15分鐘'
+                            },
+                            {                            name: '粉蒸肉',
+                            ingredients: ['五花肉 400g', '蒸肉粉 1包', '地瓜 1個', '豆瓣醬', '甜麵醬'],
+                            steps: ['五花肉切片，用豆瓣醬、甜麵醬、酒拌勻醃20分鐘。', '每片肉均勻裹上蒸肉粉。', '碗底鋪上地瓜塊，上面鋪上肉片。', '入蒸鍋大火蒸60分鐘至軟糯。'],
+                            time: '80分鐘'
+                            },
+                            {
+                            name: '黑胡椒牛肉片',
+                            ingredients: ['牛肉片 250g', '青椒/紅椒', '黑胡椒粒', '洋蔥', '生粉'],
+                            steps: ['牛肉用生抽、黑胡椒、生粉醃漬。', '先炒香洋蔥與青紅椒備用。', '熱鍋熱油滑熟牛肉。', '加入黑胡椒醬與蔬菜，快速拌勻。'],
+                            time: '20分鐘'
+                            },
+                            {
+                            name: '三杯雞',
+                            ingredients: ['雞腿肉 500g', '九層塔', '薑片', '蒜頭', '麻油/醬油/米酒'],
+                            steps: ['麻油爆香薑片至邊緣捲曲。', '下雞肉塊炒至金黃。', '加入醬油、米酒、冰糖調味。', '中火燜煮至湯汁收乾。', '熄火放入九層塔快速翻動。'],
+                            time: '35分鐘'
+                            },
+                            {
+                            name: '京醬肉絲',
+                            ingredients: ['豬里肌肉 200g', '甜麵醬 2大勺', '蔥白絲', '豆腐皮'],
+                            steps: ['里肌肉切絲，加蛋清、生粉抓勻醃製。', '熱鍋滑熟肉絲撈出。', '鍋留底油炒香甜麵醬、糖與少許水。', '倒入肉絲均勻裹上醬汁。', '搭配蔥絲與豆腐皮包裹食用。'],
+                            time: '20分鐘'
+                            },
+                            {
+                            name: '蜜汁叉燒(簡易版)',
+                            ingredients: ['梅花肉 500g', '叉燒醬 3勺', '蜂蜜', '料酒/薑末'],
+                            steps: ['梅花肉切長條，用叉燒醬、蜂蜜醃製隔夜。', '烤箱預熱200度。', '入烤箱正反面各烤20分鐘，期間反覆塗抹殘餘醬汁與蜂蜜。', '出爐稍涼後切片。'],
+                            time: '50分鐘'
+                            },
+                            {
+                            name: '台式滷肉醬',
+                            ingredients: ['豬皮/絞肉 500g', '紅蔥頭酥', '五香粉', '醬油', '冰糖'],
+                            steps: ['紅蔥頭切碎炸香（或用現成紅蔥酥）。', '下絞肉炒至散開出油。', '加入醬油、冰糖、五香粉炒香。', '加水小火熬煮至少1小時至湯汁黏稠。'],
+                            time: '70分鐘'
+                            },
+                            {
+                            name: '孜然排骨',
+                            ingredients: ['小排骨 400g', '孜然粉/粒', '辣椒粉', '蒜末'],
+                            steps: ['排骨煮熟撈出。', '熱鍋下油炸排骨至表面乾焦。', '下蒜末炒香，撒入大量孜然粉、辣椒粉與鹽。', '翻炒均勻出香味。'],
+                            time: '30分鐘'
+                            },
+                            {
+                            name: '珍珠丸子',
+                            ingredients: ['豬絞肉 300g', '長糯米 100g', '蔥薑末', '香油'],
+                            steps: ['糯米浸泡4小時。', '絞肉調味後捏成小圓球。', '肉丸在外圍滾上一層糯米。', '大火蒸15-20分鐘。'],
+                            time: '40分鐘'
+                            },
+                            {
+                            name: '滑蛋牛肉',
+                            ingredients: ['牛肉片 200g', '雞蛋 3顆', '蔥花', '生粉'],
+                            steps: ['牛肉醃嫩後快速炒熟備用。', '蛋液中加入鹽與蔥花。', '熱鍋下油，蛋液剛凝固時放入牛肉。', '半熟狀態立即出鍋。'],
+                            time: '15分鐘'
+                            },
+                            {
+                            name: '可樂雞翅',
+                            ingredients: ['雞翅 10隻', '可樂 1罐', '薑片', '醬油'],
+                            steps: ['雞翅劃刀，冷水下鍋燙洗。', '鍋中加油將雞翅煎至兩面微黃。', '倒入可樂、醬油、薑片。', '中小火煮20分鐘至湯汁濃稠收乾。'],
+                            time: '30分鐘'
+                            },
+                            {
+                            name: '南乳扣肉',
+                            ingredients: ['五花肉 500g', '紅南乳 2塊', '薑片/大蒜', '生粉'],
+                            steps: ['五花肉煮熟抹上老抽，皮朝下炸至起泡。', '切厚片用南乳汁醃漬。', '皮朝下整齊擺入碗中，鋪上薑蒜。', '蒸2小時至肉片入口即化，扣入盤中。'],
+                            time: '130分鐘'
+                            }
+                            ],
+                    '海鮮': [
+                            {
+                            name: '蒜蓉粉絲蒸扇貝', 
+                            ingredients: ['大扇貝 6顆', '龍口粉絲 1把', '大蒜 2整球', '生抽 2勺', '蔥花/辣椒圈', '熱油'], 
+                            steps: ['粉絲泡軟切段鋪在扇貝殼底。', '扇貝肉洗淨去黑腸，放回粉絲上。', '大蒜切末，一半油炸至金黃，混合另一半生蒜末，加鹽、糖、生抽調勻。', '將蒜蓉醬均勻鋪在扇貝上。', '入蒸鍋大火蒸5-8分鐘。', '出鍋撒蔥花、辣椒圈，澆上一勺熱油即可。'], 
+                            time: '20分鐘' 
+                            },
+                            { 
+                            name: '泰式清蒸檸檬魚', 
+                            ingredients: ['鱸魚 1條', '檸檬 2顆', '魚露 2大勺', '砂糖 1勺', '辣椒 3根', '蒜末 1大勺', '香菜'], 
+                            steps: ['鱸魚洗淨劃刀，抹少許鹽與米酒墊薑片蒸10分鐘。', '製作醬汁：混合擠出的檸檬汁、魚露、糖、切碎的辣椒、蒜末。', '魚蒸好後倒掉多餘腥水，淋上醬汁。', '撒上大量香菜，可邊加熱邊吃更入味。'], 
+                            time: '20分鐘' 
+                            },
+                            { 
+                            name: '避風塘炒蝦', 
+                            ingredients: ['大蝦 12隻', '麵包粉 1杯', '大蒜末 3大勺', '豆豉 1小勺', '乾辣椒/蔥花', '生粉'], 
+                            steps: ['蝦子剪鬚去腸泥，抹乾水份沾薄薄生粉。', '油鍋燒熱將蝦子炸至酥脆盛出。', '小火炸香大量蒜末至淡黃色，加入豆豉、乾辣椒與麵包粉。', '炒至麵包粉金黃酥脆後，將蝦子回鍋。', '加鹽調味，快速翻炒使蝦身裹滿蒜酥與麵包粉。'], 
+                            time: '25分鐘' 
+                            },
+                            { 
+                            name: '蛤蜊燉蛋(水蒸蛋)', 
+                            ingredients: ['蛤蜊 15顆', '雞蛋 3顆', '溫水 (蛋液的1.5倍)', '生抽/香油'], 
+                            steps: ['蛤蜊吐沙洗淨，加少許水煮至剛開口撈出。', '雞蛋打散，加入蛤蜊原湯與溫水，過濾掉氣泡。', '將蛤蜊整齊放入深盤，緩緩倒入蛋液。', '蓋上保鮮膜劃小孔，中火蒸10-12分鐘。', '出鍋淋生抽與香油。'], 
+                            time: '20分鐘' 
+                            },
+                            { 
+                             name: '金沙中卷', 
+                             ingredients: ['中卷 2隻', '鹹蛋黃 3顆', '蒜末', '蔥花', '生粉'], 
+                             steps: ['中卷切圈，汆燙後抹乾水份沾生粉。', '將中卷圈入鍋略炸至定型撈出。', '熱鍋小火炒香鹹蛋黃至冒細泡。', '放入蒜末與中卷圈，快速翻炒至每圈均勻裹上蛋黃。', '撒上蔥花增加色彩。'], 
+                             time: '25分鐘' 
+                             },
+                            { 
+                             name: '紅燒大蝦', 
+                             ingredients: ['大白蝦 10隻', '薑片/蒜片', '生抽', '老抽', '糖', '番茄醬 (可選)'], 
+                             steps: ['大蝦去蝦線，鍋中煎至兩面發紅變脆。', '爆香薑片、蒜片。', '加入生抽、老抽、足量白糖翻炒。', '加少許水燜煮3分鐘，大火收汁至粘稠掛在蝦身上。'], 
+                             time: '15分鐘' 
+                             },
+                            { 
+                             name: '清燉獅子頭(魚肉版)', 
+                             ingredients: ['草魚肉 400g', '肥肉末 50g', '荸薺', '雞蛋 1個', '青江菜'], 
+                             steps: ['魚肉去骨剁成泥，與肥肉末、荸薺碎混勻。', '加鹽、酒、蛋清朝一方向攪打上勁。', '捏成圓丸子，入滾水微火浸熟。', '湯底加青江菜，清爽鮮甜。'], 
+                             time: '50分鐘' 
+                             },
+                            { 
+                             name: '香煎干貝', 
+                             ingredients: ['大干貝 6顆', '奶油 15g', '黑胡椒', '海鹽', '檸檬'], 
+                             steps: ['干貝徹底吸乾水份，撒上鹽與胡椒。', '平底鍋燒熱噴煙，下油將一面煎1.5分鐘至焦黃。', '翻面下奶油與大蒜瓣，用湯匙將融化奶油淋在干貝上。', '兩面金黃即起鍋，擠上檸檬汁。'], 
+                             time: '10分鐘' 
+                             },
+                            { 
+                             name: '三杯透抽', 
+                             ingredients: ['透抽 2隻', '九層塔', '薑片', '大蒜', '麻油/醬油/米酒'], 
+                             steps: ['透抽切圈汆燙備用。', '麻油爆香薑片至邊緣捲曲。', '下大蒜與透抽翻炒。', '加醬油、米酒、冰糖大火收汁。', '熄火前放入九層塔拌勻。'], 
+                             time: '15分鐘' 
+                             },
+                            { 
+                             name: '酥炸蚵仔酥', 
+                             ingredients: ['鮮蚵 300g', '九層塔', '地瓜粉', '胡椒鹽'], 
+                             steps: ['蚵仔洗淨瀝乾水份。', '均勻裹上粗粒地瓜粉，靜置1分鐘待反潮。', '高溫油炸至金黃酥脆。', '最後投入九層塔炸香立即撈出，撒胡椒鹽食用。'], 
+                             time: '15分鐘' 
+                             },
+                            { 
+                             name: '清蒸大閘蟹', 
+                             ingredients: ['大閘蟹 2隻', '薑片', '紫蘇葉', '鎮江香醋/薑絲'], 
+                             steps: ['螃蟹刷洗乾淨，肚子朝上放在紫蘇葉上，壓上薑片。', '大火蒸15-20分鐘(視大小而定)。', '搭配薑絲與香醋調成的蘸醬。'], 
+                             time: '25分鐘' 
+                             },
+                            { 
+                             name: '鳳梨蝦球', 
+                             ingredients: ['蝦仁 200g', '鳳梨罐頭', '美乃滋', '雞蛋/太白粉'], 
+                             steps: ['蝦仁去腸泥背部劃深，沾蛋液與太白粉。', '炸至金黃捲曲呈球狀。', '美乃滋混合一點檸檬汁。', '將蝦球、鳳梨塊與醬汁快速拌勻。'], 
+                             time: '20分鐘' 
+                             },
+                            { 
+                             name: '醬爆海瓜子', 
+                             ingredients: ['海瓜子 500g', '九層塔', '沙茶醬 1勺', '薑末/蒜末', '辣椒'], 
+                             steps: ['海瓜子燙開口。', '熱鍋爆香薑、蒜、辣椒與沙茶醬。', '倒入海瓜子大火快炒。', '起鍋前撒入九層塔。'], 
+                             time: '10分鐘' 
+                             },
+                            { 
+                             name: '味噌魚片湯', 
+                             ingredients: ['鯛魚片 200g', '嫩豆腐 1塊', '味噌 2勺', '蔥花', '柴魚片'], 
+                             steps: ['水燒開放豆腐煮滾。', '味噌先用溫水化開倒入。', '放入魚片煮熟(約2分鐘)。', '撒上蔥花與柴魚片。'], 
+                             time: '15分鐘' 
+                             },
+                            { 
+                             name: 'XO醬炒生干貝', 
+                             ingredients: ['生干貝 10顆', '蜜蘭豆', '紅椒', 'XO醬 1大勺'], 
+                             steps: ['干貝略煎定型。', '炒熟蜜蘭豆與紅椒片。', '加入XO醬與干貝大火翻炒均勻。'], 
+                             time: '10分鐘' 
+                             },
+                            { 
+                             name: '豆瓣紅燒魚', 
+                             ingredients: ['黃魚 1條', '辣豆瓣醬 1勺', '薑末/蒜末/蔥花', '醋/糖'], 
+                             steps: ['魚兩面煎至金黃備用。', '炒香薑蒜末與豆瓣醬。', '加水、糖、醋煮滾後放入魚。', '中火燜煮至湯汁濃稠，淋在魚身上。'], 
+                             time: '30分鐘' 
+                             },
+                            { 
+                             name: '清酒蛤蜊', 
+                             ingredients: ['蛤蜊 400g', '清酒 半杯', '奶油 5g', '蒜片', '乾辣椒'], 
+                             steps: ['蒜片、辣椒下油鍋爆香。', '倒入蛤蜊與清酒，蓋上鍋蓋煮至全開。', '最後放入一小塊奶油拌勻。'], 
+                             time: '10分鐘' 
+                             },
+                            { 
+                             name: '紅蟳米糕', 
+                             ingredients: ['紅蟳 1隻', '糯米 2杯', '香菇/肉絲/蝦米'], 
+                             steps: ['糯米煮熟。', '炒香香菇、肉絲、蝦米，與糯米拌勻鋪平。', '紅蟳切塊擺在米糕上。', '大火蒸15分鐘讓蟹油滲入米糕。'], 
+                             time: '60分鐘' 
+                             },
+                            { 
+                             name: '法式紙包魚', 
+                             ingredients: ['鱈魚片 1片', '小番茄', '蘆筍', '檸檬片', '白酒/橄欖油'], 
+                             steps: ['烘焙紙鋪底，放上魚片、蔬菜、檸檬。', '淋上橄欖油、白酒、鹽、胡椒。', '密封紙包，入烤箱200度烤15分鐘。'], 
+                             time: '20分鐘' 
+                             },
+                            { 
+                             name: '龍蝦刺身(處理法)', 
+                             ingredients: ['活龍蝦 1隻', '冰塊水', '芥末/醬油'], 
+                             steps: ['龍蝦放尿後，將頭部與身分離。', '取出身肉切片。', '立即放入冰塊水中冰鎮2分鐘，肉質會變得爽脆。', '盛盤搭配芥末醬油。'], 
+                             time: '30分鐘' 
+                             }
+                            ],
+                    '蔬菜': [
+                             { 
+                             name: '乾煸四季豆', 
+                             ingredients: ['四季豆 300g', '絞肉 50g', '蝦米 1大勺', '大蒜末', '乾辣椒', '生抽/鹽'], 
+                             steps: ['四季豆洗淨撕去老筋，瀝乾水分。', '油鍋燒熱，下四季豆中火炸至表面起皺皮，撈出瀝油。', '留底油炒香絞肉、蝦米、蒜末與乾辣椒。', '倒入四季豆，加入生抽、鹽大火快速翻炒均勻。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '麻婆豆腐', 
+                             ingredients: ['嫩豆腐 1盒', '豬絞肉 50g', '豆瓣醬 1大勺', '花椒粉', '蔥花', '太白粉水'], 
+                             steps: ['豆腐切小塊汆燙去除豆腥味。', '油鍋炒香絞肉，加入豆瓣醬炒出紅油。', '加水與豆腐，中火煮3分鐘入味。', '勾薄芡，出鍋撒上大量花椒粉與蔥花。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '地三鮮', 
+                             ingredients: ['馬鈴薯 1個', '茄子 1根', '青椒 1個', '生抽', '糖', '蒜末'], 
+                             steps: ['馬鈴薯、茄子、青椒切塊。', '馬鈴薯炸至金黃，茄子炸軟瀝油。', '爆香蒜末，下青椒翻炒。', '回鍋馬鈴薯與茄子，加生抽、糖、水調味收汁。'], 
+                             time: '25分鐘' 
+                             },
+                             { 
+                             name: '手撕包菜', 
+                             ingredients: ['高麗菜 半顆', '乾辣椒', '蒜片', '五花肉片 少許', '醋', '生抽'], 
+                             steps: ['高麗菜洗淨用手撕成片狀。', '熱鍋下五花肉片煸出豬油，炸香蒜片與辣椒。', '下高麗菜大火快炒。', '沿鍋邊淋入醋與生抽，炒至斷生保持脆度。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '上湯娃娃菜', 
+                             ingredients: ['娃娃菜 3棵', '皮蛋 1顆', '鹹蛋 1顆', '枸杞', '火腿末', '高湯'], 
+                             steps: ['娃娃菜一開四，入滾水燙熟擺盤。', '鍋中熱油炒香皮蛋與鹹蛋碎。', '加入高湯煮至湯色變白，放入枸杞。', '將湯汁淋在娃娃菜上即可。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '蒜蓉西蘭花', 
+                             ingredients: ['西蘭花(青花菜) 1顆', '蒜末', '鹽', '雞精'], 
+                             steps: ['西蘭花切小朵燙熟瀝乾。', '熱油爆香大量蒜末。', '下西蘭花快速翻炒，加鹽調味即可。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '魚香茄子', 
+                             ingredients: ['茄子 2根', '絞肉 50g', '泡椒末', '薑蒜末', '魚香汁(醋/糖/醬油)'], 
+                             steps: ['茄子切長條炸軟備用。', '炒香肉末、薑蒜末與泡椒。', '下茄子與調好的魚香汁。', '翻炒均勻收汁即可。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '蠔油生菜', 
+                             ingredients: ['廣東生菜 2顆', '蠔油', '蒜末', '太白粉'], 
+                             steps: ['生菜汆燙後快速撈出擺盤。', '鍋中熱油炒香蒜末。', '加入蠔油、少許水煮開。', '勾薄芡淋在生菜上。'], 
+                             time: '5分鐘' 
+                             },
+                             { 
+                             name: '酸辣土豆絲', 
+                             ingredients: ['馬鈴薯 2個', '乾辣椒', '花椒', '白醋'], 
+                             steps: ['馬鈴薯切細絲，反覆沖水洗去澱粉。', '熱油爆香花椒與辣椒。', '下土豆絲大火快炒，淋入白醋。', '炒至脆爽即可出鍋。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '涼拌手撕茄子', 
+                             ingredients: ['茄子 2根', '蒜末', '生抽', '香油', '辣油', '香菜'], 
+                             steps: ['茄子整根蒸熟晾涼。', '用手撕成長條。', '混合蒜末、生抽、辣油、香油。', '將醬汁淋在茄子上，撒香菜拌勻。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '家常炒絲瓜', 
+                             ingredients: ['絲瓜 1根', '蝦米', '薑片', '鹽'], 
+                             steps: ['絲瓜去皮切塊。', '爆香薑片與蝦米。', '下絲瓜翻炒至微軟，加少許水燜煮2分鐘。', '加鹽調味，保持絲瓜翠綠。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '三杯杏鮑菇', 
+                             ingredients: ['杏鮑菇 3根', '九層塔', '薑片', '黑麻油', '醬油/米酒/糖'], 
+                             steps: ['杏鮑菇切滾刀塊。', '麻油爆香薑片。', '下杏鮑菇炒至表面微焦。', '加入三杯調味收汁，起鍋前拌入九層塔。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '螞蟻上樹', 
+                             ingredients: ['冬粉 2把', '豬絞肉 50g', '豆瓣醬', '蔥花'], 
+                             steps: ['冬粉泡軟剪段。', '肉末炒散加豆瓣醬。', '加入少許高湯與冬粉煮開。', '吸乾湯汁後撒上蔥花。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '清燉冬瓜', 
+                             ingredients: ['冬瓜 500g', '薑絲', '鹽', '枸杞'], 
+                             steps: ['冬瓜去皮切厚片。', '加水與薑絲煮滾，下冬瓜。', '中小火煮至冬瓜透明。', '撒枸杞調味即可。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '白勺秋葵', 
+                             ingredients: ['秋葵 10根', '生抽', '蒜泥', '辣椒'], 
+                             steps: ['秋葵去蒂頭燙熟。', '擺盤淋上生抽。', '鋪蒜泥，燒熱油激發香氣。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '苦瓜炒蛋', 
+                             ingredients: ['苦瓜 1根', '雞蛋 3顆', '鹽'], 
+                             steps: ['苦瓜去籽切薄片，用鹽抓過洗淨去苦味。', '雞蛋打散炒至半熟盛出。', '下苦瓜翻炒至熟，回鍋雞蛋拌勻。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '荷塘月色(什錦蔬)', 
+                             ingredients: ['蓮藕', '雲耳', '甜豆', '胡蘿蔔', '山藥'], 
+                             steps: ['所有食材切片。', '依序入鍋汆燙。', '下油鍋大火快炒，加鹽調味，勾薄芡。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '金湯腐竹', 
+                             ingredients: ['腐竹', '南瓜泥', '青豆'], 
+                             steps: ['腐竹泡發切段。', '南瓜蒸熟壓泥加高湯煮成金湯。', '下腐竹煮至入味即可。'], 
+                             time: '25分鐘' 
+                             },
+                             { 
+                             name: '老奶洋芋', 
+                             ingredients: ['馬鈴薯 2個', '酸菜末', '蔥花', '辣椒粉'], 
+                             steps: ['馬鈴薯煮熟壓成粗泥。', '油鍋炒香酸菜。', '下土豆泥中小火炒香，加鹽、辣椒粉調味。'], 
+                             time: '25分鐘' 
+                             },
+                             { 
+                             name: '燒椒皮蛋豆腐', 
+                             ingredients: ['盒裝豆腐', '皮蛋', '青辣椒'], 
+                             steps: ['青辣椒在火上燒出焦皮，撕掉皮切碎。', '豆腐切塊放皮蛋碎。', '拌入燒椒與調味汁。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '涼拌木耳', 
+                             ingredients: ['雲耳', '蒜末', '醋', '洋蔥絲'], 
+                             steps: ['木耳燙熟過冷水。', '拌入洋蔥絲與調味料浸泡入味。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '蒜泥茄子卷', 
+                             ingredients: ['長茄子', '蒜泥', '生抽'], 
+                             steps: ['茄子削薄片蒸熟。', '捲入蒜泥醬汁。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '腐乳通菜', 
+                             ingredients: ['空心菜', '豆腐乳', '大蒜'], 
+                             steps: ['腐乳壓碎。', '大火爆香蒜末與腐乳。', '下空心菜快炒熄火。'], 
+                             time: '5分鐘' 
+                             },
+                             { 
+                             name: '宮保杏鮑菇', 
+                             ingredients: ['杏鮑菇', '乾辣椒', '花生'], 
+                             steps: ['杏鮑菇切丁炸至金黃。', '依宮保醬汁比例炒勻。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '培根炒高麗菜', 
+                             ingredients: ['高麗菜', '培根'], 
+                             steps: ['培根炒香出油。', '下高麗菜大火炒脆。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '金針菇肥牛捲(蔬菜版)', 
+                             ingredients: ['金針菇', '豆皮'], 
+                             steps: ['豆皮捲金針菇煎熟。', '淋上蠔油汁燜煮。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '芹菜炒豆干', 
+                             ingredients: ['芹菜', '五香豆干'], 
+                             steps: ['食材切條，大火爆炒加鹽。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '番茄炒蛋', 
+                             ingredients: ['番茄', '雞蛋'], 
+                             steps: ['雞蛋先炒熟，下番茄炒出汁。', '回鍋蛋液加糖調味。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '豆豉苦瓜', 
+                             ingredients: ['苦瓜', '豆豉', '小魚乾'], 
+                             steps: ['爆香豆豉魚乾。', '下苦瓜燜煮至入味。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '香烤花椰菜', 
+                             ingredients: ['白花椰菜', '橄欖油', '孜然粉'], 
+                             steps: ['花椰菜拌油與香料。', '入烤箱200度烤20分鐘。'], 
+                             time: '25分鐘' 
+                             },
+                             { 
+                             name: '涼拌青木瓜絲', 
+                             ingredients: ['青木瓜', '花生', '檸檬'], 
+                             steps: ['木瓜切絲。', '擣碎辛香料拌入。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '避風塘杏鮑菇', 
+                             ingredients: ['杏鮑菇', '蒜酥'], 
+                             steps: ['杏鮑菇炸酥。', '拌入大量蒜酥炒乾。'], 
+                             time: '25分鐘' 
+                             },
+                             { 
+                             name: '韭菜花炒蝦皮', 
+                             ingredients: ['韭菜花', '蝦皮'], 
+                             steps: ['炒香蝦皮，下韭菜段快炒。'], 
+                             time: '10分鐘' 
+                             },
+                             { 
+                             name: '南瓜燉百合', 
+                             ingredients: ['南瓜', '鮮百合'], 
+                             steps: ['南瓜煮軟。', '加入百合略煮保持脆度。'], 
+                             time: '20分鐘' 
+                             },
+                             { 
+                             name: '泰式涼拌秋葵', 
+                             ingredients: ['秋葵', '泰式酸辣汁'], 
+                             steps: ['秋葵燙熟冰鎮。', '淋上泰式醬汁。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '塔香茄子', 
+                             ingredients: ['茄子', '九層塔'], 
+                             steps: ['茄子過油，下醬汁煮軟。', '最後撒九層塔。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '清燙豆芽', 
+                             ingredients: ['銀芽', '胡蘿蔔絲'], 
+                             steps: ['食材燙熟，淋上香油。'], 
+                             time: '5分鐘' 
+                             },
+                             { 
+                             name: '三絲炒冬粉', 
+                             ingredients: ['冬粉', '高麗菜絲', '木耳絲'], 
+                             steps: ['冬粉泡軟，與蔬菜絲同炒。'], 
+                             time: '15分鐘' 
+                             },
+                             { 
+                             name: '拔絲地瓜', 
+                             ingredients: ['地瓜', '砂糖'], 
+                             steps: ['地瓜炸熟。', '炒糖至拉絲，裹在地瓜上。'], 
+                             time: '30分鐘' 
+                             },
+                             { 
+                             name: '糖醋藕片', 
+                             ingredients: ['蓮藕', '糖醋汁'], 
+                             steps: ['藕片燙熟，拌入糖醋醬。'], 
+                             time: '10分鐘' 
+                             }
+                            ],
+                    '煲湯': [
+                             {
+                             name: '山藥排骨補氣湯',
+                             ingredients: ['小排骨 500g', '日本山藥 300g', '紅棗 6顆', '枸杞 1大勺', '薑片', '米酒'],
+                             steps: ['排骨洗淨冷水下鍋，加薑片與米酒汆燙去腥撈出。', '山藥去皮切滾刀塊（建議戴手套防止過敏）。', '砂鍋注入足量清水，放入排骨、薑片、紅棗，大火燒開轉小火燉煮40分鐘。', '加入山藥塊繼續燉煮15-20分鐘至山藥軟糯。', '最後5分鐘撒入枸杞，加鹽調味即可。'],
+                             time: '65分鐘'
+                             },
+                             {
+                             name: '廣式胡椒豬肚雞',
+                             ingredients: ['處理好的豬肚 1個', '土雞 半隻', '白胡椒粒 20g', '黨參 1根', '紅棗 5顆', '牛奶 (可選)'],
+                             steps: ['白胡椒粒搗碎炒香裝入濾袋。', '豬肚與雞肉分別汆燙切條/切塊。', '湯鍋放水，加入豬肚、雞肉、胡椒袋與黨參。', '大火燒開撇去浮沫，轉中火煲1.5小時。', '若追求奶白色湯頭，最後可加少許鮮乳，加鹽調味。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '青木瓜花生排骨湯',
+                             ingredients: ['青木瓜 半顆', '生花生 100g', '排骨 400g', '蜜棗 2顆', '薑片'],
+                             steps: ['花生提前浸泡2小時。', '排骨汆燙瀝乾。青木瓜去皮去籽切大塊。', '所有食材放入瓦罐，一次加滿冷水。', '大火燒滾轉文火煲2小時，讓花生徹底綿軟、木瓜清香入湯。'],
+                             time: '130分鐘'
+                             },
+                             {
+                             name: '蟲草花花膠燉雞湯',
+                             ingredients: ['花膠 2片', '乾蟲草花 20g', '土雞塊 500g', '薑片', '乾香菇 3朵'],
+                             steps: ['花膠提前一天泡發，加薑片蔥段汆燙去腥。', '蟲草花、香菇洗淨泡軟。', '燉盅內放入所有食材，加水八分滿。', '隔水燉煮2.5小時，出鍋加鹽即可。'],
+                             time: '160分鐘'
+                             },
+                             {
+                             name: '羅宋湯(中式煲法)',
+                             ingredients: ['牛腩 500g', '番茄 3顆', '洋蔥 1顆', '馬鈴薯 1個', '胡蘿蔔 1根', '番茄糊'],
+                             steps: ['牛腩切塊汆燙。蔬菜全部切成塊狀。', '起鍋炒香洋蔥與番茄糊，加入牛腩翻炒。', '移入大砂鍋，加足量水煮滾，小火燉1小時。', '放入剩餘蔬菜再燉40分鐘。', '加鹽、少許胡椒粉，湯頭酸甜濃厚。'],
+                             time: '110分鐘'
+                             },
+                             {
+                             name: '蓮藕花生排骨湯',
+                             ingredients: ['老蓮藕 2節', '排骨 500g', '花生 50g', '魷魚乾 (提鮮)', '薑片'],
+                             steps: ['蓮藕去皮切厚片。花生泡水。', '排骨與魷魚乾洗淨汆燙。', '砂鍋水滾後下所有料。', '文火煲2小時，直到蓮藕呈現粉紫色且鬆軟。'],
+                             time: '130分鐘'
+                             },
+                             {
+                             name: '冬瓜薏米瘦肉湯',
+                             ingredients: ['冬瓜 600g', '瘦肉 300g', '生薏米 30g', '熟薏米 30g', '陳皮 1小塊'],
+                             steps: ['薏米洗淨泡半小時。冬瓜連皮洗淨切大塊。', '瘦肉切大塊汆燙。', '水滾下肉、薏米與陳皮。', '中小火煲1小時後，放冬瓜再煮30分鐘。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '金針菇蛤蜊湯',
+                             ingredients: ['蛤蜊 300g', '金針菇 1把', '嫩豆腐 1塊', '薑絲', '蔥花'],
+                             steps: ['蛤蜊吐沙洗淨。金針菇去根部。', '鍋中燒水，水開下薑絲與豆腐塊。', '放入金針菇煮1分鐘。', '倒入蛤蜊，待殼全開後立即熄火，撒鹽與蔥花。'],
+                             time: '15分鐘'
+                             },
+                             {
+                             name: '霸王花無花果豬骨湯',
+                             ingredients: ['乾霸王花 2朵', '乾無花果 4顆', '扇骨 500g', '南北杏 10g'],
+                             steps: ['霸王花泡發洗淨切段。豬骨汆燙。', '砂鍋燒熱水，放入所有材料。', '大火15分鐘轉小火煲2小時。', '此湯清熱潤肺，味道清甜。'],
+                             time: '135分鐘'
+                             },
+                             {
+                             name: '酸菜筍尖老鴨湯',
+                             ingredients: ['老鴨 半隻', '酸菜 100g', '乾筍尖 50g', '泡椒 2顆', '薑塊'],
+                             steps: ['鴨肉切塊，冷水下鍋加酒燙去腥味。', '乾筍尖提前泡發撕條。', '起鍋炒香酸菜與薑塊。', '加入鴨肉翻炒，移入砂鍋加滿水燉2小時。'],
+                             time: '130分鐘'
+                             },
+                             {
+                             name: '番茄土豆牛腩湯',
+                             ingredients: ['牛腩 400g', '番茄 2顆', '馬鈴薯 2個', '薑片', '蔥段'],
+                             steps: ['牛腩燉軟爛(約1小時)。', '加入馬鈴薯塊煮20分鐘。', '最後下番茄片煮至湯色變紅，濃稠好喝。'],
+                             time: '90分鐘'
+                             },
+                             {
+                             name: '西洋菜陳腎豬骨湯',
+                             ingredients: ['西洋菜 1斤', '豬骨 500g', '陳腎(臘鴨肫) 2個', '蜜棗 1顆'],
+                             steps: ['豬骨、陳腎汆燙。', '水滾下豬骨、陳腎、蜜棗煲1小時。', '西洋菜必須等水極滾後再分批下入(防止變苦)。', '再煲40分鐘即可。'],
+                             time: '110分鐘'
+                             },
+                             {
+                             name: '黑豆杜仲補腰湯',
+                             ingredients: ['黑豆 50g', '杜仲 15g', '尾龍骨/排骨 500g', '紅棗 4顆'],
+                             steps: ['黑豆洗淨乾鍋炒至皮裂。', '豬骨汆燙洗淨。', '所有料入鍋，加水煲2小時。', '適合久坐上班族。'],
+                             time: '130分鐘'
+                             },
+                             {
+                             name: '白蘿蔔絲鮮魚湯',
+                             ingredients: ['鯽魚 1條', '白蘿蔔 半根', '薑絲', '蔥花', '熱開水'],
+                             steps: ['魚洗淨瀝乾，油鍋兩面煎金黃。', '倒入足量「熱開水」(必備，湯才會白)。', '加入薑絲、白蘿蔔絲大火煮10分鐘。', '轉中小火再煮5分鐘，鹽、胡椒粉調味。'],
+                             time: '25分鐘'
+                             },
+                             {
+                             name: '猴頭菇銀耳養胃湯',
+                             ingredients: ['猴頭菇 2朵', '銀耳 半朵', '瘦肉 200g', '蓮子/百合'],
+                             steps: ['猴頭菇反覆擠壓浸泡去苦味。', '銀耳泡發撕碎。', '全部食材入盅燉1.5小時。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '五指毛桃薏米豬骨湯',
+                             ingredients: ['五指毛桃 30g', '赤小豆/薏米', '豬骨 500g', '陳皮'],
+                             steps: ['五指毛桃洗淨(有椰香味)。', '所有食材放入砂鍋，煲2小時。', '健脾去濕，香氣獨特。'],
+                             time: '125分鐘'
+                             },
+                             {
+                             name: '苦瓜黃豆排骨湯',
+                             ingredients: ['排骨 400g', '苦瓜 1根', '黃豆 50g', '薑片'],
+                             steps: ['黃豆泡發。苦瓜去籽切大塊。', '排骨燙熟。先煲排骨與黃豆1小時。', '下苦瓜再煲30分鐘，消暑降火。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '雪梨龍脷葉豬肺湯',
+                             ingredients: ['雪梨 2個', '豬肺/瘦肉', '龍脷葉 15g', '南北杏'],
+                             steps: ['雪梨去芯留皮。豬肺需反覆灌水清洗乾淨並汆燙。', '全部食材入鍋煲1.5小時。', '化痰止咳，清心潤肺。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '四神湯(家常風)',
+                             ingredients: ['豬小腸 300g', '茯苓/芡實/山藥/蓮子 各15g', '米酒'],
+                             steps: ['小腸洗淨汆燙切段。', '藥材洗淨泡水。', '全部食材燉1小時，起鍋淋米酒。'],
+                             time: '70分鐘'
+                             },
+                             {
+                             name: '絲瓜蛋花湯',
+                             ingredients: ['絲瓜 1根', '雞蛋 2顆', '蝦米', '薑絲'],
+                             steps: ['炒香蝦米薑絲。', '下絲瓜炒軟加水煮滾。', '淋入蛋液煮花，加鹽調味。'],
+                             time: '10分鐘'
+                             }
+                            ],
+                    '火鍋': [
+                             {
+                             name: '重慶老火鍋 (麻辣)',
+                             ingredients: ['牛油 500g', '乾辣椒 100g', '花椒 50g', '豆瓣醬 150g', '薑蒜', '冰糖', '高湯 2L'],
+                             steps: ['炒底料：熱牛油，下薑蒜爆香，放入豆瓣醬、辣椒、花椒小火慢炒至香氣溢出。', '熬製：加入高湯與冰糖，煮滾後轉小火熬 30 分鐘，讓味道融合。', '食材：毛肚、鵝腸、黃喉、肥牛片、蓮藕。', '秘訣：一定要用牛油，味道才夠醇厚。'],
+                             time: '60分鐘'
+                             },
+                             {
+                             name: '酸菜白肉鍋',
+                             ingredients: ['東北酸白菜 1包', '帶皮五花肉 500g', '凍豆腐', '川粉', '蝦米', '蔥薑'],
+                             steps: ['五花肉先煮熟切薄片。', '酸白菜洗淨切絲，稍微擠乾水份。', '鍋中炒香蔥薑蝦米，下酸白菜略炒。', '加入煮肉的高湯，鋪上五花肉、凍豆腐與川粉煮滾即可。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '日式壽喜燒 (關東風)',
+                             ingredients: ['高級牛肉片', '大蔥', '豆腐', '香菇', '蒟蒻絲', '醬油/味醂/清酒/糖 (各1份)'],
+                             steps: ['調製壽喜燒醬汁：將所有醬料混合煮沸。', '熱平底鍋，先煎大蔥至微焦，放入部分牛肉片煎熟。', '倒入醬汁，依序擺入豆腐、香菇、蒟蒻絲與剩餘肉片。', '蘸生蛋液食用口感最滑嫩。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '昆布柴魚海鮮鍋',
+                             ingredients: ['昆布 1段', '柴魚片 1包', '蝦子', '螃蟹', '大蛤蜊', '大白菜'],
+                             steps: ['冷水浸泡昆布 30 分鐘，煮滾前取出。', '下柴魚片煮 1 分鐘後關火過濾，得清高湯。', '先下白菜煮出甜味。', '陸續加入海鮮食材，吃完後剩餘湯汁可用來煮「雜炊」粥。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '港式豬骨煲',
+                             ingredients: ['豬大骨 2根', '白蘿蔔 1根', '甜玉米 1根', '白胡椒粒', '馬蹄(荸薺)'],
+                             steps: ['豬骨汆燙洗淨，胡椒粒搗碎。', '大火燒滾水，下所有食材燉煮 1.5 小時至湯頭乳白。', '搭配特製生抽與辣椒圈作為蘸醬。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '韓式部隊鍋',
+                             ingredients: ['泡菜 200g', '午餐肉', '德式香腸', '辛拉麵', '起司片', '韓式辣醬'],
+                             steps: ['鍋底鋪滿泡菜與洋蔥。', '整齊擺上午餐肉、香腸、豆腐、年糕。', '加水與辣醬，煮滾後放入拉麵與起司。'],
+                             time: '25分鐘'
+                             },
+                             {
+                             name: '汕頭沙茶牛肉鍋',
+                             ingredients: ['特製沙茶醬', '手切溫體牛肉', '扁魚乾', '冬菜', '大白菜'],
+                             steps: ['湯底：炸香扁魚乾，加入高湯與冬菜。', '牛肉一定要手切薄片，講究「三秒起鍋」。', '蘸醬必備沙茶醬加蛋黃。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '泰式冬蔭功火鍋',
+                             ingredients: ['香茅 2根', '南薑', '檸檬葉', '泰式酸辣醬', '草菇', '大蝦'],
+                             steps: ['水滾後下香茅、南薑、檸檬葉煮香。', '放入酸辣醬調味，再下蝦子與草菇。', '最後淋上椰奶與魚露增添風味。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '藥膳燒酒雞鍋',
+                             ingredients: ['土雞 半隻', '米酒 2瓶', '十全藥膳包', '薑片', '黑麻油'],
+                             steps: ['黑麻油爆香薑片，放入雞塊炒至皮焦香。', '倒入米酒與藥材，大火煮滾點火去酒味。', '加蓋小火燉 40 分鐘，雞肉軟嫩酒香四溢。'],
+                             time: '60分鐘'
+                             },
+                             {
+                             name: '老四川養生白湯鍋',
+                             ingredients: ['雞骨/豬骨', '當歸/紅棗/枸杞', '整粒大蒜 (去皮)', '天麻'],
+                             steps: ['大骨熬至濃稠奶白。', '加入大量去皮大蒜與藥材繼續燉煮。', '湯頭醇厚、不燥不火，適合涮煮各種肉類。'],
+                             time: '120分鐘'
+                             },
+                             {
+                             name: '日式豆乳鍋',
+                             ingredients: ['無糖濃豆漿 500ml', '昆布高湯 500ml', '味噌 1大勺', '雞肉/蔬菜'],
+                             steps: ['昆布高湯煮滾，轉小火後慢慢倒入豆漿。', '味噌先用少許湯化開再倒入。', '全程保持微滾，避免豆漿焦糊。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '台式羊肉爐',
+                             ingredients: ['帶皮羊肉 600g', '老薑', '麻油', '豆瓣醬', '高麗菜/豆腐'],
+                             steps: ['麻油爆薑，下羊肉塊與豆瓣醬炒香。', '加入中藥湯頭燉煮 1 小時。', '配上豆腐乳特製蘸醬。'],
+                             time: '80分鐘'
+                             },
+                             {
+                             name: '起司牛奶鍋',
+                             ingredients: ['牛奶 500ml', '大口高湯 300ml', '起司片 2片', '洋蔥/奶油'],
+                             steps: ['奶油炒香洋蔥碎，加高湯煮沸。', '關小火加牛奶，放入起司片融化。', '適合涮煮海鮮與南瓜。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '胡椒豬肚雞火鍋', ingredients: ['豬肚', '土雞', '白胡椒', '黨參/紅棗'],
+                             steps: ['豬肚與雞肉先燉至軟爛，胡椒香氣濃郁。', '吃完雞肉豬肚後加入高湯涮菜。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '清燉番茄鍋', ingredients: ['大番茄 4顆', '洋蔥 半顆', '牛腩 (可選)', '番茄醬'],
+                             steps: ['番茄切塊炒出汁，加入洋蔥與高湯。', '煮至番茄完全融化，酸甜開胃。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '椰子雞火鍋', ingredients: ['新鮮椰子 2個', '文昌雞 1隻', '珍珠馬蹄', '椰肉'],
+                             steps: ['直接用純椰子水做湯底，加入椰肉與馬蹄。', '雞肉煮 6 分鐘即可，蘸醬用青檸檬沙薑生抽。'],
+                             time: '15分鐘'
+                             },
+                             {
+                             name: '咖哩魚蛋火鍋',
+                             ingredients: ['港式咖哩醬', '魚蛋', '豬皮/蘿蔔', '椰漿'],
+                             steps: ['咖哩醬炒香加水，下蘿蔔燉軟。', '加入大量魚蛋與配料煮滾。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '石頭火鍋 (台式)',
+                             ingredients: ['五花肉片', '乾魷魚絲', '洋蔥', '麻油', '特製高湯'],
+                             steps: ['鍋熱下麻油，爆香魷魚絲、洋蔥與肉片炒至半熟取出。', '加高湯、白菜煮滾，再放回肉片。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '胡麻擔擔鍋',
+                             ingredients: ['白芝麻醬', '辣油', '絞肉', '豆漿', '高湯'],
+                             steps: ['炒香辣肉燥。湯底混合芝麻醬、豆漿與高湯。', '最後淋上辣油，濃郁辛香。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '菌菇佛跳牆鍋',
+                             ingredients: ['姬松茸', '香菇', '金針菇', '鮑魚菇', '高湯'],
+                             steps: ['收集多種菇類熬製底湯。', '鮮美無比，健康低熱量。'],
+                             time: '40分鐘'
+                             }
+                            ],
+                    '甜品': [
+                             {
+                             name: '紅豆紫米露',
+                             ingredients: ['紅豆 200g', '紫米 100g', '冰糖 80g', '鮮奶或椰奶 少許'],
+                             steps: ['紅豆與紫米洗淨，提前浸泡 4 小時以上。', '放入電鍋或壓力鍋，加入 5 倍的水。', '煮至紅豆軟爛、紫米黏稠。', '趁熱加入冰糖拌勻，食用時依喜好加入鮮奶增添風味。'],
+                             time: '90分鐘'
+                             },                   
+                             {
+                             name: '楊枝甘露',
+                             ingredients: ['愛文芒果 2顆', '西谷米 50g', '紅柚果肉 少許', '椰奶 200ml', '糖水'],
+                             steps: ['西谷米入沸水煮至中心微白，關火燜至透明，撈出過冰水。', '一顆芒果切丁，另一顆芒果加椰奶、糖水打成泥。', '將芒果泥裝碗，放入西谷米。', '頂部鋪上芒果丁與紅柚果肉即可。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '手作芋圓/地瓜圓',
+                             ingredients: ['芋頭/地瓜 300g', '木薯粉(太白粉) 120g', '砂糖 30g'],
+                             steps: ['芋頭或地瓜蒸熟壓成泥，加入砂糖。', '趁熱分次加入木薯粉，揉成不黏手的團狀。', '搓成長條狀並切成小塊。', '入沸水煮至浮起，再煮 1 分鐘撈出放入冰糖水中防止黏連。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '冰糖燉雪梨',
+                             ingredients: ['水梨 1顆', '冰糖 20g', '紅棗 3顆', '枸杞 5-10顆'],
+                             steps: ['雪梨洗淨，橫切掉頂部當蓋子。', '用湯匙挖去梨芯。', '梨洞內塞入冰糖、紅棗、枸杞。', '放入碗中隔水蒸 40 分鐘，喝湯吃肉，生津潤肺。'],
+                             time: '50分鐘'
+                             },
+                             {
+                             name: '日式焦糖布丁',
+                             ingredients: ['雞蛋 3顆', '全脂鮮乳 400ml', '砂糖 60g(布丁液)', '砂糖 50g(焦糖)', '熱水 1勺'],
+                             steps: ['製作焦糖：砂糖加少許水小火煮至深琥珀色，熄火加一勺熱水（小心噴濺）倒入模具。', '牛奶加糖微熱至溶解，分次倒入蛋液拌勻。', '將蛋奶液過篩兩次。', '倒入模具，用錫箔紙封口，烤盤加冷水，150度烤 40 分鐘。'],
+                             time: '60分鐘'
+                             },
+                             {
+                             name: '花生芝麻湯圓',
+                             ingredients: ['糯米粉 200g', '溫水 150ml', '花生/芝麻粉', '無鹽奶油', '糖粉'],
+                             steps: ['內餡：花生粉混合融化奶油與糖粉，揉成小球冰凍定型。', '糯米粉加溫水揉成團，取一小塊入水燙熟回揉（增加延展性）。', '包入餡料搓圓。', '入沸水煮至浮起即可。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '鮮奶燉蛋',
+                             ingredients: ['雞蛋 2顆', '溫鮮乳 250ml', '砂糖 20g'],
+                             steps: ['雞蛋與砂糖打散，緩緩加入溫牛奶拌勻。', '過篩濾掉泡沫。', '碗蓋上保鮮膜防止水氣。', '中火蒸 10 分鐘，關火燜 5 分鐘，口感如絲綢般滑嫩。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '銀耳蓮子羹',
+                             ingredients: ['乾銀耳 半朵', '蓮子 20g', '紅棗 5顆', '冰糖 適量'],
+                             steps: ['銀耳泡發後剪碎（越碎越容易出膠）。', '與蓮子、紅棗一同入鍋燉煮。', '大火煮開轉小火燉 1.5 小時。', '煮至湯汁黏稠後加入冰糖調味。'],
+                             time: '100分鐘'
+                             },
+                             {
+                             name: '法式烤布蕾',
+                             ingredients: ['動物性鮮奶油 250ml', '蛋黃 4個', '砂糖 30g', '香草精 少許'],
+                             steps: ['鮮奶油加香草精小火加熱（不煮沸）。', '蛋黃加糖拌勻，緩緩加入鮮奶油拌勻。', '過篩後倒入矮瓷碗，隔水加熱烤 30 分鐘。', '冷藏後表面撒砂糖，用火槍燒出焦糖層。'],
+                             time: '45分鐘'
+                             },
+                             {
+                             name: '桂花酒釀蛋',
+                             ingredients: ['甜酒釀 3大勺', '雞蛋 1顆', '乾燥桂花', '小湯圓 少許'],
+                             steps: ['水燒開下小湯圓煮至浮起。', '放入酒釀拌開。', '打入蛋液做成蛋花。', '熄火盛碗，撒上清香的桂花。'],
+                             time: '15分鐘'
+                             },
+                             {
+                             name: '芒果班戟 (Pancake)',
+                             ingredients: ['芒果塊', '鮮奶油 100g', '低筋麵粉 80g', '雞蛋 1個', '牛奶 200ml'],
+                             steps: ['製作餅皮：雞蛋、牛奶、麵粉拌勻過篩，平底鍋煎出薄餅皮。', '鮮奶油加糖打發。', '餅皮鋪底，中心放鮮奶油與芒果。', '像包信封一樣折起來，冷藏後切半食用。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '黑糖薑汁豆花',
+                             ingredients: ['無糖豆漿 1000ml', '熟石膏粉/鹽滷', '黑糖', '老薑片'],
+                             steps: ['豆漿煮滾冷卻至 80 度。', '倒入凝固劑混合液（沖入法）。', '靜置 20 分鐘凝固。', '黑糖加薑片煮成糖水淋上即可。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '草莓大福',
+                             ingredients: ['糯米粉 100g', '玉米澱粉 20g', '水 130ml', '紅豆泥', '草莓 6顆'],
+                             steps: ['粉類加水與糖蒸熟成糯米團。', '草莓外面包裹一層紅豆泥。', '手沾熟糯米粉防止黏手，將糯米皮包住紅豆草莓。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '椰香西米露',
+                             ingredients: ['西谷米', '椰奶', '芋頭丁'],
+                             steps: ['西米煮至透明。', '芋頭丁蒸熟。', '混合椰奶、糖、西米與芋頭。'],
+                             time: '25分鐘'
+                             },
+                             {
+                             name: '桃膠皂角米燉雪燕',
+                             ingredients: ['桃膠 10g', '皂角米 5g', '雪燕 3g', '冰糖'],
+                             steps: ['桃膠雪燕需提前 12 小時泡發。', '洗淨雜質後入燉盅燉 40 分鐘。', '適合女性滋補。'],
+                             time: '60分鐘'
+                             },
+                             {
+                             name: '脆皮炸鮮奶',
+                             ingredients: ['牛奶 250ml', '玉米澱粉 30g', '炸粉/麵包粉'],
+                             steps: ['牛奶加澱粉加糖煮至黏稠塊狀，冷藏定型。', '切塊沾裹麵糊或麵包粉。', '大火炸至表面金黃。'],
+                             time: '40分鐘'
+                             },
+                             {
+                             name: '木瓜燉奶',
+                             ingredients: ['熟木瓜 1顆', '全脂牛奶 200ml', '冰糖'],
+                             steps: ['木瓜切塊與冰糖先燉 10 分鐘。', '倒入牛奶加熱至微溫即關火（避免牛奶結塊）。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '抹茶紅豆奶酪',
+                             ingredients: ['牛奶 200ml', '抹茶粉 5g', '吉利丁片 5g', '蜜紅豆'],
+                             steps: ['牛奶加熱溶解糖與抹茶粉，放入泡軟的吉利丁。', '倒入容器冷藏 4 小時。', '吃前鋪上蜜紅豆。'],
+                             time: '20分鐘'
+                             },
+                             {
+                             name: '拔絲地瓜',
+                             ingredients: ['地瓜 2條', '砂糖 100g', '油'],
+                             steps: ['地瓜切塊炸至金黃熟透。', '鍋內留少許油熬糖，煮至金黃拉絲狀。', '下地瓜快速翻裹均勻。'],
+                             time: '30分鐘'
+                             },
+                             {
+                             name: '雙皮奶',
+                             ingredients: ['全脂奶 400ml', '蛋白 2個', '砂糖 30g'],
+                             steps: ['牛奶煮微滾盛碗結奶皮。', '刺破皮倒出牛奶，混合蛋白糖再倒回。', '蓋膜蒸 10 分鐘，形成上下兩層奶皮。'],
+                             time: '30分鐘'
+                             }
+                            ],
+                    '辦桌料理': [
+                        { 
+                            name: '紅蟳櫻花蝦米糕', 
+                            ingredients: [
+                                '新鮮紅蟳 2隻 (每隻約8-10兩，需有蟹黃)', 
+                                '長糯米 600g (事先浸泡至少4小時)', 
+                                '東港櫻花蝦 50g (或高品質蝦米)', 
+                                '乾香菇 8朵 (泡發後切絲)', 
+                                '豬五花肉絲 150g', 
+                                '紅蔥頭 10顆 (切碎炸成紅蔥酥)', 
+                                '調味料：老抽、五香粉、白胡椒粉、麻油、米酒'
+                            ], 
+                            steps: [
+                                '準備米糕底：將浸泡過的糯米瀝乾，放入蒸籠大火蒸約 25-30 分鐘至熟透，中途可灑少許水讓米粒 Q 彈。',
+                                '爆香配料：熱鍋倒入麻油與色拉油各半，下紅蔥頭炸至金黃，續入香菇絲、肉絲、櫻花蝦炒出濃郁香氣。',
+                                '拌米：調入醬油、五香粉、白胡椒、米酒，關火將蒸好的糯米拌入鍋內，使每一顆米都均勻上色沾滿油脂香氣。',
+                                '處裡紅蟳：將紅蟳洗淨、去腮，切成四大塊，保留蟹蓋與飽滿蟹黃。',
+                                '最後蒸製：將拌好的米糕鋪平在蒸籠盤上，紅蟳塊依序整齊排列其上。',
+                                '大火續蒸：水滾後放入，大火蒸 15 分鐘直到紅蟳變紅、蟹肉熟成且鮮甜精華滲入米糕中。'
+                            ], 
+                            time: '90分鐘' 
+                        },
+                        { 
+                            name: '御品御膳佛跳牆', 
+                            ingredients: [
+                                '主料：排骨酥、大甲芋頭、鮑魚 6顆、海參 3條、鵪鶉蛋 12顆、干貝 6顆', 
+                                '底料：大白菜 1顆、蹄筋 200g', 
+                                '湯頭：老母雞高湯 1.5L', 
+                                '香料：紅棗、當歸片、蒜瓣、蔥段', 
+                                '調味：紹興酒 2大匙、生抽、冰糖'
+                            ], 
+                            steps: [
+                                '前處理：芋頭切塊油炸至表面金黃不鬆散；排骨酥先行醃漬炸好；鵪鶉蛋亦油炸至虎皮狀。',
+                                '燙洗海味：海參及鮑魚用薑片、米酒水川燙去腥。',
+                                '底座鋪墊：取一瓷甕，底部先墊入大量的大白菜及油炸後的蒜瓣。',
+                                '層疊排列：由下而上依序放入芋頭、排骨酥、蹄筋、干貝、海參、鮑魚，最上方放紅棗裝飾。',
+                                '調湯灌甕：老母雞湯加入紹興酒、生抽、鹽、冰糖煮滾，緩緩注入甕中至九分滿。',
+                                '文火燉煮：甕口封上耐熱保鮮膜或蓋子，放入大蒸鍋或電鍋，水滾後轉文火蒸煮 2-2.5 小時，直到食材精華與高湯融合。'
+                            ], 
+                            time: '180分鐘' 
+                        },
+                        { 
+                            name: '五味冷盤(九孔/軟絲)', 
+                            ingredients: [
+                                '新鮮九孔鮑 12顆', 
+                                '厚實大軟絲 1隻', 
+                                '五味醬：番茄醬 4大匙、烏醋 3大匙、砂糖 2大匙、香油 1小匙', 
+                                '辛香料：薑末、蒜末、香菜碎、青蔥碎', 
+                                '墊底：苜蓿芽、紫洋蔥絲'
+                            ], 
+                            steps: [
+                                '處理九孔：用刷子刷乾淨表面，沸水入鍋加薑片與酒，中火川燙 2 分鐘後迅速入冰水鎮涼，去殼去內臟。',
+                                '處理軟絲：軟絲去除內膜與內臟，刻花切片，沸水快速燙 30 秒即撈出入冰水泡涼。',
+                                '調製靈魂醬汁：將所有五味醬料與辛香料末充分混合均勻，冷藏備用。',
+                                '擺盤：盤底鋪上瀝乾水分的洋蔥絲與苜蓿芽。',
+                                '組合：將九孔肉與軟絲片交疊排列整齊，淋上厚厚的五味醬，最後撒上香菜碎。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '樹子清蒸龍虎斑', 
+                            ingredients: [
+                                '新鮮龍虎斑 1條 (約 600-800g)', 
+                                '樹子(破布子) 3大匙(連湯汁)', 
+                                '老薑絲、青蔥絲、辣椒絲', 
+                                '調味：魚露 1大匙、米酒 1大匙、砂糖少許、香油'
+                            ], 
+                            steps: [
+                                '洗淨魚身：魚腹血水需洗淨，在魚背最厚處劃兩刀，幫助熟成與入味。',
+                                '擺盤：魚盤底鋪兩根蔥段墊高魚身，讓蒸氣流通均勻。',
+                                '下料：將樹子、薑絲、米酒均勻鋪在魚身上，淋上混合好的魚露與糖水。',
+                                '大火蒸製：蒸鍋水大滾後放入魚盤，蓋上鍋蓋大火蒸 8-10 分鐘。',
+                                '悶蒸：關火悶 2 分鐘，倒掉盤中過多的腥水。',
+                                '潑油：鋪上新鮮蔥絲、辣椒絲，燒熱 2 大匙香油與色拉油，迅速淋在蔥絲上激發香氣。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '富貴八寶鴨', 
+                            ingredients: [
+                                '全鴨 1隻 (約 2kg)', 
+                                '八寶料：糯米、乾干貝、火腿丁、蓮子、香菇、肉絲、栗子、蝦米', 
+                                '塗料：老抽醬油、麥芽糖水'
+                            ], 
+                            steps: [
+                                '鴨子去骨：這是最具挑戰的一步，需從頸部開口完整去除胸骨與背骨，保留皮肉完整。',
+                                '炒八寶餡：將糯米與所有乾貨配料炒香，調味後塞入鴨腹內至七分滿，用棉繩縫合。',
+                                '定型上色：鴨皮抹上老抽與麥芽糖水，下油鍋炸至表皮呈現紅亮的琥珀色。',
+                                '長時蒸煮：將炸好的鴨子放入深盤，加入滷汁，大火蒸煮 3 小時至鴨肉完全酥爛入味。',
+                                '淋汁：取出鴨子，將原湯濾出勾芡淋回鴨身。'
+                            ], 
+                            time: '240分鐘' 
+                        },
+                        { 
+                            name: '糖醋菊花魚', 
+                            ingredients: ['大草魚或黃魚 1條', '洋蔥碎、甜椒丁', '番茄醬、白醋、糖', '太白粉'], 
+                            steps: [
+                                '刀工切塊：將魚肉切成方形，深度切至皮但不切斷，縱橫交錯切出如菊花瓣的細條。',
+                                '裹粉：均勻撒上厚太白粉，確保細縫處皆沾滿。',
+                                '炸製：中火下鍋炸至定型展開如花朵，再大火逼油炸至酥脆。',
+                                '煮汁：炒香洋蔥甜椒，加入番茄醬糖醋汁煮至濃稠，澆淋在魚肉上。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '白斬閹雞', 
+                            ingredients: ['肥美閹雞 1隻', '鹽、老薑', '蘸醬：客家桔醬或蔥油'], 
+                            steps: [
+                                '三提三放：水滾入薑片鹽巴，將雞放入滾水 10 秒提起來瀝乾，重覆三次，讓雞腹腔內外溫度均勻。',
+                                '悶熟：水蓋過雞身，保持微滾狀態煮 20 分鐘後熄火悶 30 分鐘，這是雞肉鮮嫩多汁的關鍵。',
+                                '冷卻抹鹽：出鍋後趁熱抹上薄鹽，刷一點熟油防止皮乾，完全冷卻後再切塊。'
+                            ], 
+                            time: '60分鐘' 
+                        },
+                        { 
+                            name: '酥炸八寶丸', 
+                            ingredients: ['豬絞肉 300g', '魚漿 100g', '荸薺碎 50g', '鹹蛋黃 3顆', '豬網油或豆皮'], 
+                            steps: [
+                                '內餡調配：絞肉混合魚漿、荸薺、油蔥酥、五香粉，用力摔打出筋性。',
+                                '包製：將肉餡包入鹹蛋黃碎，外層包裹豆皮或豬網油，製成條狀再切段。',
+                                '低溫炸熟：油溫 140度入鍋炸至內熟，最後 180度拉高溫度炸至表皮金黃酥脆。'
+                            ], 
+                            time: '50分鐘' 
+                        },
+                        { 
+                            name: '蠔油干貝長年菜', 
+                            ingredients: ['芥菜心(大芥菜)', '生干貝 6顆', '蠔油、雞油'], 
+                            steps: [
+                                '去苦：長年菜切大片，入沸水加鹽與糖川燙 3 分鐘撈出。',
+                                '煨煮：雞油炒香薑片，放入長年菜與干貝，加入高湯與蠔油，微火煨煮 15 分鐘至菜葉變軟入味。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '佛手排骨', 
+                            ingredients: ['豬腹脇排', '海鮮醬', '腐乳汁', '蒜泥'], 
+                            steps: [
+                                '醃漬：排骨切長條，加入蒜泥、海鮮醬、腐乳汁、糖醃漬 4 小時。',
+                                '酥炸：裹上一層薄薄的番薯粉，中小火炸至肉熟，最後大火炸香逼油呈佛手形狀擺盤。'
+                            ], 
+                            time: '50分鐘' 
+                        }
+                    ],
+                    '日式料理': [
+                        { 
+                            name: '本格派握壽司', 
+                            ingredients: [
+                                '壽司米 (越光米最佳)', 
+                                '赤醋或白醋調配壽司醋 (醋:糖:鹽 = 5:3:1)', 
+                                '生食級鮮魚片 (鮭魚、鮪魚、旗魚等)', 
+                                '生山葵 (Wasabi)', 
+                                '高品質昆布 1片'
+                            ], 
+                            steps: [
+                                '煮飯技巧：米洗淨後加入昆布同煮，水量比一般煮飯少 10%，煮好後悶 10 分鐘。',
+                                '拌醋：將飯盛入木桶，趁熱均勻淋上壽司醋，用切撥方式混合，切忌壓碎米粒。',
+                                '扇涼：一邊拌一邊用扇子扇涼，讓醋香吸入米飯且表皮油亮。',
+                                '切片：將鮮魚逆紋斜切，長度約 8 公分。',
+                                '捏製：手沾少許手醋水，取約 15-20g 醋飯，手掌微彎捏成橢圓形，抹上少許山葵，蓋上魚片並用雙指按壓定型，保持飯粒間有空氣感。'
+                            ], 
+                            time: '60分鐘' 
+                        },
+                        { 
+                            name: '大海蝦天婦羅', 
+                            ingredients: [
+                                '大海蝦 6隻', 
+                                '各式野菜 (秋葵、南瓜、地瓜)', 
+                                '天婦羅粉 (或低筋麵粉+蛋+冰水)', 
+                                '大根泥 (白蘿蔔泥)', 
+                                '天婦羅醬汁：出汁 4、醬油 1、味醂 1'
+                            ], 
+                            steps: [
+                                '蝦子處理：去殼留尾，去除腸泥。在腹部斜劃 3-4 刀後，將蝦身壓直（聽到筋斷裂聲），炸出來才不會彎曲。',
+                                '調製麵糊：這步最關鍵。蛋黃加入冰水打勻，再篩入麵粉。切記「粗略攪拌」，留有粉塊沒關係，過度攪拌出筋就不酥脆了。',
+                                '溫控：油溫維持 170-180 度。',
+                                '炸製：蝦子先沾薄薄乾粉，再裹麵糊，入鍋時輕輕晃動產生花衣。野菜同樣裹漿炸至酥脆。',
+                                '配食：搭配大根泥沾醬汁食用。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '濃厚豚骨拉麵', 
+                            ingredients: [
+                                '豬大骨與背脂 1kg', 
+                                '細拉麵', 
+                                '叉燒肉 (五花肉捲)', 
+                                '溏心蛋', 
+                                '黑木耳絲、蔥花'
+                            ], 
+                            steps: [
+                                '熬湯：大骨汆燙洗淨，放入大鍋中加水沒過，加入洋蔥、薑塊。',
+                                '乳化：大火沸騰後持續保持「劇烈滾動」 6 小時以上，將骨髓精華與油脂完全乳化成白湯。',
+                                '鹽味汁(Tare)：將昆布、醬油、味醂煮濃縮作為底味。',
+                                '煮麵：依喜好硬度煮拉麵，時間通常 1-2 分鐘。',
+                                '組合：碗底放鹽味汁，注入滾燙豚骨湯，放入麵條整理整齊，擺上叉燒、溏心蛋、木耳與蔥花。'
+                            ], 
+                            time: '400分鐘' 
+                        },
+                        { 
+                            name: '日式照燒雞腿', 
+                            ingredients: ['去骨雞腿排 2片', '照燒醬：醬油 2、味醂 2、清酒 1、砂糖 0.5'], 
+                            steps: [
+                                '乾煎：平底鍋不放油，雞皮朝下入鍋，壓上重物用中火逼出油脂。',
+                                '焦香：皮煎至金黃酥脆後翻面，煎至八分熟。',
+                                '縮汁：擦乾多餘油脂，倒入調好的照燒醬汁，邊煮邊將醬汁淋在肉面。',
+                                '收尾：煮至醬汁濃稠呈掛漿狀即可切塊。'
+                            ], 
+                            time: '25分鐘' 
+                        },
+                        { 
+                            name: '關西風章魚燒', 
+                            ingredients: ['章魚塊', '麵粉、蛋、鰹魚出汁', '紅生薑、蔥花', '柴魚片、章魚燒醬'], 
+                            steps: [
+                                '粉漿：出汁與麵粉比例約 3:1，加蛋打成稀薄水狀粉漿。',
+                                '下料：模具抹油加熱，倒入全滿粉漿，撒入章魚、紅生薑、蔥花。',
+                                '翻轉：待底部凝固，用挑針將邊緣撥入，分兩次 90度翻轉成圓球。',
+                                '煎酥：反覆滾動至金黃微焦，出爐淋上醬、美乃滋、柴魚片。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '特盛牛肉丼', 
+                            ingredients: ['肥牛薄片 200g', '洋蔥絲', '日式醬油、味醂、清酒、砂糖'], 
+                            steps: [
+                                '煮汁：鍋中放高湯與洋蔥煮滾至半透明。',
+                                '入味：加入醬汁調味，放入牛肉片快速攪散。',
+                                '火候：肉色變白即關火，利用餘溫悶 2 分鐘，保持肉質軟嫩。',
+                                '裝碗：大量牛肉覆蓋米飯，撒上紅薑。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '茶碗蒸 (高湯蒸蛋)', 
+                            ingredients: ['雞蛋 2顆', '鰹魚出汁 300ml (蛋液:出汁 = 1:2.5)', '蝦仁、香菇、魚板'], 
+                            steps: [
+                                '過篩：蛋液與冷的高湯混合後，必須經過細篩 2 次去除氣泡，這是口感滑嫩的關鍵。',
+                                '入料：容器底放配料，緩緩注入蛋液。',
+                                '低溫蒸：蒸鍋留一條縫（散熱避免溫度過高），中小火蒸 10-12 分鐘。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '石狩鍋 (鮭魚味噌)', 
+                            ingredients: ['鮭魚塊', '白菜、馬鈴薯、豆腐', '赤味噌與白味噌混合', '奶油'], 
+                            steps: [
+                                '底湯：昆布水煮滾，下白菜、馬鈴薯煮至軟。',
+                                '下肉：放鮭魚與豆腐。',
+                                '調味：取湯化開味噌後回填，最後加一塊奶油提味。'
+                            ], 
+                            time: '35分鐘' 
+                        },
+                        { 
+                            name: '名古屋風鰻魚飯', 
+                            ingredients: ['白燒或蒲燒鰻', '珍珠米飯', '高湯、芥末、蔥花、海苔'], 
+                            steps: [
+                                '蒸烤：蒲燒鰻魚刷醬烤至油亮。',
+                                '三吃法：一吃原味，二吃加蔥花芥末，三吃加入茶或高湯作茶泡飯。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '厚切炸豬排', 
+                            ingredients: ['大里肌肉厚片', '麵包粉(粗粒)', '麵粉、蛋液'], 
+                            steps: [
+                                '前處理：斷筋並拍打肉身，撒鹽胡椒醃 10 分鐘。',
+                                '裹粉：依序「麵粉->蛋液->麵包粉」，按壓緊實。',
+                                '低溫炸：160度油溫入鍋，炸約 5 分鐘至內熟，取出靜置 2 分鐘讓肉汁回流，再回鍋高溫炸 30 秒至酥脆。'
+                            ], 
+                            time: '40分鐘' 
+                        }
+                    ],
+                    '精選醬菜': [
+                        { 
+                            name: '台式傳承黃金泡菜', 
+                            ingredients: ['大白菜 1顆 (約1.5kg)', '胡蘿蔔 1條', '大蒜 100g', '豆腐乳 3塊', '白醋 150ml', '砂糖 100g', '香油 100ml', '鹽巴 適量'], 
+                            steps: [
+                                '白菜處理：大白菜切成大片，撒上鹽巴抓勻後靜置 2 小時，待其出水軟化後，用冷開水徹底洗淨鹽分並瀝乾。',
+                                '製作醬泥：胡蘿蔔切片蒸熟，放入果汁機，加入大蒜、豆腐乳、醋、糖及香油，打成細滑的黃金醬漿。',
+                                '混合：將黃金醬泥倒入瀝乾的白菜中，用手充分抓勻，讓每片菜葉都沾滿醬汁。',
+                                '發酵醃漬：放入乾淨玻璃罐，冷藏保存 1-2 天，待味道融合後風味最佳。'
+                            ], 
+                            time: '2天' 
+                        },
+                        { 
+                            name: '秘製辣味醃蘿蔔', 
+                            ingredients: ['白蘿蔔 2條', '乾辣椒 5條', '砂糖 200g', '醬油 150ml', '白醋 150ml', '鹽 2大匙'], 
+                            steps: [
+                                '殺青：白蘿蔔洗淨不去皮（口感更脆），切成長條或厚片，用鹽巴抓勻靜置 3 小時後壓重物，將苦水完全擠出。',
+                                '洗滌：擠乾後的蘿蔔用冷開水沖洗，再用紗布包裹扭乾多餘水分。',
+                                '煮汁：醬油、醋、糖放入鍋中煮滾後完全放涼，加入切碎的乾辣椒。',
+                                '浸泡：將蘿蔔條放入密封罐，倒入放涼的滷汁，冷藏 24 小時即可食用。'
+                            ], 
+                            time: '1天' 
+                        },
+                        { 
+                            name: '日式淺漬小黃瓜', 
+                            ingredients: ['小黃瓜 5支', '昆布 1小片', '乾辣椒圈 少許', '鹽 1.5% (依重量計算)', '糖 1小匙'], 
+                            steps: [
+                                '板刷：小黃瓜撒鹽在砧板上用手掌來回搓揉，破壞表皮細胞使其更容易入味。',
+                                '切片：將小黃瓜切成 1 公分厚的輪狀。',
+                                '加壓：放入保鮮袋，加入昆布絲、辣椒圈、糖及剩餘鹽巴，揉勻後排開空氣密封。',
+                                '冷藏：在袋上壓重物，冷藏 2-4 小時，待黃瓜呈半透明狀即可。'
+                            ], 
+                            time: '4小時' 
+                        },
+                        { 
+                            name: '酒粕味噌醃肉床', 
+                            ingredients: ['白味噌 500g', '清酒粕 100g', '味醂 50ml', '砂糖 30g'], 
+                            steps: [
+                                '調配：將白味噌、酒粕、味醂與糖攪拌至糊狀。',
+                                '床鋪製作：在容器底部鋪一層味噌糊。',
+                                '醃漬應用：可用紗布包裹豆腐或肉片放在味噌床上，上方再蓋一層味噌。',
+                                '熟成：豆腐約醃漬 2 天，肉類約 1 天，取出後沖掉醬漿烹飪，具濃郁發酵香氣。'
+                            ], 
+                            time: '2天' 
+                        },
+                        { 
+                            name: '紫蘇醃梅(傳統工法)', 
+                            ingredients: ['青梅 2kg', '粗鹽 200g', '紅紫蘇葉 200g', '冰糖 1kg'], 
+                            steps: [
+                                '殺青：青梅洗淨去梗，用粗鹽揉搓至變色出水，重物壓製 2 天去除苦水。',
+                                '曬梅：取出梅子，在日光下曝曬至表皮略皺（約 2 天）。',
+                                '處理紫蘇：紅紫蘇葉用鹽揉搓去黑汁（澀液），留下的紅葉備用。',
+                                '層疊：玻璃罐底部放糖、紅紫蘇、梅子，交替疊放。',
+                                '熟成：放置陰涼處 3 個月以上，時間越久風味越醇厚。'
+                            ], 
+                            time: '3個月' 
+                        },
+                        { 
+                            name: '韓式手作泡菜', 
+                            ingredients: ['山東大白菜 1顆', '粗鹽 適量', '糯米糊 1碗', '韓式辣椒粉 150g', '魚露 50ml', '蝦醬 1大匙', '蒜泥 50g', '薑泥 10g', '韭菜、白蘿蔔絲'], 
+                            steps: [
+                                '鹽漬：大白菜對半切，每層菜葉均勻抹鹽，壓重物醃 6-8 小時至菜軸變軟。',
+                                '洗滌：清水洗淨 3 次，徹底瀝乾水分。',
+                                '調醬：糯米粉水煮成糊放涼，加入辣椒粉、魚露、蝦醬、蒜、薑、糖混合。',
+                                '抹醬：將白蘿蔔絲、韭菜段與醬料拌勻，逐層抹入白菜葉縫。',
+                                '發酵：室溫放 1 天後轉冷藏，一週後乳酸菌風味最佳。'
+                            ], 
+                            time: '7天' 
+                        },
+                        { 
+                            name: '四川老罈泡菜', 
+                            ingredients: ['高麗菜、嫩薑、豇豆', '老罈水 (或純淨水)', '粗鹽', '高度白酒 (50度以上)', '花椒、八角、冰糖'], 
+                            steps: [
+                                '準備罈子：洗淨晾乾，確保無油無水。',
+                                '配製鹽水：開水放涼，加入 6-8% 的鹽、冰糖及香料。',
+                                '入罈：放入洗淨晾乾的蔬菜，倒入鹽水淹沒，最後加入一小杯白酒殺菌。',
+                                '水封：罈緣注水封閉，放置陰涼處。',
+                                '觀察：夏季約 3 天，冬季 7 天即可食用。'
+                            ], 
+                            time: '5天' 
+                        },
+                        { 
+                            name: '古早味脆筍片', 
+                            ingredients: ['新鮮麻竹筍', '粗鹽', '水'], 
+                            steps: [
+                                '殺青：筍子切薄片，入沸水煮 20 分鐘去苦，撈出放涼。',
+                                '壓製：加入大量鹽抓勻，放入桶中壓重物 1 週，使其發酵產酸。',
+                                '漂洗：取出後反覆浸泡換水去掉過多鹽分，即可炒食或製作醃筍。'
+                            ], 
+                            time: '7天' 
+                        },
+                        { 
+                            name: '日式糠漬(Nukazuke)', 
+                            ingredients: ['米糠 1kg', '粗鹽 150g', '水 1L', '昆布、乾辣椒、老薑、蛋殼(鈣質)'], 
+                            steps: [
+                                '米糠床：米糠炒香，加入鹽水攪拌至如耳垂般的硬度。',
+                                '養床：加入昆布辣椒等，每天早晚用手攪拌翻動，持續一週培養乳酸菌。',
+                                '醃漬：將黃瓜或蕪菁埋入床中 12-24 小時。',
+                                '維護：這是一罈「活」的醬菜，需每天攪拌否則會發臭。'
+                            ], 
+                            time: '1天' 
+                        },
+                        { 
+                            name: '紹興醉醃嫩薑', 
+                            ingredients: ['嫩薑 300g', '紹興酒 100ml', '白醋 100ml', '砂糖 80g', '鹽少許'], 
+                            steps: [
+                                '切片：嫩薑切薄片，用鹽巴抓過後靜置 10 分鐘洗淨瀝乾。',
+                                '浸泡：糖與醋煮溶放涼，加入紹興酒。',
+                                '醃漬：薑片放入汁液中，冷藏 2 天，具濃郁酒香與脆爽口感。'
+                            ], 
+                            time: '2天' 
+                        },
+                        { 
+                            name: '廣式糖醋蕎頭', 
+                            ingredients: ['鮮蕎頭 1kg', '鹽 50g', '米醋 500ml', '白糖 400g'], 
+                            steps: [
+                                '前處裡：蕎頭去根鬚、去外衣洗淨，用鹽醃一天去辛辣味。',
+                                '洗淨：用涼開水洗淨，晾至表面乾爽。',
+                                '糖醋液：醋與糖比例約 1:1，煮沸放涼。',
+                                '浸泡：入罐密封，置於陰涼處 20 天後食用，口感酸甜脆嫩。'
+                            ], 
+                            time: '20天' 
+                        },
+                        { 
+                            name: '客家福菜(覆菜)', 
+                            ingredients: ['大芥菜 5kg', '粗鹽 500g'], 
+                            steps: [
+                                '曬乾：芥菜採收後曝曬至葉片萎凋。',
+                                '鹽漬：加鹽揉搓至出水，入桶壓重物一週。',
+                                '倒置：將醃過的菜塞入玻璃瓶並「倒置」，讓水分自然流出，發酵 3-6 個月至金黃色。'
+                            ], 
+                            time: '100天' 
+                        },
+                        { 
+                            name: '麻油香筍絲', 
+                            ingredients: ['熟筍絲 500g', '麻油 50ml', '豆瓣醬 1大匙', '糖、白胡椒、辣椒'], 
+                            steps: [
+                                '乾煸：將熟筍絲水分炒乾。',
+                                '調味：加入麻油爆香辣椒與豆瓣醬。',
+                                '拌炒：筍絲入鍋吸收麻油，加入糖、胡椒調味，冷卻後密封冷藏。'
+                            ], 
+                            time: '2小時' 
+                        },
+                        { 
+                            name: '醋漬洋蔥絲', 
+                            ingredients: ['紫洋蔥 2顆', '醬油 50ml', '果醋 100ml', '香油、芝麻'], 
+                            steps: [
+                                '冰鎮：洋蔥切極薄片，入冰水浸泡 30 分鐘去除辛辣。',
+                                '瀝乾：徹底去除水分。',
+                                '拌勻：加入醬油與醋，撒上芝麻與香油，靜置 30 分鐘即可食用。'
+                            ], 
+                            time: '1小時' 
+                        },
+                        { 
+                            name: '辣味醃蒜頭', 
+                            ingredients: ['剝皮蒜仁 300g', '辣椒粉 2大匙', '醬油 100ml', '糖 2大匙'], 
+                            steps: [
+                                '殺菌：蒜頭洗淨晾乾。',
+                                '醬汁：醬油與糖煮沸放涼。',
+                                '醃漬：混合辣椒粉與蒜頭，倒入醬汁。冷藏一個月後蒜頭呈琥珀色且無辛辣味。'
+                            ], 
+                            time: '30天' 
+                        },
+                        { 
+                            name: '蜂蜜醋漬櫻桃蘿蔔', 
+                            ingredients: ['櫻桃蘿蔔 10顆', '蜂蜜 2大匙', '蘋果醋 100ml', '鹽巴'], 
+                            steps: [
+                                '切片：蘿蔔切極薄連皮片。',
+                                '抓鹽：輕拍鹽巴靜置 5 分鐘擠掉水。',
+                                '蜜漬：加入蜂蜜與醋，1 小時後蘿蔔呈現粉紅晶瑩色，適合裝飾餐盤。'
+                            ], 
+                            time: '1小時' 
+                        },
+                        { 
+                            name: '蘇北糖醋蒜(整顆)', 
+                            ingredients: ['帶皮新蒜 1kg', '食鹽 20g', '白糖 300g', '香醋 500ml'], 
+                            steps: [
+                                '浸泡：蒜球去老皮留 2 層，入鹽水泡 2 天去辣。',
+                                '晾乾：根部向上晾乾水分。',
+                                '封存：糖醋混合後浸沒蒜球。放置 3 個月至蒜瓣呈半透明翡翠狀。'
+                            ], 
+                            time: '90天' 
+                        },
+                        { 
+                            name: '香油拌貢菜', 
+                            ingredients: ['乾貢菜 100g', '蒜泥、辣椒油、生抽、砂糖、香油'], 
+                            steps: [
+                                '泡發：乾貢菜溫水泡 1 小時，切段。',
+                                '川燙：滾水燙 30 秒立即冰鎮保持脆度。',
+                                '拌製：混合所有辛香料抓勻，靜置 2 小時風味尤佳。'
+                            ], 
+                            time: '3小時' 
+                        },
+                        { 
+                            name: '味噌醃小茄子', 
+                            ingredients: ['小圓茄 10個', '味噌 300g', '鹽少許'], 
+                            steps: [
+                                '固定色澤：茄子表面抹鹽輕揉，放入沸水加蓋燙 30 秒。',
+                                '醃漬：將茄子埋入味噌床，冷藏 12 小時。',
+                                '風味：口感紮實，帶有濃郁豆香與蔬菜甜味。'
+                            ], 
+                            time: '12小時' 
+                        },
+                        { 
+                            name: '冰糖醃苦瓜', 
+                            ingredients: ['白玉苦瓜 1條', '話梅 5顆', '冰糖 50g', '檸檬汁 20ml'], 
+                            steps: [
+                                '去瓤：苦瓜去籽，內層白膜需刮除乾淨。',
+                                '薄切：切成半透明薄片。',
+                                '浸泡：將話梅、冰糖、檸檬汁與苦瓜拌勻。',
+                                '冰漬：冷藏 4 小時，苦瓜變脆且帶果香。'
+                            ], 
+                            time: '4小時' 
+                        },
+                        { 
+                            name: '紹興醉蝦 (經典冷醃)', 
+                            ingredients: ['白蝦 600g', '紹興酒 300ml', '水 300ml', '當歸 2片', '黃耆 5片', '枸杞 1大匙', '紅棗 5顆', '鹽 1大匙', '冰糖 1小匙'], 
+                            steps: [
+                                '熬煮藥湯：將水、當歸、黃耆、枸杞、紅棗、鹽與冰糖煮滾後轉小火煮 10 分鐘。',
+                                '冷卻入酒：藥湯完全放涼後，倒入紹興酒拌勻（不可在熱湯中入酒，以免酒香揮發）。',
+                                '汆燙白蝦：白蝦去蝦鬚，入沸水加少許鹽、酒汆燙至熟，撈起立即入冰水冰鎮以保持 Q 彈。',
+                                '低溫醃漬：將冰鎮後的蝦濾乾，放入紹興藥湯中，入冰箱冷藏醃漬 24 小時。',
+                                '保存秘訣：醃漬超過 48 小時蝦肉易縮水變老，建議 24 小時風味最佳時享用。'
+                            ], 
+                            time: '30分鐘 (不含冷藏)' 
+                        },
+                        { 
+                            name: '台式黃金泡菜', 
+                            ingredients: ['大白菜 1顆', '大蒜 80g', '紅蘿蔔 100g', '辣腐乳 4塊', '白醋 150ml', '砂糖 100g', '香油 150ml', '辣椒 適量'], 
+                            steps: [
+                                '殺菁脫水：大白菜洗淨切塊，撒鹽拌勻靜置 2 小時，至出水變軟，用過濾水洗淨鹽分並擠乾水分。',
+                                '製作金醬：將大蒜、紅蘿蔔、腐乳、白醋、糖、香油放入調理機打成滑順泥狀。',
+                                '拌勻靜置：將擠乾的大白菜與金醬混合拌勻，放入乾淨容器中。',
+                                '低溫熟成：冷藏醃漬 1~2 天，待味道融合後口感最為濃郁。',
+                                '保存秘訣：使用腐乳是香氣來源，需確保白菜水分擠乾否則醬汁會變稀。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '日式鹽麴半熟蛋', 
+                            ingredients: ['雞蛋 6顆', '鹽麴 3大匙', '味醂 1大匙', '清酒 1小匙', '開水 1大匙'], 
+                            steps: [
+                                '煮半熟蛋：水滾後緩緩放入雞蛋，大火煮 6 分鐘，立即撈起沖冷水剝殼。',
+                                '調製醃料：將鹽麴、味醂、清酒與開水混合均勻。',
+                                '真空/袋醃：將剝好殼的蛋與醃料放入保鮮袋，排除空氣讓醃料均勻包裹蛋身。',
+                                '冷藏熟成：冷藏 1~2 天即可享用，鹽麴的酵素會讓蛋白質地極其滑嫩。',
+                                '保存秘訣：鹽麴鹹度不一，可依個人口味增減鹽麴比例。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '韓式醃漬芝麻葉', 
+                            ingredients: ['新鮮芝麻葉 30片', '醬油 4大匙', '韓國粗辣椒粉 2大匙', '蒜末 1大匙', '砂糖 1大匙', '香油 1大匙', '白芝麻 1大匙', '蔥末 少許'], 
+                            steps: [
+                                '處理葉片：芝麻葉洗淨並逐片擦乾或晾乾（水分會導致變質）。',
+                                '混合辣醬：將所有調味料混合拌勻成膏狀。',
+                                '層疊塗抹：取一片芝麻葉，背面朝上抹上少許辣醬，再疊上一片，重複至完成。',
+                                '室溫熟成：室溫放 2 小時後轉冷藏，隔天即可配飯食用。',
+                                '保存秘訣：芝麻葉需保持完整無破損，醃漬愈久風味愈鹹香。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '西式醃漬紅洋蔥 (Quick Pickled)', 
+                            ingredients: ['紅洋蔥 1顆', '白醋 200ml', '水 100ml', '砂糖 2大匙', '鹽 1小匙', '黑胡椒粒、月桂葉 1片'], 
+                            steps: [
+                                '切片處理：紅洋蔥切成薄圈，放入熱水中汆燙 10 秒後撈起（可去除辛辣味並讓色澤更鮮艷）。',
+                                '煮漬汁：將醋、水、糖、鹽、香料煮滾至糖融化。',
+                                '趁熱浸泡：將洋蔥放入乾淨玻璃瓶，倒入熱漬汁蓋過洋蔥。',
+                                '冷卻：冷藏 30 分鐘後即可變為迷人的亮粉紅色。',
+                                '應用：漢堡、塔可、沙拉的絕佳配角。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '秘製醬油漬干貝', 
+                            ingredients: ['生食級干貝 10顆', '醬油 2大匙', '味醂 1大匙', '柚子胡椒 少許', '檸檬皮屑 少許'], 
+                            steps: [
+                                '表面處理：干貝用廚房紙巾吸乾水分。',
+                                '調配醬汁：醬油、味醂與柚子胡椒拌勻。',
+                                '短時醃漬：干貝放入醬汁，冷藏醃漬 30 分鐘即可，不宜過久以免肉質縮水。',
+                                '點綴：取出後撒上檸檬皮屑增加清香味。',
+                                '應用：搭配海苔做成握壽司或直接當前菜。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '蜜汁梅漬小番茄', 
+                            ingredients: ['小番茄 500g', '話梅 8顆', '蜂蜜 2大匙', '砂糖 50g', '水 500ml', '白醋 1大匙'], 
+                            steps: [
+                                '番茄去皮：小番茄底部輕劃十字，入沸水燙 20 秒撈出，泡冰水輕易去皮。',
+                                '熬煮梅湯：水與話梅、砂糖煮滾 5 分鐘出味，加入蜂蜜、醋，放涼備用。',
+                                '浸泡入味：去皮番茄放入涼梅湯，冷藏 24 小時。',
+                                '保存秘訣：必須去皮才能入味，冷藏可放 3~5 天。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '台式辣味醃蜆仔', 
+                            ingredients: ['黃金蜆 600g', '醬油 150ml', '米酒 2大匙', '蒜瓣碎 50g', '生辣椒片 2根', '薑片 3片', '話梅 2顆 (提鮮用)'], 
+                            steps: [
+                                '吐沙開口：蜆仔吐沙洗淨，入冷水中小火慢慢煮至微張口即撈起（不可大滾）。',
+                                '調製滷汁：將醬油、酒、蒜、辣椒、話梅混勻。',
+                                '冷泡熟成：將微熟蜆仔入滷汁，冷藏醃漬 24 小時。',
+                                '保存秘訣：蜆仔半生熟口感最嫩，但務必選擇新鮮來源。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '日式味噌漬奶油乳酪 (Cream Cheese)', 
+                            ingredients: ['奶油乳酪 200g', '白味噌 100g', '味醂 2大匙', '清酒 1大匙', '砂糖 1大匙'], 
+                            steps: [
+                                '調製味噌床：將味噌、味醂、酒、糖拌勻。',
+                                '包裹醃漬：乳酪切成方塊，用紗布包裹（避免直接接觸過鹹），埋入味噌醬中。',
+                                '時間魔術：冷藏醃漬 2~3 天，味噌風味會滲透進入，乳酪質地會變得像海膽般濃縮。',
+                                '應用：切薄片搭配紅酒或清酒，極致下酒菜。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '泰式涼拌醃木瓜', 
+                            ingredients: ['青木瓜絲 300g', '長豆段 30g', '小番茄 5顆', '蝦米 1大匙', '碎花生 1大匙', '魚露 2大匙', '檸檬汁 2大匙', '椰糖 1大匙', '大蒜 2瓣', '朝天椒 適量'], 
+                            steps: [
+                                '擣拌釋味：石臼放入大蒜、辣椒、蝦米擣碎，加入魚露、檸檬汁、椰糖拌勻。',
+                                '入味處理：放入青木瓜絲與長豆，用力擣拌使汁水進入纖維。',
+                                '點綴：最後加入番茄塊與花生碎稍微拌勻即可。',
+                                '保存秘訣：現做現吃口感最脆，久放會軟掉。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '醋溜酸甜紫甘藍', 
+                            ingredients: ['紫甘藍 1/2顆', '蘋果醋 150ml', '蜂蜜 2大匙', '鹽 1小匙', '肉桂粉 少許'], 
+                            steps: [
+                                '切絲脫水：紫甘藍切極細絲，撒少許鹽抓勻靜置 15 分鐘，瀝乾水分。',
+                                '調味：拌入蘋果醋、蜂蜜與肉桂粉。',
+                                '冷藏：靜置 2 小時後顏色會變亮紫。',
+                                '應用：搭配烤肉、德式香腸。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '日式南蠻漬魚塊', 
+                            ingredients: ['白肉魚塊 300g', '洋蔥絲 1/2顆', '紅蘿蔔絲 少許', '醋 100ml', '醬油 50ml', '味醂 50ml', '鷹爪辣椒輪 1小匙'], 
+                            steps: [
+                                '炸魚：魚塊裹薄粉炸熟備用。',
+                                '煮漬汁：洋蔥、紅蘿蔔絲與醋、醬油、味醂、辣椒煮開。',
+                                '熱浸：趁漬汁與魚塊都溫熱時混合，讓溫差帶動吸收。',
+                                '應用：冷熱皆宜，常見的日式家常菜。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '油封蒜香漬磨菇', 
+                            ingredients: ['鮮香菇或磨菇 300g', '特級初榨橄欖油 200ml', '大蒜瓣 5瓣', '乾辣椒 1根', '迷迭香 1小枝', '鹽、黑胡椒'], 
+                            steps: [
+                                '煸乾水分：磨菇入乾鍋炒至出水並收乾，香氣才會濃郁。',
+                                '低溫油封：橄欖油加蒜、香料小火加熱至微起泡，放入磨菇低溫泡煮 5 分鐘。',
+                                '冷藏熟成：連油裝瓶冷藏 1 天。',
+                                '應用：搭配麵包、拌義大利麵。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '老北京糖蒜', 
+                            ingredients: ['新鮮整顆大蒜 10顆', '白醋 500ml', '砂糖 250g', '鹽 2大匙'], 
+                            steps: [
+                                '去辣：新蒜去老皮留 1-2 層，泡入清水 24 小時，中間換水兩次。',
+                                '瀝乾：大蒜根部朝上徹底晾乾。',
+                                '入甕：白醋加糖、鹽煮溶放涼，與大蒜一起放入密封罐。',
+                                '時間磨練：陰涼處存放 1 個月，蒜辣味消失轉為酸甜。'
+                            ], 
+                            time: '40分鐘 (醃漬1個月)' 
+                        },
+                        { 
+                            name: '韓式醃辣味魷魚', 
+                            ingredients: ['新鮮魷魚絲 300g', '韓國辣醬 3大匙', '細辣椒粉 1大匙', '蒜泥 1大匙', '麥芽糖 2大匙', '香油 1大匙'], 
+                            steps: [
+                                '殺菌：魷魚絲快速汆燙 10 秒撈起冷卻。',
+                                '混合醬料：將辣醬、辣椒粉、蒜、糖漿拌勻。',
+                                '揉搓入味：手帶手套用力抓揉魷魚與醬料。',
+                                '應用：韓國經典飯饌（小菜）。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '日式淺漬昆布小黃瓜', 
+                            ingredients: ['小黃瓜 3根', '鹽昆布 (Shio Kombu) 1大匙', '香油 1小匙', '蒜碎 1小匙'], 
+                            steps: [
+                                '拍碎：小黃瓜拍裂後切段（拍碎比切片更容易吸汁）。',
+                                '混和：放入袋中加鹽昆布、香油、蒜碎抓勻。',
+                                '縮短時間：重物壓 15 分鐘即可食用。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '義式漬乾番茄', 
+                            ingredients: ['聖女番茄 500g', '橄欖油 足量', '奧勒岡/百里香 適量', '鹽 1小匙'], 
+                            steps: [
+                                '低溫烘乾：番茄切半，橫切面朝上，低溫 100度烘烤 3-4 小時至皺縮。',
+                                '裝瓶：番茄乾與香料放入瓶中，橄欖油加滿完全覆蓋。',
+                                '保存秘訣：確保番茄不接觸空氣，可保存數月。'
+                            ], 
+                            time: '4小時' 
+                        },
+                        { 
+                            name: '辣味醃西瓜皮', 
+                            ingredients: ['西瓜皮(去綠皮取白色部) 300g', '鹽 1小匙', '辣油 1大匙', '砂糖 1小匙', '烏醋 1大匙'], 
+                            steps: [
+                                '脆化：西瓜皮切片，鹽醃 10 分鐘，擠掉苦澀水。',
+                                '拌合：加入辣油、糖、醋拌勻，口感極似涼拌大頭菜。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '川味醃漬嫩薑', 
+                            ingredients: ['嫩薑 300g', '泡椒水 100ml', '白醋 50ml', '花椒 少許', '冰糖 1大匙'], 
+                            steps: [
+                                '切片：嫩薑切薄片。',
+                                '浸泡：混合泡椒水、醋、花椒、糖。',
+                                '冷藏：3 天後嫩薑變粉紅且具發酵酸辣氣息。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '日式糠漬風 (ぬか漬け) 簡易版', 
+                            ingredients: ['黃瓜/蘿蔔 適量', '生米糠或黃豆粉 200g', '鹽 30g', '水 150ml', '昆布、乾辣椒'], 
+                            steps: [
+                                '製作糠床：米糠加鹽水拌成味噌狀。',
+                                '埋入：食材洗淨抹鹽，埋入糠床。',
+                                '等待：12-24 小時後取出洗淨即可。'
+                            ], 
+                            time: '20分鐘' 
+                        }
+                    ],
+                    '頂級調味醬汁': [
+                        { 
+                            name: '萬用傳承秘製滷汁', 
+                            ingredients: ['優質醬油 500ml', '冰糖 150g', '米酒 200ml', '水 1500ml', '老薑片 5片', '大蒜 10瓣', '青蔥 3支', '八角 5粒', '桂皮 1小塊', '甘草 3片', '花椒 1大匙'], 
+                            steps: [
+                                '煸香辛料：鍋中入少許油，將薑片、大蒜、青蔥爆香，再放入花椒、八角、桂皮低溫炒出香味。',
+                                '炒糖色：另起鍋將冰糖中小火炒至琥珀色液體狀，加入少量熱水拌勻成糖色。',
+                                '燉煮調合：將煸香的料放入大鍋，倒入水、醬油、米酒、糖色與其餘藥材。',
+                                '靜置熟成：大火煮滾後轉小火燉煮 40 分鐘，熄火靜置 12 小時讓藥材香味完全釋放，此為「老滷」之基底。',
+                                '應用：適合滷製豬腳、牛肚、海帶或滷蛋。'
+                            ], 
+                            time: '1小時' 
+                        },
+                        { 
+                            name: '秘製台式蒜蓉辣椒醬', 
+                            ingredients: ['生紅辣椒 300g', '大蒜瓣 200g', '朝天椒 50g (調整辣度)', '香油 100ml', '鹽 2大匙', '砂糖 1大匙', '高度白酒 1大匙'], 
+                            steps: [
+                                '研磨處理：辣椒洗淨徹底晾乾水分（非常重要），與大蒜一起放入調理機打成粗碎狀。',
+                                '殺菌調味：將辣椒蒜碎放入碗中，加入鹽、糖、白酒拌勻。',
+                                '熱油封味：將香油燒至微冒煙，分次潑在辣椒碎上激發香氣，同時不斷攪拌。',
+                                '熟成保存：裝入消毒過的玻璃罐，冷藏一週後風味最為醇厚。',
+                                '應用：拌麵、火鍋沾醬、蒸魚基底。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '日式萬用照燒醬汁', 
+                            ingredients: ['濃口醬油 100ml', '味醂 100ml', '料理清酒 100ml', '砂糖 50g', '麥芽糖 1大匙', '老薑片 2片'], 
+                            steps: [
+                                '混合比例：醬油、味醂、清酒以 1:1:1 的黃金比例混合於鍋中。',
+                                '熬煮濃縮：加入砂糖與薑片，中火煮沸後轉小火慢慢熬煮。',
+                                '增稠光澤：加入麥芽糖攪拌至溶解，持續煮至液體體積減少約 1/3，且質地略顯黏稠具有光澤。',
+                                '過濾：撈除薑片後放涼備用。',
+                                '應用：照燒雞腿、烤鰻魚、漢堡排淋醬。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '西式法式荷蘭醬 (Hollandaise)', 
+                            ingredients: ['蛋黃 3個', '澄清奶油 200g', '檸檬汁 1大匙', '白酒醋 1小匙', '鹽巴 少許', '白胡椒或紅椒粉 少許'], 
+                            steps: [
+                                '隔水加熱：將蛋黃、白酒醋放入耐熱碗中，置於微沸的熱水鍋上（碗底不碰水）。',
+                                '打發乳化：用打蛋器快速攪打至蛋黃呈乳白色且體積膨脹兩倍。',
+                                '緩慢入油：一邊攪打，一邊極緩慢地滴入溫熱的澄清奶油，直至質地濃稠滑順。',
+                                '最後調味：加入檸檬汁、鹽與胡椒調勻。',
+                                '應用：班尼迪克蛋、搭配蘆筍或烤鮭魚。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '靈魂川味紅油', 
+                            ingredients: ['二荊條辣椒粉 100g', '菜籽油 500ml', '花椒粒 20g', '八角、桂皮、草果、月桂葉', '芝麻 20g', '紫草 (選用，上色用)'], 
+                            steps: [
+                                '分溫潑油：辣椒粉平鋪於耐熱容器，拌入芝麻。',
+                                '煉香油：菜籽油加熱至 200度，放入所有香料炸焦黃後撈出。',
+                                '一噴香：當油溫降至 180度時，倒 1/3 油入辣椒粉中攪拌。',
+                                '二鮮紅：降至 150度再倒 1/3 油。',
+                                '三濃郁：降至 120度倒入剩餘油，加入幾滴醋提香，加蓋靜置 24 小時。',
+                                '應用：紅油抄手、口水雞、涼拌菜。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '經典義大利羅勒青醬', 
+                            ingredients: ['新鮮甜羅勒葉 100g', '松子 30g', '帕馬森起司粉 50g', '大蒜 2瓣', '特級初榨橄欖油 150ml', '鹽巴 少許'], 
+                            steps: [
+                                '低溫處理：松子先用平底鍋小火炒出香氣後放涼。',
+                                '混合研磨：將羅勒、松子、大蒜、鹽放入調理機，分次加入橄欖油低速打碎。',
+                                '拌入起司：最後手動拌入起司粉，避免調理機高溫導致羅勒變黑。',
+                                '應用：義大利麵、塗抹法棍麵包。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '泰式酸辣魚露醬 (Nam Jim)', 
+                            ingredients: ['魚露 4大匙', '現擠檸檬汁 4大匙', '砂糖 2大匙', '蒜碎 1大匙', '紅蔥頭碎 1大匙', '香菜末 1大匙', '泰式朝天椒末 適量'], 
+                            steps: [
+                                '溶解糖分：先將檸檬汁與砂糖攪拌至糖完全溶解。',
+                                '混合液體：倒入魚露混合。',
+                                '添加辛香料：加入蒜碎、紅蔥頭碎及辣椒末拌勻。',
+                                '點綴：最後撒上香菜末。',
+                                '應用：泰式檸檬魚、涼拌海鮮、炸春捲沾醬。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '廣式蒸魚豉油', 
+                            ingredients: ['生抽醬油 100ml', '老抽醬油 10ml', '魚露 10ml', '冰糖 20g', '水 100ml', '香菜根 3支', '紅蔥頭、薑絲 少許'], 
+                            steps: [
+                                '熬煮底湯：鍋中放入水、香菜根、紅蔥頭、薑絲煮 5 分鐘出味。',
+                                '調配醬色：濾掉雜質，加入醬油、老抽、魚露及冰糖。',
+                                '濃縮：中火煮開後轉小火煮 3 分鐘至糖化即可。',
+                                '應用：清蒸海上鮮、白灼蝦沾醬。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '萬用韓式醃肉醬', 
+                            ingredients: ['水梨汁 100ml', '醬油 100ml', '砂糖 50g', '蒜泥 2大匙', '薑泥 1小匙', '香油 2大匙', '白芝麻 1大匙', '黑胡椒粉 少許'], 
+                            steps: [
+                                '軟化纖維：水梨打汁過濾，水梨酵素能讓肉質更軟嫩。',
+                                '混合：將所有食材在大碗中混和攪拌。',
+                                '應用：韓式烤牛小排、豬五花醃漬。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '法式油醋醬 (Vinaigrette)', 
+                            ingredients: ['特級初榨橄欖油 3份', '巴薩米克醋或紅酒醋 1份', '法式芥末醬 (Dijon) 1小匙', '蜂蜜或砂糖 少許', '黑胡椒、鹽'], 
+                            steps: [
+                                '乳化關鍵：先將醋、芥末醬、鹽、胡椒放入碗中攪勻。',
+                                '入油：緩緩加入橄欖油，同時用小打蛋器用力攪拌，使油水乳化不分離。',
+                                '應用：新鮮綠色沙拉、烤蔬菜淋醬。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '北京老字號甜麵醬汁', 
+                            ingredients: ['甜麵醬 200g', '砂糖 30g', '香油 20ml', '水 50ml'], 
+                            steps: [
+                                '蒸製：將甜麵醬、糖、水拌勻，入蒸籠蒸 15 分鐘（此為不燥口秘訣）。',
+                                '拌香油：取出後趁熱拌入香油，口感更滑順。',
+                                '應用：京醬肉絲、烤鴨沾醬。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '日式芝麻胡麻醬', 
+                            ingredients: ['白芝麻醬 3大匙', '味醂 1大匙', '醬油 1大匙', '糖 1小匙', '白醋 1大匙', '美乃滋 1大匙'], 
+                            steps: [
+                                '稀釋：先用醬油與味醂慢慢將芝麻醬化開。',
+                                '調合：加入其餘調味料，攪打至質地乳化均勻。',
+                                '應用：胡麻涼麵、涮涮鍋肉片沾醬。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '台式沙茶萬用底醬', 
+                            ingredients: ['沙茶醬 3大匙', '花生粉 1大匙', '醬油膏 1大匙', '蒜泥 1大匙', '烏醋 1小匙'], 
+                            steps: [
+                                '組合：將所有食材直接混合拌勻。花生粉能增加濃稠度與香氣。',
+                                '應用：台式石頭火鍋底料、沙茶牛肉炒醬。'
+                            ], 
+                            time: '3分鐘' 
+                        },
+                        { 
+                            name: '西式凱薩醬', 
+                            ingredients: ['美乃滋 150g', '鯷魚碎 2條', '蒜泥 1瓣', '檸檬汁 1大匙', '帕馬森起司粉 30g', '黑胡椒、伍斯特醬 (Worcestershire) 少許'], 
+                            steps: [
+                                '搗碎：將鯷魚搗成泥狀。',
+                                '混合：與美乃滋及其他配料充分攪勻。',
+                                '應用：凱薩沙拉、炸雞沾醬。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '墨西哥莎莎醬 (Salsa Roja)', 
+                            ingredients: ['成熟番茄 3顆', '洋蔥碎 1/2顆', '香菜碎 1把', '墨西哥辣椒 (Jalapeno) 1根', '青檸汁 1大匙', '孜然粉、鹽'], 
+                            steps: [
+                                '炙烤：番茄與辣椒烤至表皮焦黑，去皮切碎。',
+                                '混合：與新鮮洋蔥、香菜、檸檬汁拌勻，冷藏 1 小時後味道最佳。',
+                                '應用：搭配塔可、玉米片。'
+                            ], 
+                            time: '25分鐘' 
+                        },
+                        { 
+                            name: '港式蔥油醬', 
+                            ingredients: ['青蔥末 150g', '老薑泥 30g', '鹽 1小匙', '花生油或雞油 100ml'], 
+                            steps: [
+                                '脫水：蔥末與薑泥拌鹽，靜置 5 分鐘瀝掉一點汁水。',
+                                '熗油：油燒至冒煙，直接淋在蔥薑上，瞬間激發辛香味。',
+                                '應用：油雞、拌飯。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '濃郁肉醬 (Bolognese Base)', 
+                            ingredients: ['番茄糊 (Tomato Paste) 100g', '紅酒 100ml', '牛膝草/牛至 (Oregano) 少許', '牛肉高湯 200ml'], 
+                            steps: [
+                                '炒糊：將番茄糊炒至深紅色，消除生味。',
+                                '嗆酒：倒入紅酒煮至酒精揮發，再加入高湯燉煮濃縮。',
+                                '應用：千層麵、義式肉醬麵底醬。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '南洋沙嗲醬', 
+                            ingredients: ['粗粒花生醬 150g', '椰奶 100ml', '紅咖哩醬 1大匙', '棕櫚糖 1大匙', '羅望子汁 1小匙'], 
+                            steps: [
+                                '爆香：紅咖哩醬小火炒香。',
+                                '融合：加入椰奶、花生醬煮至溶化，調入糖與羅望子汁。',
+                                '應用：南洋烤肉串沾醬。'
+                            ], 
+                            time: '12分鐘' 
+                        },
+                        { 
+                            name: '日式味噌萬用醬', 
+                            ingredients: ['赤味噌 100g', '砂糖 50g', '味醂 2大匙', '蛋黃 1個'], 
+                            steps: [
+                                '慢熬：味噌、糖、味醂置於鍋中，小火邊煮邊攪動。',
+                                '加壓：稍降溫後拌入蛋黃（增加濃厚感），再回火上攪動片刻。',
+                                '應用：田樂燒、味噌烤魚、沾食生蔬菜。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '五味醬 (經典台式冷盤醬)', 
+                            ingredients: ['番茄醬 3大匙', '醬油膏 3大匙', '砂糖 2大匙', '烏醋 2大匙', '香油 1大匙', '蒜末、薑末、蔥末、辣椒末 各適量'], 
+                            steps: [
+                                '黃金比例：將液體類調味料依序混合均勻。',
+                                '鮮味提昇：最後加入大量的蔥、薑、蒜、辣椒碎。',
+                                '應用：五味淡菜、五味花枝、九孔冷盤。'
+                            ], 
+                            time: '5分鐘' 
+                        }
+                    ],
+                    '職人電鍋料理': [
+                        { 
+                            name: '古法蒜頭蒸雞湯', 
+                            ingredients: ['全雞或雞腿肉 600g', '剝皮大蒜 20顆', '乾干貝 3顆', '薑片 3片', '米酒 2大匙', '鹽 少許', '外鍋水 2杯'], 
+                            steps: [
+                                '食材預處理：雞肉切塊汆燙去除血水。乾干貝用少許米酒泡軟備用。',
+                                '炸蒜頭(關鍵)：將一半的蒜頭入鍋油炸至金黃色（增加焦香氣），另一半保持生蒜。',
+                                '入鍋：將雞肉、生熟蒜頭、干貝、薑片放入內鍋，加入過濾水淹過食材。',
+                                '啟動：外鍋倒入 2 杯水，按下開關蒸煮至跳起。',
+                                '調味：跳起後悶 15 分鐘，加入鹽巴調味即成。'
+                            ], 
+                            time: '50分鐘' 
+                        },
+                        { 
+                            name: '日式和風五目炊飯', 
+                            ingredients: ['白米 2杯', '雞肉丁 100g', '香菇絲 3朵', '紅蘿蔔絲 少許', '牛蒡絲 少許', '醬油 1.5大匙', '味醂 1大匙', '出汁(高湯) 2杯'], 
+                            steps: [
+                                '浸泡：白米洗淨後，加入高湯、醬油與味醂浸泡 20 分鐘。',
+                                '鋪料：將所有副食材平均鋪在米飯上方，不可攪拌（否則米飯容易煮不熟）。',
+                                '烹煮：外鍋 1 杯水，按下開關。',
+                                '悶熟：跳起後務必悶 15 分鐘，再將食材與米飯拌勻。',
+                                '秘訣：使用高湯代替清水，飯粒會充滿深層鮮味。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '豆酥/樹子蒸鱈魚', 
+                            ingredients: ['鱈魚或鱸魚片 1片', '樹子醬 2大匙', '大蔥絲 少許', '薑片 3片', '米酒 1大匙', '外鍋水 0.5杯'], 
+                            steps: [
+                                '去腥：魚片洗淨抹乾，雙面淋上米酒，鋪上薑片。',
+                                '淋醬：將樹子醬均勻鋪在魚片上。',
+                                '蒸煮：外鍋 0.5 杯水，水滾後放入魚片蒸約 8~10 分鐘（開關跳起即熟）。',
+                                '點綴：取出魚片，撒上新鮮蔥絲，淋上一點熱油激發香氣。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '台式古早味滷肉', 
+                            ingredients: ['五花肉 600g', '紅蔥頭酥 3大匙', '醬油 1/2杯', '冰糖 1大匙', '五香粉 少許', '米酒 1/4杯', '外鍋水 2杯'], 
+                            steps: [
+                                '爆香：五花肉切小塊，先用炒鍋炒至表面焦香出油。',
+                                '調味：加入冰糖炒出糖色，再下醬油、米酒煮滾。',
+                                '燉煮：將內容物移至電鍋內鍋，加入蔥酥與水，外鍋 2 杯水。',
+                                '重複(可選)：若喜歡極軟爛口感，可於開關跳起後，外鍋再加 1 杯水續蒸一次。'
+                            ], 
+                            time: '60分鐘' 
+                        },
+                        { 
+                            name: '老少平安 (肉末蒸豆腐)', 
+                            ingredients: ['豬絞肉 150g', '嫩豆腐 1盒', '蝦米 少許', '蔥花 少許', '醬油 1大匙', '糖、白胡椒 少許'], 
+                            steps: [
+                                '醃肉：絞肉加入醬油、糖、白胡椒與切碎的蝦米攪拌至有黏性。',
+                                '疊放：嫩豆腐切大片鋪底，將肉末均勻鋪在豆腐上。',
+                                '蒸製：外鍋 0.7 杯水，按下開關。',
+                                '出爐：跳起後撒上蔥花，豆腐會吸收肉汁，極其鮮甜。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '蠔油鮑魚香菇蒸雞', 
+                            ingredients: ['雞翅或雞腿塊 300g', '香菇 5朵', '小鮑魚罐頭 1罐', '蠔油 1.5大匙', '薑絲 少許', '外鍋水 1杯'], 
+                            steps: [
+                                '浸泡：乾香菇泡軟切半。',
+                                '醃漬：雞肉與蠔油、薑絲、香菇及鮑魚湯汁拌勻醃 15 分鐘。',
+                                '合裝：將食材平鋪在深盤中，擺上鮑魚。',
+                                '蒸熟：外鍋 1 杯水蒸至開關跳起即可。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '高麗菜飯 (台式經典)', 
+                            ingredients: ['白米 2杯', '高麗菜 1/4顆', '五花肉絲 100g', '蝦米 1大匙', '乾香菇 3朵', '油蔥酥 適量', '醬油 2大匙'], 
+                            steps: [
+                                '爆香預處理：建議先在鍋中炒香肉絲、蝦米與香菇，加入醬油上色。',
+                                '混合：洗淨的米與炒好的料拌勻，加入與米同比例的水量。',
+                                '蓋菜：最後將大量高麗菜切粗片鋪在最上面。',
+                                '煮飯：外鍋 1 杯水，依正常煮飯流程即可。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '上海菜飯 (簡易版)', 
+                            ingredients: ['白米 2杯', '青江菜 200g', '金華火腿或臘肉絲 50g', '高湯 2杯'], 
+                            steps: [
+                                '煮飯：米、高湯、火腿絲放入內鍋，正常煮飯。',
+                                '處理青菜：青江菜切碎，用少許油鹽炒熟備用。',
+                                '拌合：待電鍋開關跳起，立即加入炒好的青江菜拌勻。',
+                                '悶香：蓋上鍋蓋再悶 5 分鐘，可保持青菜翠綠。'
+                            ], 
+                            time: '35分鐘' 
+                        },
+                        { 
+                            name: '梅干扣肉', 
+                            ingredients: ['五花肉塊 600g', '梅干菜 100g', '大蒜 3瓣', '醬油 3大匙', '糖 1大匙', '外鍋水 2.5杯'], 
+                            steps: [
+                                '處理梅干菜：反覆清洗去除砂土，切碎後先炒乾水分並下糖調味。',
+                                '切片裝碗：五花肉煎香切厚片，皮朝下整齊排列在碗底。',
+                                '覆蓋：填入炒好的梅干菜壓實。',
+                                '長時間蒸：外鍋 2.5 杯水，蒸至開關跳起，倒扣至盤中即可。'
+                            ], 
+                            time: '70分鐘' 
+                        },
+                        { 
+                            name: '鮮蝦蒸粉絲', 
+                            ingredients: ['大蝦 8隻', '冬粉 2把', '蒜末 2大匙', '醬油 1.5大匙', '糖 1小匙', '外鍋水 0.5杯'], 
+                            steps: [
+                                '浸泡：冬粉泡軟切段鋪在盤底。',
+                                '開背：蝦子去腸泥開背，鋪在冬粉上。',
+                                '淋醬：調製蒜泥醬油，均勻淋在蝦身上。',
+                                '速蒸：外鍋 0.5 杯水，水滾蒸約 5 分鐘，蝦肉才不會過老。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '蛤蜊蒸蛋 (零失敗)', 
+                            ingredients: ['雞蛋 2顆', '蛤蜊 10顆', '溫水 (蛋液的2倍重量)', '鹽 少許', '外鍋水 0.7杯'], 
+                            steps: [
+                                '蛤蜊預處理：蛤蜊先燙至微開口，留取湯汁。',
+                                '打蛋：雞蛋打散，加入蛤蜊湯與溫水，比例約為 1(蛋):2(液體)。',
+                                '過濾：務必用濾網過濾蛋液至碗中。',
+                                '蒸煮關鍵：電鍋蓋插一支筷子留縫，外鍋 0.7 杯水，蒸出如布丁般的平滑面。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '南瓜粉蒸肉', 
+                            ingredients: ['豬里肌或小排 300g', '南瓜 1/2顆', '蒸肉粉 1包', '辣豆瓣醬 1小匙'], 
+                            steps: [
+                                '醃肉：肉塊用少許醬油、豆瓣醬醃過，均勻裹上蒸肉粉。',
+                                '墊底：南瓜切大塊鋪在盤底。',
+                                '堆疊：將肉塊平鋪在南瓜上。',
+                                '蒸製：外鍋 1.5 杯水，蒸至肉質軟糯、南瓜鬆軟。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '電鍋版紅燒牛肉', 
+                            ingredients: ['牛腩 600g', '紅白蘿蔔 各1根', '滷包 1個', '蔥、薑、八角', '醬油、辣豆瓣醬', '外鍋水 3杯'], 
+                            steps: [
+                                '汆燙：牛肉切塊汆燙。',
+                                '炒醬：起油鍋炒香薑片、八角、豆瓣醬。',
+                                '合煮：內鍋放牛肉、蘿蔔、炒好的醬、滷包及水。',
+                                '兩段蒸：外鍋先放 1.5 杯水，跳起後檢查軟硬度，再加 1.5 杯水續蒸一次。'
+                            ], 
+                            time: '90分鐘' 
+                        },
+                        { 
+                            name: '清蒸紅棗枸杞鱸魚', 
+                            ingredients: ['鱸魚 1條', '紅棗 5顆', '枸杞 少許', '薑絲、蔥絲', '魚露或薄鹽醬油 1大匙'], 
+                            steps: [
+                                '劃刀：魚身斜劃兩刀。',
+                                '擺盤：鋪上薑絲、紅棗、枸杞。',
+                                '蒸煮：外鍋 0.8 杯水蒸至跳起。',
+                                '淋汁：取出後淋上魚露，放上蔥絲即成。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '蒜蓉蒸小排', 
+                            ingredients: ['豬小排 300g', '蒜末 2大匙', '豆豉 1小匙', '太白粉 1小匙', '米酒 1大匙'], 
+                            steps: [
+                                '醃漬：排骨加入所有調味拌勻，最後加入太白粉鎖住肉汁。',
+                                '鋪平：盡量不要堆疊排骨，受熱才會均勻。',
+                                '蒸煮：外鍋 1.5 杯水蒸熟即可。'
+                            ], 
+                            time: '35分鐘' 
+                        },
+                        { 
+                            name: '五彩蒸時蔬', 
+                            ingredients: ['玉米筍、花椰菜、香菇、甜椒、秋葵', '橄欖油、海鹽'], 
+                            steps: [
+                                '分層：耐煮的放在下面（玉米筍），易熟的放在上面。',
+                                '快蒸：外鍋 0.3 杯水，開關一跳馬上取出，顏色才漂亮。',
+                                '調味：取出後淋上橄欖油與海鹽拌勻。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '紅棗銀耳蓮子湯 (甜點)', 
+                            ingredients: ['乾銀耳 1朵', '新鮮蓮子 50g', '紅棗 8顆', '冰糖 適量', '外鍋水 2杯'], 
+                            steps: [
+                                '泡發：銀耳泡軟去蒂剪碎（碎一點更容易出膠）。',
+                                '燉煮：銀耳、紅棗加水入內鍋，外鍋 2 杯水燉煮。',
+                                '入蓮子：跳起後放入蓮子、冰糖，外鍋再加 0.5 杯水續蒸，可保蓮子完整不碎。'
+                            ], 
+                            time: '50分鐘' 
+                        },
+                        { 
+                            name: '電鍋版蜜地瓜', 
+                            ingredients: ['地瓜 3-5條', '砂糖 100g', '麥芽糖 2大匙', '水 少許'], 
+                            steps: [
+                                '切塊：地瓜去皮切滾刀塊。',
+                                '拌糖：將地瓜與糖、麥芽糖放入內鍋。',
+                                '不加水煮：內鍋不加水，外鍋 1 杯水蒸熟。',
+                                '悶漬：跳起後讓糖水浸泡地瓜至冷卻，口感更 Q。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '豉汁蒸鳳爪 (港式風)', 
+                            ingredients: ['雞爪 300g', '豆豉 1大匙', '辣椒絲、蒜泥', '醬油 1大匙', '糖、白胡椒粉'], 
+                            steps: [
+                                '處理：雞爪去趾切半，先汆燙再用油炸至起泡（或買現成的）。',
+                                '醃料：混合所有調味料與鳳爪。',
+                                '蒸透：外鍋 2 杯水，將鳳爪蒸至皮骨分離。'
+                            ], 
+                            time: '50分鐘' 
+                        },
+                        { 
+                            name: '古早味蒸蛋糕', 
+                            ingredients: ['雞蛋 3顆', '低筋麵粉 100g', '砂糖 60g', '植物油 20g'], 
+                            steps: [
+                                '全蛋打發：雞蛋加糖打發至畫「8」字不消失。',
+                                '拌粉：分次篩入麵粉拌勻，加入植物油輕拌。',
+                                '蒸製：內鍋鋪烘焙紙倒入麵糊，外鍋 1.5 杯水。',
+                                '小叮嚀：鍋蓋要留小縫，避免水滴掉在蛋糕表面。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                          { 
+                            name: '剝皮辣椒雞湯', 
+                            ingredients: ['雞腿肉 500g', '剝皮辣椒罐頭 1/2罐', '薑片 4片', '蛤蜊 150g', '米酒 1大匙', '外鍋水 1.5杯'], 
+                            steps: [
+                                '處理：雞腿肉切塊，放入滾水中汆燙去除血水與雜質。',
+                                '擺料：將雞肉、薑片、剝皮辣椒及一半的罐頭汁液放入內鍋。',
+                                '入水：內鍋加入清水至 6-7 分滿。',
+                                '蒸煮：外鍋 1.5 杯水，按下開關。',
+                                '提鮮：開關跳起後，放入蛤蜊並倒入米酒，外鍋補 0.2 杯水再蒸 3 分鐘即可。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '台式粉蒸肉', 
+                            ingredients: ['梅花肉塊 400g', '地瓜 1條', '五香蒸肉粉 1包', '辣豆瓣醬 1大匙', '糖 1小匙', '外鍋水 2杯'], 
+                            steps: [
+                                '醃漬：梅花肉切厚片，拌入豆瓣醬、糖及少許米酒，靜置 20 分鐘。',
+                                '裹粉：將肉片均勻裹上蒸肉粉。',
+                                '鋪底：地瓜去皮切大塊，鋪在深盤底部，再將肉片整齊排在地瓜上。',
+                                '燉蒸：外鍋 2 杯水。若想要肉質極度軟爛，建議跳起後再加 1 杯水蒸第二次。'
+                            ], 
+                            time: '60分鐘' 
+                        },
+                        { 
+                            name: '電鍋版塔香蛤蜊', 
+                            ingredients: ['蛤蜊 400g', '九層塔 一大把', '蒜末 1大匙', '辣椒絲 少許', '米酒 1大匙', '外鍋水 0.4杯'], 
+                            steps: [
+                                '預熱：外鍋加 0.4 杯水，按下開關讓電鍋先產生蒸氣。',
+                                '入料：內鍋（或深盤）放入蛤蜊、蒜末、辣椒，不加水直接放入。',
+                                '噴酒：淋上米酒。',
+                                '快蒸：待開關跳起（約 5-8 分鐘），立即開蓋放入九層塔快速拌勻，悶 1 分鐘即可。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '腐乳蒸排骨', 
+                            ingredients: ['小排骨 300g', '辣腐乳 2塊', '腐乳汁 1大匙', '糖 1小匙', '蒜末 少許', '外鍋水 1.5杯'], 
+                            steps: [
+                                '壓碎：將腐乳壓成泥，混合腐乳汁、糖、蒜末調成醬。',
+                                '抓醃：排骨洗淨抹乾，加入腐乳醬拌勻醃漬 30 分鐘。',
+                                '擺放：平鋪於盤中，盡量不要重疊以利導熱。',
+                                '蒸熟：外鍋 1.5 杯水蒸至跳起，肉質吸飽鹹甜香氣。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '紅燒紅蘿蔔燉馬鈴薯', 
+                            ingredients: ['馬鈴薯 2顆', '紅蘿蔔 1根', '醬油 2大匙', '味醂 1大匙', '素蠔油 1小匙', '外鍋水 1杯'], 
+                            steps: [
+                                '切塊：食材切成一口大小的滾刀塊。',
+                                '調味：將食材與所有調味料放入內鍋，水加到剛好沒過食材。',
+                                '烹煮：外鍋 1 杯水蒸至跳起。',
+                                '入味：跳起後不要開蓋，繼續悶 20 分鐘，能讓根莖類中心更加綿密入味。'
+                            ], 
+                            time: '35分鐘' 
+                        },
+                        { 
+                            name: '薑絲冬瓜蒸蛤蜊', 
+                            ingredients: ['冬瓜 200g', '蛤蜊 200g', '薑絲 一小把', '鹽 少許', '外鍋水 0.8杯'], 
+                            steps: [
+                                '切片：冬瓜去皮切成約 0.5 公分薄片鋪底。',
+                                '疊放：蛤蜊平鋪在冬瓜上，撒上薑絲。',
+                                '蒸煮：外鍋 0.8 杯水。',
+                                '鮮味：冬瓜會吸收蛤蜊流出的鮮甜精華湯汁，完全不需要額外高湯。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '日式馬鈴薯燉肉', 
+                            ingredients: ['五花肉片 150g', '馬鈴薯 2顆', '洋蔥 1/2顆', '醬油 3大匙', '糖 1大匙', '外鍋水 1.5杯'], 
+                            steps: [
+                                '爆香(關鍵)：建議洋蔥先用炒鍋炒軟至透明。',
+                                '入鍋：將洋蔥、馬鈴薯、肉片放入內鍋，加入調味料。',
+                                '蒸煮：外鍋 1.5 杯水。',
+                                '悶漬：煮好後靜置悶 30 分鐘，馬鈴薯才會呈現完美的金黃色且入味。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '金針菇蒸牛肉片', 
+                            ingredients: ['肥牛火鍋片 200g', '金針菇 1把', '黑胡椒醬 1大匙', '蒜泥 少許', '外鍋水 0.5杯'], 
+                            steps: [
+                                '底材：金針菇去根部洗淨鋪平在盤底。',
+                                '鋪肉：將牛肉片整齊鋪在菇上。',
+                                '淋醬：黑胡椒醬混合蒜泥後均勻淋在肉片表面。',
+                                '速蒸：外鍋 0.5 杯水蒸熟即可，肉片變色即關火口感最佳。'
+                            ], 
+                            time: '12分鐘' 
+                        },
+                        { 
+                            name: '鮮菇翡翠豆腐羹', 
+                            ingredients: ['嫩豆腐 1盒', '各式鮮菇 100g', '青江菜末 少許', '蛋白 1顆', '高湯 3杯', '外鍋水 1杯'], 
+                            steps: [
+                                '切碎：豆腐切小方丁，鮮菇切片。',
+                                '加熱：將高湯、豆腐、菇類放入內鍋，外鍋 1 杯水蒸熱。',
+                                '勾芡與淋蛋：跳起後，加入少許太白粉水攪拌，並淋入蛋白液與青菜末，蓋上悶 2 分鐘。'
+                            ], 
+                            time: '25分鐘' 
+                        },
+                        { 
+                            name: '臘味飯 (港式家庭版)', 
+                            ingredients: ['白米 2杯', '臘腸 1根', '肝腸 1根', '紹興酒 少許', '甜醬油 適量', '外鍋水 1杯'], 
+                            steps: [
+                                '洗米：米洗淨放入內鍋，依正常米水比放水。',
+                                '放料：臘腸與肝腸整根放在米上面。',
+                                '煮飯：外鍋 1 杯水正常煮。',
+                                '切片：飯煮好後取出臘腸切片再放回，淋上甜醬油與紹興酒拌勻。'
+                            ], 
+                            time: '40分鐘' 
+                        },
+                        { 
+                            name: '清蒸南瓜肉餅', 
+                            ingredients: ['絞肉 200g', '南瓜末 50g', '鹹蛋黃 1顆', '醬油 1大匙', '外鍋水 1.2杯'], 
+                            steps: [
+                                '拌勻：絞肉混合南瓜末、醬油，摔打至有黏性。',
+                                '塑形：壓平在淺盤中，中央放上一顆鹹蛋黃。',
+                                '蒸煮：外鍋 1.2 杯水蒸熟，肉餅口感紮實帶有南瓜甜味。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '電鍋鹽焗雞腿', 
+                            ingredients: ['大雞腿 2隻', '鹽 1大匙', '薑片 5片', '蔥段 少許', '外鍋水 1.5杯'], 
+                            steps: [
+                                '抹鹽：雞腿洗淨瀝乾，全身抹上厚厚的鹽巴，冷藏醃 2 小時。',
+                                '無水蒸：內鍋不放水，墊入蔥、薑片防止雞皮黏底，放入雞腿。',
+                                '蒸製：外鍋 1.5 杯水。',
+                                '冷卻：取出待完全涼透後再切塊，皮 Q 肉嫩且充滿雞油香。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '蒜蓉粉絲海鮮拼盤', 
+                            ingredients: ['鮮蝦 6隻', '蛤蜊 10顆', '透抽 1隻', '冬粉 1把', '蒜蓉醬 2大匙', '外鍋水 0.7杯'], 
+                            steps: [
+                                '墊底：冬粉泡軟鋪在最底層。',
+                                '擺海鮮：將蝦、蛤蜊、透抽圈整齊排列在冬粉上。',
+                                '醬汁：均勻淋上調好的蒜蓉醬（蒜末+醬油+糖）。',
+                                '蒸熟：外鍋 0.7 杯水，水滾後放入蒸 10 分鐘，海鮮最鮮甜。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '四神湯 (電鍋版)', 
+                            ingredients: ['豬小腸或排骨 300g', '四神中藥包 1份', '當歸 1片', '米酒 適量', '外鍋水 3杯'], 
+                            steps: [
+                                '前處理：小腸徹底洗淨切段，汆燙去味。',
+                                '藥材清洗：藥材沖水洗淨，與小腸放入內鍋，水加至 8 分滿。',
+                                '分段蒸：外鍋先放 2 杯水。跳起後續補 1 杯水蒸第二次，直到藥材軟糯。',
+                                '提香：最後淋上當歸酒悶 5 分鐘。'
+                            ], 
+                            time: '80分鐘' 
+                        },
+                        { 
+                            name: '香菇雞肉燥', 
+                            ingredients: ['雞絞肉 300g', '乾香菇末 50g', '紅蔥頭 5顆', '五香粉 少許', '醬油、冰糖', '外鍋水 1杯'], 
+                            steps: [
+                                '炒香：紅蔥頭切碎，先在平底鍋炒香。',
+                                '混合：將所有食材與調味放入內鍋。',
+                                '煮製：外鍋 1 杯水。',
+                                '拌飯：這款肉燥油脂較低，非常適合搭配電鍋炊飯使用。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '紅棗銀耳蓮子露 (濃稠版)', 
+                            ingredients: ['乾銀耳 1朵', '紅棗 6顆', '蓮子 1把', '冰糖 適量', '外鍋水 3杯'], 
+                            steps: [
+                                '剪碎(關鍵)：銀耳泡軟後務必用剪刀剪成極碎，越碎膠質釋放越快。',
+                                '初蒸：內鍋加水，外鍋 2 杯水，先蒸銀耳。',
+                                '續蒸：加入蓮子與紅棗，外鍋補 1 杯水續蒸，最後加糖溶化。'
+                            ], 
+                            time: '70分鐘' 
+                        },
+                        { 
+                            name: '焦糖雞蛋布丁', 
+                            ingredients: ['雞蛋 3顆', '全脂鮮奶 400ml', '砂糖 50g', '焦糖液 少許', '外鍋水 1杯'], 
+                            steps: [
+                                '溫奶：牛奶加糖微熱至糖融化。',
+                                '混合：蛋打散，將溫牛奶緩緩倒入蛋液中拌勻。',
+                                '過濾：過濾兩次以確保細緻。',
+                                '蒸法：碗底放焦糖液，倒入蛋液。蓋上錫箔紙，鍋蓋插筷子留大縫，外鍋 1 杯水慢蒸。'
+                            ], 
+                            time: '25分鐘' 
+                        },
+                        { 
+                            name: '養生南瓜泥', 
+                            ingredients: ['南瓜 1/2顆', '牛奶或鮮奶油 少許', '鹽 一小撮', '外鍋水 1.5杯'], 
+                            steps: [
+                                '切塊：南瓜連皮或去皮皆可。',
+                                '蒸熟：外鍋 1.5 杯水蒸到極度軟爛。',
+                                '壓泥：取出趁熱壓成泥，拌入牛奶與鹽，就是極佳的健康配菜或濃湯底。'
+                            ], 
+                            time: '30分鐘' 
+                        },
+                        { 
+                            name: '電鍋版麻油雞米糕', 
+                            ingredients: ['長糯米 2杯', '雞腿丁 150g', '黑麻油 3大匙', '老薑片 8片', '米酒 1杯'], 
+                            steps: [
+                                '浸泡：糯米洗淨浸泡 2 小時後瀝乾。',
+                                '爆香：黑麻油煸香薑片，放入雞肉炒至 5 分熟。',
+                                '混合：將肉、米、薑片放入內鍋，加入米酒（液體量比平常煮飯略少 10%）。',
+                                '蒸製：外鍋 1 杯水，跳起後悶 15 分鐘。'
+                            ], 
+                            time: '45分鐘' 
+                        },
+                        { 
+                            name: '清蒸蠔油芥蘭', 
+                            ingredients: ['芥蘭菜 一把', '蠔油 1大匙', '蒜酥 少許', '外鍋水 0.3杯'], 
+                            steps: [
+                                '入鍋：芥蘭洗淨整齊放入盤中。',
+                                '快蒸：外鍋僅需 0.3 杯水。',
+                                '出爐：開關一跳立刻取出（約 4 分鐘），淋上蠔油與蒜酥，口感脆嫩不發黃。'
+                            ], 
+                            time: '10分鐘' 
+                        }
+                    ],
+                    '職人燒烤料理': [
+                        { 
+                            name: '秘製醬香安格斯牛小排', 
+                            ingredients: ['帶骨牛小排 500g', '水梨泥 2大匙', '醬油 3大匙', '蜂蜜 1大匙', '蒜泥 1大匙', '黑胡椒、麻油 少許'], 
+                            steps: [
+                                '軟化肉質：將牛小排洗淨後，用「水梨泥」醃漬 30 分鐘，利用酵素軟化筋膜。',
+                                '特調醃醬：混合醬油、蜂蜜、蒜泥、黑胡椒及麻油。',
+                                '長時間入味：將牛小排浸泡在醬汁中至少 4 小時（隔夜更佳）。',
+                                '火候控制：炭火大火預熱，下肉後每面烤約 2-3 分鐘至表面微焦上色。',
+                                '靜置：離火後靜置 5 分鐘鎖住肉汁再剪塊享用。'
+                            ], 
+                            time: '10-15分鐘' 
+                        },
+                        { 
+                            name: '鹽蔥炭烤霜降松阪豬', 
+                            ingredients: ['松阪豬 300g', '海鹽 少許', '白胡椒 少許', '蔥花 1大把', '洋蔥碎 少許', '香油、芝麻'], 
+                            steps: [
+                                '分切技巧：松阪豬逆紋切薄片，口感最為脆彈。',
+                                '底味：肉片僅需抹薄鹽與白胡椒，保留原味香氣。',
+                                '鹽蔥製作：蔥花、洋蔥碎加入香油、芝麻及鹽拌勻靜置。',
+                                '高溫燒烤：將肉片烤至兩面邊緣微焦捲曲，呈現金黃色澤。',
+                                '點綴：起鍋後堆疊大量鹽蔥即可。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '蒜風味北海道干貝', 
+                            ingredients: ['生食級干貝 6顆', '無鹽奶油 20g', '蒜末 1大匙', '檸檬汁 少許', '海鹽 少許'], 
+                            steps: [
+                                '吸乾水分：干貝表面必須完全吸乾，烤的時候才不會出水影響上色。',
+                                '奶油蒜醬：小鍋加熱奶油與蒜末，微滾出香味即熄火。',
+                                '精確火候：單面大火炙烤約 1 分鐘，產生焦香層即翻面。',
+                                '補醬：翻面後淋上奶油蒜醬，續烤 30 秒至 5-7 分熟。',
+                                '上桌：滴上一點檸檬汁提昇鮮味。'
+                            ], 
+                            time: '3分鐘' 
+                        },
+                        { 
+                            name: '孜然新疆風味羊肉串', 
+                            ingredients: ['羊肩肉 400g', '孜然粉 2大匙', '辣椒粉 1大匙', '洋蔥絲 少許', '米酒 1大匙', '雞蛋 1顆(取蛋白)'], 
+                            steps: [
+                                '去羶：肉塊用洋蔥絲、米酒、鹽與蛋白抓勻醃漬，蛋白可讓口感滑嫩。',
+                                '串製：肥瘦相間串入竹籤，油脂在烤時會滲透瘦肉。',
+                                '第一階段烤：烤至肉質變色且油脂滴落。',
+                                '靈魂香料：大量撒上孜然粉與辣椒粉，再回烤至香氣噴發。',
+                                '秘訣：邊烤邊刷上一層薄薄的油，防止香料燒焦。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '明太子醬烤雞翅', 
+                            ingredients: ['二節翅 8隻', '明太子醬(市售或自調) 1條', '美乃滋 2大匙', '檸檬汁 1小匙'], 
+                            steps: [
+                                '斷筋：雞翅關節處劃一刀，攤平受熱更均勻。',
+                                '素烤：雞翅不刷醬，中火烤至雙面雞皮呈現金黃酥脆。',
+                                '醬料混合：明太子加美乃滋與少許檸檬汁拌勻。',
+                                '塗抹：將醬料厚塗在雞翅皮上。',
+                                '二次加熱：改小火或用噴槍炙烤至醬料冒泡發出微焦香味。'
+                            ], 
+                            time: '12分鐘' 
+                        },
+                        { 
+                            name: '奶油味噌烤午魚一夜干', 
+                            ingredients: ['午魚一夜干 1尾', '白味噌 1大匙', '味醂 1小匙', '清酒 1小匙', '融化奶油 少許'], 
+                            steps: [
+                                '魚皮朝下：先將魚肉面朝上，烤至魚皮出油變脆。',
+                                '味噌抹醬：混合味噌、味醂、清酒調成濃稠狀。',
+                                '塗抹：均勻刷在魚肉面。',
+                                '慢烤：轉至微火，讓味噌醬慢乾凝固上色，避免糖分燒焦。',
+                                '點綴：最後淋上幾滴奶油增加西式香氣。'
+                            ], 
+                            time: '10-15分鐘' 
+                        },
+                        { 
+                            name: '培根捲金針菇串', 
+                            ingredients: ['培根 6片', '金針菇 1把', '日式照燒醬 少許'], 
+                            steps: [
+                                '包裹：培根對切，將金針菇分小把緊緊捲起，接縫處用牙籤固定。',
+                                '脆皮：先烤培根重疊處固定，再翻轉烤至培根出油縮緊。',
+                                '刷醬：最後一分鐘薄刷照燒醬。',
+                                '口感：培根的鹹香搭配金針菇多汁的口感，是燒烤店必點。'
+                            ], 
+                            time: '6分鐘' 
+                        },
+                        { 
+                            name: '炭烤蒜香鮮草蝦', 
+                            ingredients: ['草蝦 10隻', '蒜末 2大匙', '粗鹽 少許', '黑胡椒 少許', '橄欖油 少許'], 
+                            steps: [
+                                '開背處理：用剪刀從蝦背剪開，挑除砂腸，並填入大量蒜末。',
+                                '外皮保護：蝦殼抹上一點橄欖油與粗鹽。',
+                                '直火烤：蝦殼變紅後，翻轉讓蒜末面朝向火源炙烤片刻。',
+                                '起鍋：當蒜香飄散且蝦身微捲時即可。'
+                            ], 
+                            time: '5-7分鐘' 
+                        },
+                        { 
+                            name: '起司醬香烤大香菇', 
+                            ingredients: ['鮮香菇 6朵', '起司絲 少許', '日式醬油 1大匙', '七味粉 少許'], 
+                            steps: [
+                                '去蒂：香菇去蒂頭，內側劃格狀花紋。',
+                                '底部預烤：香菇正面朝下烤 2 分鐘出水。',
+                                '填充：翻面，在菌褶處滴入幾滴醬油，填滿起司絲。',
+                                '融化：蓋上錫箔紙或用悶蓋讓起司融化拉絲。',
+                                '完成：撒上七味粉增加層次感。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '韓式五花肉裹生菜', 
+                            ingredients: ['厚切豬五花 300g', '韓式辣醬 1大匙', '蒜片、辣椒圈', '美生菜 1顆', '麻油鹽醬 少許'], 
+                            steps: [
+                                '原肉烤：整條五花肉先上烤盤，大火煎烤至雙面焦脆。',
+                                '剪塊：用剪刀剪成一口大小，再將側邊翻面烤至逼出油脂。',
+                                '調味：可選一部分拌入韓式辣醬，一部分吃原味。',
+                                '層次吃法：生菜包入肉片、蒜片、辣椒圈，沾一點麻油鹽醬。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '照燒汁烤肥腸', 
+                            ingredients: ['熟大腸 200g', '蔥段 少許', '照燒醬 2大匙'], 
+                            steps: [
+                                '乾烤：熟大腸切塊，直接上火烤至油脂吱吱作響。',
+                                '酥脆度：翻動頻率要高，直到外皮出現微小的脆裂感。',
+                                '掛漿：反覆刷照燒醬 3 次，每次乾了再刷。',
+                                '搭配：串入蔥段一起食用，解膩提味。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '義大利香料烤小羔羊排', 
+                            ingredients: ['法式羊排 4隻', '義大利綜合香料 1大匙', '迷迭香 少許', '大蒜瓣 4顆', '橄欖油 2大匙'], 
+                            steps: [
+                                '低溫熟成：羊排抹香料、橄欖油、碎迷迭香與壓扁的大蒜，醃 1 小時。',
+                                '封肉汁：先用大火鎖住兩面。',
+                                '邊緣加溫：將脂肪層立起來烤，讓羊油焦香。',
+                                '熟度：建議 5-7 分熟，肉質最為細緻。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '焦糖香草烤鳳梨', 
+                            ingredients: ['新鮮鳳梨 1/4顆', '二號砂糖 2大匙', '肉桂粉 少許', '薄荷葉 少許'], 
+                            steps: [
+                                '切片：鳳梨切成厚長條。',
+                                '焦糖化：將砂糖均勻撒在鳳梨表面。',
+                                '炙烤：高溫炙烤砂糖面，直到糖融化變成深褐色焦糖層。',
+                                '熱平衡：溫熱的鳳梨酸度會下降，甜度極大提昇。',
+                                '完成：撒上肉桂粉與薄荷點綴。'
+                            ], 
+                            time: '4分鐘' 
+                        },
+                        { 
+                            name: '手羽先(雞翅)明太子塞', 
+                            ingredients: ['去骨雞翅 6隻', '明太子末 2大匙', '蔥花 少許', '胡椒鹽 少許'], 
+                            steps: [
+                                '填充：將去骨雞翅洗淨，內裡塞滿調好的明太子蔥花泥。',
+                                '封口：用牙籤將開口處固定。',
+                                '慢火烤：一定要用中低火，否則皮焦了裡面明太子還沒熟。',
+                                '翻動：定時轉動，讓雞皮的油脂慢慢滲透到內餡。'
+                            ], 
+                            time: '18分鐘' 
+                        },
+                        { 
+                            name: '炭烤玉米筍 (帶皮原味)', 
+                            ingredients: ['帶皮玉米筍 10根', '胡椒鹽 適量', '美乃滋 少許'], 
+                            steps: [
+                                '整根烤：不要去皮，直接整根放在炭火邊緣。',
+                                '水氣蒸發：當外皮燒焦發黑時，裡面的玉米筍正利用自身水氣悶熟。',
+                                '去皮：剝開外皮（注意燙手），保留玉米鬚。',
+                                '沾醬：沾取少許胡椒鹽或美乃滋享用。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '胡麻醬烤日本圓茄', 
+                            ingredients: ['圓茄 1顆', '日式胡麻醬 2大匙', '柴魚片 少許', '蔥絲 少許'], 
+                            steps: [
+                                '對剖：茄子洗淨對半切，果肉面劃十字。',
+                                '刷油：果肉面刷厚油防止變黑。',
+                                '軟化：果肉面朝下烤至變軟，再翻面。',
+                                '抹醬：厚刷胡麻醬，烤至醬汁微滾出泡。',
+                                '點綴：鋪上柴魚片，遇熱會跳舞並散發香氣。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '香草奶油烤墨魚', 
+                            ingredients: ['大墨魚 1隻', '義大利香菜碎 1小匙', '奶油 30g', '紅椒粉 少許'], 
+                            steps: [
+                                '劃圈：墨魚身體劃圈不切斷。',
+                                '香草奶油：奶油隔水加熱加入香菜碎與紅椒粉。',
+                                '速烤：墨魚受熱會迅速捲曲，顏色變白即熟。',
+                                '淋醬：烤時反覆刷上香草奶油。',
+                                '口感：保持軟 Q，不要烤過久變韌。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '沙嗲雞肉串 (東南亞風)', 
+                            ingredients: ['雞胸肉或腿肉 300g', '沙嗲醬 3大匙', '椰奶 1大匙', '黃薑粉 少許'], 
+                            steps: [
+                                '醃肉：雞肉切長條，用椰奶與黃薑粉、少許沙嗲醬醃 2 小時。',
+                                '穿串：S 型穿法串在竹籤上。',
+                                '翻烤：中火翻烤至表面出現焦糖色點。',
+                                '沾醬：食用時搭配濃稠的沙嗲花生醬。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '辣味醬烤秋葵', 
+                            ingredients: ['秋葵 12根', '韓式辣粉 少許', '蒜香油 1大匙'], 
+                            steps: [
+                                '抹油：秋葵整根抹上蒜香油。',
+                                '短時烤：烤至表面微皺，約 3 分鐘。',
+                                '調味：起鍋後趁熱撒上鹽與辣粉。',
+                                '脆感：保持秋葵內部黏稠感，外表微焦。'
+                            ], 
+                            time: '4分鐘' 
+                        },
+                        { 
+                            name: '煉乳炭烤麻糬', 
+                            ingredients: ['日式切餅(麻糬) 4塊', '煉乳 適量', '花生粉 適量'], 
+                            steps: [
+                                '慢火悶烤：麻糬放在炭火邊緣，慢慢受熱。',
+                                '膨脹：看到麻糬中間鼓起、表面呈現微黃裂紋。',
+                                '柔軟度：壓下去有彈性即可。',
+                                '經典組合：淋上厚厚煉乳並撒上花生粉。'
+                            ], 
+                            time: '6分鐘' 
+                        },
+                        { 
+                            name: '威士忌煙燻帶骨肋眼排', 
+                            ingredients: ['帶骨肋眼 800g', '威士忌 50ml', '迷迭香碎 1大匙', '海鹽、黑胡椒', '融化奶油 30g'], 
+                            steps: [
+                                '噴灑威士忌：在肉塊表面均勻噴灑威士忌，靜置 20 分鐘讓酒精揮發留下木質香氣。',
+                                '乾式抹料：厚撒海鹽、黑胡椒及迷迭香碎，用力按壓使香料附著。',
+                                '間接加熱法：先置於炭火旁低溫悶烤 15 分鐘，使其內部溫度均勻提升。',
+                                '高溫炙封：將肉移至大火中心，每面各烤 90 秒鎖住肉汁並產生炭焦香。',
+                                '奶油洗禮：離火前刷上一層香料奶油增加光澤與乳香味。'
+                            ], 
+                            time: '25-30分鐘' 
+                        },
+                        { 
+                            name: '泰式椰奶酸辣烤豬頸肉', 
+                            ingredients: ['豬頸肉(松阪) 400g', '濃椰奶 3大匙', '魚露 2大匙', '椰糖 1大匙', '香菜粉 少許'], 
+                            steps: [
+                                '椰奶醃製：椰奶中的油脂能讓豬頸肉更滑順，混合椰糖、魚露醃漬至少 2 小時。',
+                                '低溫慢火：這道菜含有糖分，建議放在炭火邊緣慢烤防止焦黑。',
+                                '斜切技巧：烤至邊緣金黃微縮後離火，必須「逆紋斜切」出大面積薄片。',
+                                '搭配：食用時沾取泰式椒麻醬（檸檬汁、魚露、乾辣椒碎、烤糯米粉）。'
+                            ], 
+                            time: '12分鐘' 
+                        },
+                        { 
+                            name: '極上蔥鹽和牛橫膈膜', 
+                            ingredients: ['牛橫膈膜 300g', '日式清酒 1小匙', '自製蔥鹽醬 (蔥、洋蔥、麻油)', '海鹽 少許'], 
+                            steps: [
+                                '斷筋處理：橫隔膜纖維較粗，需在表面輕劃格狀刀紋。',
+                                '酒香去羶：抹上極少量清酒與海鹽靜置。',
+                                '大火猛烤：橫膈膜適合 5 分熟，必須用極高溫炭火快速翻動，約 2-3 分鐘。',
+                                '疊加蔥鹽：裝盤後鋪上冰鎮過的蔥鹽醬，利用肉的餘溫釋放蔥香。'
+                            ], 
+                            time: '3-5分鐘' 
+                        },
+                        { 
+                            name: '義式卡布里風味烤小卷', 
+                            ingredients: ['現撈小卷 6隻', '羅勒碎 1小匙', '帕瑪善起司粉 少許', '橄欖油、蒜粉'], 
+                            steps: [
+                                '去內臟：保留外皮，小卷內塞入一小塊起司。',
+                                '表面處理：抹上橄欖油、蒜粉與鹽。',
+                                '快速成型：高溫烤至小卷膨脹、外皮呈現紅褐色。',
+                                '點綴：撒上起司粉與羅勒碎，感受地中海風格的燒烤鮮味。'
+                            ], 
+                            time: '4分鐘' 
+                        },
+                        { 
+                            name: '韓式果泥醬燒豬排骨', 
+                            ingredients: ['豬小排 500g', '蘋果泥 3大匙', '韓式大醬 1大匙', '蜂蜜 1大匙', '蒜泥 1大匙'], 
+                            steps: [
+                                '天然軟化：蘋果泥含有強大酵素，與大醬、蜂蜜混勻後醃漬排骨過夜。',
+                                '先悶後烤：先用鋁箔紙包裹排骨悶烤 10 分鐘，確保內部熟透。',
+                                '拆開上色：打開鋁箔紙，移至直火處反覆刷醬烤至微焦。',
+                                '撒粉：最後撒上熟芝麻增加香氣。'
+                            ], 
+                            time: '20分鐘' 
+                        },
+                        { 
+                            name: '檸檬葉烤手撕鹽麴雞', 
+                            ingredients: ['雞腿肉 2塊', '液態鹽麴 2大匙', '新鮮檸檬葉 4片', '香茅段 少許'], 
+                            steps: [
+                                '鹽麴滲透：鹽麴能讓雞肉組織細緻多汁，醃漬時間不宜超過 4 小時避免過鹹。',
+                                '香料夾心：將檸檬葉與香茅墊在雞皮下一起烤。',
+                                '皮朝下：先烤皮側，利用雞油潤滑肉質。',
+                                '熟度判斷：竹籤穿刺流出清澈汁液即可。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '青醬乳酪烤大蝦', 
+                            ingredients: ['大白蝦 8隻', '市售青醬 2大匙', '莫札瑞拉起司 少許', '麵包粉 1小匙'], 
+                            steps: [
+                                '蝴蝶切：將蝦背切開至腹部但不切斷，攤開如蝴蝶狀。',
+                                '鋪料：內側抹上青醬，再覆蓋起司與麵包粉。',
+                                '頂火加熱：若有上蓋效果更佳，烤至蝦身變紅、起司融化成金黃焦酥。'
+                            ], 
+                            time: '6分鐘' 
+                        },
+                        { 
+                            name: '職人醬烤白鰻 (蒲燒風)', 
+                            ingredients: ['白鰻片 200g', '鰻魚骨熬醬(醬油、味醂、糖)', '山椒粉 少許'], 
+                            steps: [
+                                '白燒階段：不沾醬先烤皮再烤肉，逼出魚油香氣。',
+                                '反覆沾刷：將魚片浸入醬汁後回烤，此動作需重複 4-5 次，形成亮澤塗層。',
+                                '山椒畫龍點睛：裝盤後撒上極少量山椒粉，去除油膩感。'
+                            ], 
+                            time: '12分鐘' 
+                        },
+                        { 
+                            name: '法式香草奶油烤生蠔', 
+                            ingredients: ['大生蠔 4顆', '法式奶油 20g', '荷蘭芹碎 少許', '白葡萄酒 1小匙'], 
+                            steps: [
+                                '開殼處理：保留生蠔原汁，滴入白葡萄酒。',
+                                '放置奶油：每顆放上一塊香草奶油。',
+                                '滾動式受熱：烤至生蠔裙邊收縮、奶油沸騰冒泡即可。',
+                                '鮮度：建議保持 8 分熟，口感最滑嫩。'
+                            ], 
+                            time: '3-5分鐘' 
+                        },
+                        { 
+                            name: '剝皮辣椒起司雞肉捲', 
+                            ingredients: ['雞胸薄片 4片', '剝皮辣椒 2條', '奶油乳酪(Cream Cheese) 50g'], 
+                            steps: [
+                                '捲製：雞胸片包入剝皮辣椒切段與奶油乳酪，用牙籤固定。',
+                                '抹油烤：表面抹少量油防止黏網。',
+                                '鹹甜辣平衡：剝皮辣椒的辣度被起司中和，層次極為豐富。'
+                            ], 
+                            time: '8分鐘' 
+                        },
+                        { 
+                            name: '美式煙燻德州香腸', 
+                            ingredients: ['粗磨德式香腸 4根', '黃芥末醬', '美式烤肉醬'], 
+                            steps: [
+                                '劃格纹：在香腸表面輕劃淺痕，讓受熱時香氣溢出。',
+                                '低溫慢燻：放在火源斜對角，蓋上鍋蓋悶烤。',
+                                '刷醬焦化：最後 2 分鐘刷上烤肉醬，大火烤至醬汁冒泡。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '黃金蒜酥烤綠蘆筍', 
+                            ingredients: ['綠蘆筍(粗) 1把', '橄欖油', '市售蒜片酥', '黑胡椒'], 
+                            steps: [
+                                '去纖維：削掉蘆筍下半部硬皮。',
+                                '快火烤：淋上橄欖油快速翻轉，避免水分流失導致乾縮。',
+                                '點綴：起鍋後撒上壓碎的蒜片酥與黑胡椒。'
+                            ], 
+                            time: '3分鐘' 
+                        },
+                        { 
+                            name: '明太子山藥厚片', 
+                            ingredients: ['日本山藥 1段', '明太子醬', '海苔絲'], 
+                            steps: [
+                                '厚切：山藥切成約 1.5 公分厚圓片。',
+                                '雙面預烤：不抹醬先烤至雙面呈現微黃焦斑。',
+                                '塗醬：厚塗明太子醬，烤至表面出現微焦黃感。'
+                            ], 
+                            time: '7分鐘' 
+                        },
+                        { 
+                            name: '味噌蜂蜜烤圓鱈', 
+                            ingredients: ['圓鱈 1片', '白味噌 2大匙', '蜂蜜 1小匙', '清酒 1小匙'], 
+                            steps: [
+                                '醃漬兩天：混合抹醬包覆鱈魚，冷藏兩天入味最徹底。',
+                                '刮除浮醬：烤前將多餘味噌刮除，以免燒焦。',
+                                '魚皮脆化：用高溫先封住油脂。'
+                            ], 
+                            time: '10分鐘' 
+                        },
+                        { 
+                            name: '辣味咖哩烤花椰菜', 
+                            ingredients: ['白花椰菜 1顆', '咖哩粉 1大匙', '優格 2大匙', '辣椒粉 少許'], 
+                            steps: [
+                                '分塊：花椰菜切小朵，拌入咖哩優格醬。',
+                                '悶烤法：用錫箔紙包起來烤 10 分鐘讓內部熟。',
+                                '明火燻香：打開包裝直接受熱 2 分鐘，增加炭香味。'
+                            ], 
+                            time: '15分鐘' 
+                        },
+                        { 
+                            name: '炭燒鹽酥雞軟骨', 
+                            ingredients: ['雞三角軟骨 200g', '五香粉', '白胡椒', '蒜末'], 
+                            steps: [
+                                '高溫乾烤：軟骨不需要太多油，直接在熱網上烤至油脂溢出。',
+                                '脆度判斷：烤到邊緣出現金黃色、質地變硬。',
+                                '重口味：撒上大量五香粉、白胡椒與蒜末翻動。'
+                            ], 
+                            time: '6分鐘' 
+                        },
+                        { 
+                            name: '紅酒黑胡椒烤鴨胸', 
+                            ingredients: ['櫻桃鴨胸 1塊', '紅酒 2大匙', '粗磨黑胡椒', '蜂蜜 1小匙'], 
+                            steps: [
+                                '皮面劃刀：鴨皮劃格狀但不傷肉，冷鍋起烤。',
+                                '逼油：皮面朝下烤 5 分鐘出油。',
+                                '紅酒醬：利用滴出的鴨油混合紅酒、黑胡椒、蜂蜜製成淋醬。',
+                                '靜置：離火後包箔紙靜置 10 分鐘，肉質呈現完美粉紅色。'
+                            ], 
+                            time: '15-20分鐘' 
+                        },
+                        { 
+                            name: '墨西哥辣醬烤甜玉米', 
+                            ingredients: ['水果玉米 2根', '美乃滋 1大匙', '紅椒粉', '帕馬善起司', '檸檬角'], 
+                            steps: [
+                                '全熟玉米：先煮熟再烤更快。',
+                                '抹醬：烤熱後塗上美乃滋。',
+                                '撒粉料：大量撒上紅椒粉與起司粉。',
+                                '酸度調整：食用前擠入大量檸檬汁，解膩開胃。'
+                            ], 
+                            time: '5分鐘' 
+                        },
+                        { 
+                            name: '日式厚燒牛舌 (根部)', 
+                            ingredients: ['牛舌根部 200g', '檸檬', '黑胡椒'], 
+                            steps: [
+                                '部位選擇：一定要選「舌根」才夠厚且軟嫩。',
+                                '劃深刀：在表面劃出深度 0.5 公分的交叉紋路。',
+                                '極速高溫：單面烤 1 分鐘，保持中間 3-5 分熟。'
+                            ], 
+                            time: '3分鐘' 
+                        },
+                        { 
+                            name: '棉花糖夾心餅乾 (S\'mores)', 
+                            ingredients: ['大棉花糖 4個', '全麥餅乾 8片', '巧克力片 少許'], 
+                            steps: [
+                                '餘溫烤：利用燒烤結束後的餘溫。',
+                                '穿串旋轉：棉花糖插在竹籤上，不停旋轉至表面金黃焦酥、內部融化。',
+                                '夾層：迅速放在餅乾與巧克力片中間壓扁。'
+                            ], 
+                            time: '2分鐘' 
+                        }
+                    ]
+                };
+
+                const categories = Object.keys(recipesData);
+
+                const filteredRecipes = computed(() => {
+                    return recipesData[selectedCategory.value].filter(r => 
+                        r.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+                    );
+                });
+
+                const selectCategory = (cat) => {
+                    selectedCategory.value = cat;
+                    expandedRecipeIdx.value = null;
+                    searchQuery.value = '';
+                };
+
+                const toggleExpand = (idx) => {
+                    expandedRecipeIdx.value = expandedRecipeIdx.value === idx ? null : idx;
+                };
+
+                return {
+                    selectedCategory,
+                    expandedRecipeIdx,
+                    searchQuery,
+                    recipesData,
+                    categories,
+                    filteredRecipes,
+                    selectCategory,
+                    toggleExpand
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
