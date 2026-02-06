@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>傳統豆花製作比例計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fdf6e3;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .step-highlight {
+            border-left: 4px solid #d97706;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            background: #fffbeb;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-amber-900 mb-2">🍮 傳統豆花比例計算器</h1>
+            <p class="text-amber-700">掌握「熟石灰」與「澱粉」的科學配方</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card p-6 mb-5 border-t-4 border-amber-500">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">輸入乾黃豆重量 (g)</label>
+                    <input type="number" id="soybeanInput" value="300" min="50" step="50"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-amber-100 focus:border-amber-500 focus:outline-none text-xl font-bold text-amber-900 transition-all">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="calculate()" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-xl font-bold transition-all transform active:scale-95 shadow-lg w-full md:w-auto">
+                        重新計算比例
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            <div class="card p-6 border-l-4 border-blue-400">
+                <h3 class="text-lg font-bold text-blue-800 mb-4">1. 熬煮豆漿階段</h3>
+                <ul class="space-y-3">
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">乾黃豆</span>
+                        <span class="font-bold text-gray-800"><span id="res-soybean">300</span> g</span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">打漿用水量 (1:7)</span>
+                        <span class="font-bold text-blue-600"><span id="res-water">2100</span> ml</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card p-6 border-l-4 border-emerald-400">
+                <h3 class="text-lg font-bold text-emerald-800 mb-4">2. 凝固粉漿階段</h3>
+                <ul class="space-y-3">
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">熟石灰粉 (食用石膏)</span>
+                        <span class="font-bold text-emerald-600"><span id="res-gypsum">4</span> g</span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">玉米粉或地瓜粉</span>
+                        <span class="font-bold text-emerald-600"><span id="res-starch">30</span> g</span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">粉漿用水 (冷開水)</span>
+                        <span class="font-bold text-gray-800"><span id="res-mixwater">100</span> ml</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Scientific Note -->
+        <div class="card p-5 mb-5 bg-amber-50 border border-amber-200">
+            <h4 class="font-bold text-amber-800 text-sm mb-2 uppercase tracking-wider">💡 為什麼要這樣配？（粉漿原理）</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <p class="text-gray-700"><span class="font-bold text-emerald-700">● 熟石灰：</span>負責「凝固」。提供鈣離子讓豆漿蛋白質變性。過多會產生苦澀鹼味。</p>
+                <p class="text-gray-700"><span class="font-bold text-emerald-700">● 澱粉：</span>負責「保水」。防止豆花出水，讓質地從乾澀轉為絲滑順口。</p>
+                <p class="text-gray-700"><span class="font-bold text-emerald-700">● </span>豆漿必須夠濃（建議 1:7），濃度不足會導致豆花過軟無法成型。</p>                
+            </div>
+        </div>
+
+        <!-- Procedure -->
+        <div class="card p-8 shadow-inner">
+            <h2 class="text-2xl font-bold text-amber-900 mb-6 flex items-center">
+                <span class="bg-amber-100 p-2 rounded-lg mr-3">🥣</span> 職人級製作流程
+            </h2>
+            <div class="space-y-8">
+                <div class="flex gap-4">
+                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">1</span></div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">精細打漿與過濾</h4>
+                        <p class="text-gray-600">黃豆泡水 6-8 小時吸飽水分。加入計算出的水量打漿。**務必使用細豆漿布徹底濾渣**，殘留豆渣會影響凝固效果。</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">2</span></div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">精準溫控 (85°C - 90°C)</h4>
+                        <p class="text-gray-600">中火煮開豆漿，熄火靜置約 1-2 分鐘。**石膏粉在此溫度範圍凝固力最強**，過熱或過冷都容易造成分離。</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">3</span></div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">懸浮粉漿 (重要細節)</h4>
+                        <p class="text-gray-600">將石膏粉、澱粉與冷開水混合。**因為石膏不溶於水，在豆漿沖入的前一秒，必須再次攪勻粉漿**，確保石膏處於均勻懸浮狀態。</p>
+                        <div class="step-highlight italic text-sm text-amber-800">注意：若石膏沉澱在底部，豆漿沖入後將無法與凝固劑充分反應。</div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">4</span></div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">一氣呵成的衝擊</h4>
+                        <p class="text-gray-600">從約 30 公分高處將熱豆漿快速倒入粉漿桶中。**倒入後嚴禁攪拌**。撈掉表面氣泡後，靜置 20 分鐘不可晃動。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section with specific margin and style -->
+        <div class="card p-6 mt-5 mb-5 bg-emerald-50 border-4 border-dashed border-emerald-200">
+            <h4 class="font-bold text-emerald-800 text-lg mb-4 flex items-center">
+                <span class="mr-2">✨</span> 成功小秘訣
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <!--<div class="bg-white p-3 rounded-lg shadow-sm"> -->
+                    <p class="text-gray-700"><span class="font-bold text-emerald-700">● 豆漿濃度：</span>市售豆漿通常太稀（蛋白質不足），很難凝固。自製的豆漿一定要夠濃。</p>
+                <!--</div> -->
+                <!--<div class="bg-white p-3 rounded-lg shadow-sm"> -->
+                    <p class="text-gray-700"><span class="font-bold text-emerald-700">● 除泡技巧：</span>沖完豆漿後，表面的氣泡可以用小湯匙輕輕撈掉，成品表面才會像鏡面一樣漂亮。</p>
+                <!--</div> -->
+            </div>
+        </div>
+
+        <footer class="text-center mt-5 text-gray-500 text-sm leading-relaxed border-t border-amber-200 pt-8">
+            <p>🍯 建議搭配冷藏後的薑汁黑糖水，或是軟綿的花生仁與紅豆，口感層次更豐富。</p>
+            <p>📅 製作完成後建議冷藏 2-3 小時再食用，豆花質地會更為穩定。請於 2 日內食用完畢以保新鮮。</p>
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            const soy = parseFloat(document.getElementById('soybeanInput').value);
+            if (isNaN(soy) || soy <= 0) return;
+
+            const waterRatio = 7;
+            const gypsumRatio = 0.013;
+            const starchRatio = 0.1;
+            const mixWaterRatio = 0.33;
+
+            const water = soy * waterRatio;
+            const gypsum = (soy * gypsumRatio).toFixed(1);
+            const starch = (soy * starchRatio).toFixed(0);
+            const mixWater = (soy * mixWaterRatio).toFixed(0);
+
+            document.getElementById('res-soybean').innerText = soy;
+            document.getElementById('res-water').innerText = water;
+            document.getElementById('res-gypsum').innerText = gypsum;
+            document.getElementById('res-starch').innerText = starch;
+            document.getElementById('res-mixwater').innerText = mixWater;
+        }
+
+        window.onload = calculate;
+    </script>
+</body>
+</html>
