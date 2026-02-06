@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野外求生互動指南</title>
+    <!-- 1. HTML 註解：使用 <!-- 和 --> <!--包起來。用於 HTML 結構和描述。 -->
+    <!-- 載入 Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 2. JavaScript 註解 (單行)：使用 // 符號。用於簡短說明。
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'survival-green': '#10b981', // Emerald
+                        'survival-dark': '#1f2937', // Dark Gray
+                        'survival-accent': '#f59e0b', // Amber
+                    },
+                },
+                fontFamily: {
+                    sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 3. CSS 註解 (多行)：使用 /* 和 */ 包起來。用於樣式區塊。 */
+        .card {
+            background-color: #374151; /* Slate-700 */
+            border: 2px solid #4b5563; /* Slate-600 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .section-content {
+            /* 調整 max-height 確保展開空間足夠，但實際高度由內容決定 */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .section-content.active {
+            /* 增加 max-height 確保內容不會被裁切 */
+            max-height: 5000px;
+        }
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        .chevron-icon.rotate {
+            transform: rotate(180deg);
+        }
+        .step-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            /* 確保圖片佔位符背景可見 */
+            background-color: #4b5563; /* Placeholder background */
+        }
+        /* 圖片開關容器的樣式 */
+        .image-container-toggle {
+            transition: opacity 0.3s ease;
+            display: none; /* 預設隱藏，由 JS 覆寫 */
+        }
+        .image-container-toggle.active {
+            display: block; /* 點擊後顯示 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- 標題區域 --><header class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-survival-green mb-3">
+                野外求生必備手冊
+            </h1>
+            <p class="text-gray-400 text-lg">
+                掌握火源、水源、庇護所和食物的關鍵技能，安全回家。
+            </p>
+        </header>
+
+        <!-- 主要求生卡片列表 --><div class="space-y-6">
+
+            <!-- 1. 火源：鑽木取火 (Fire) --><div class="card p-6 rounded-xl">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleSection('fire-section')">
+                    <div class="flex items-center space-x-4">
+                        <!-- Fire Icon -->
+                        <!-- 這是 SVG 圖標的 HTML 註解 -->
+                        <svg class="w-8 h-8 text-survival-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 0112 20a8 8 0 01-5.657-2.343A8 8 0 014 12c0-1.042.348-2.012 1.006-2.825L12 2l6.994 7.175A8 8 0 0120 12a8 8 0 01-2.343 6.657z"></path></svg>
+                        <h2 class="text-2xl font-bold text-gray-100">火源：鑽木取火</h2>
+                    </div>
+                    <button class="bg-survival-accent hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-full text-sm flex items-center transition duration-150">
+                        查看詳細步驟
+                        <svg id="fire-section-chevron" class="chevron-icon w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+                
+                <div id="fire-section" class="section-content mt-4">
+                    <p class="text-gray-300 border-l-4 border-survival-accent pl-4 py-2 my-4">
+                        火源是求生四大要素（火、水、庇護所、食物）之首。它提供溫暖、煮水、防護及信號。
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-survival-accent">鑽木取火 (Bow Drill) 步驟</h3>
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">準備材料：</strong> 取得火弓、鑽頭（直）、火板（軟木）、軸承（手柄，硬木或石頭）和火絨（極乾燥的細草、樹皮等）。
+                            <!--<button onclick="toggleImage('step-img-fire-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-1-container" class="image-container-toggle mt-2 mb-2">
+                                <!-- 這是 HTML 註解，說明圖片來源已更新 -->
+                                <img 
+                                    src="https://raw.githubusercontent.com/a175cm1980/unit-converter2/main/%E5%AE%8C%E6%95%B4%E7%9A%84%E9%91%BD%E6%9C%A8%E5%8F%96%E7%81%AB%E5%A5%97%E4%BB%B6.jpg" 
+                                    alt="完整的鑽木取火套件圖，包含弓、鑽頭、火板、軸承和火絨" 
+                                    class="step-img w-full"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/800x400/999999/ffffff?text=圖片載入失敗';"
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">製作火板凹槽：</strong> 在火板邊緣製作一個 V 形槽，並在 V 槽底部鑽出一個略小於鑽頭直徑的凹洞。
+                            <!--<button onclick="toggleImage('step-img-fire-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:火板V形槽和鑽孔" alt="火板 V 形槽和鑽孔圖" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">設置火絨巢：</strong> 在 V 形槽下方放置一小團乾燥的火絨巢。
+                            <!--<button onclick="toggleImage('step-img-fire-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:放置火絨巢" alt="放置火絨巢的示意圖" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">鑽木摩擦：</strong> 將弓弦纏繞鑽頭，用軸承壓住鑽頭頂部，開始以水平、快速的方式拉動弓，使鑽頭高速旋轉。
+                            <!--<button onclick="toggleImage('step-img-fire-4-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-4-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:拉弓鑽木摩擦" alt="鑽木取火者正在用弓帶動鑽頭高速摩擦火板" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">收集火種：</strong> 持續摩擦直到 V 形槽中產生黑色的粉末並冒出濃煙。當看到紅色火星（火種）時，停止鑽木。
+                            <!--<button onclick="toggleImage('step-img-fire-5-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-5-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:火板產生火星" alt="火板 V 槽處產生火星的特寫" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">點燃：</strong> 小心地將火種倒入火絨巢中，輕輕吹氣，直到火苗升起。
+                            <!--<button onclick="toggleImage('step-img-fire-6-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-fire-6-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://raw.githubusercontent.com/a175cm1980/unit-converter2/main/%E5%AE%8C%E6%95%B4%E7%9A%84%E9%91%BD%E6%9C%A8%E5%8F%96%E7%81%AB%E5%A5%97%E4%BB%B6.jpg" 
+                                     alt="將火種吹向火絨巢使其燃燒的圖片" 
+                                    class="step-img w-full">
+                            </div>
+                        </li>
+                    </ol>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-survival-accent">材料選擇要點</h3>
+                    <ul class="list-disc list-inside space-y-2 ml-4 text-gray-300">
+                        <li><strong class="text-white">火板與鑽頭：</strong> 建議使用乾燥、質地較軟的木材，如雪松、楊木或松木，確保摩擦時能產生足夠粉末。</li>
+                        <li><strong class="text-white">火絨巢：</strong> 必須極度乾燥，如白樺樹皮、絨毛狀植物纖維或乾燥的蘚苔。</li>
+                    </ul>
+                        <button onclick="toggleImage('step-img-fire-6-container', this)" class="text-[40px] text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                        <div id="step-img-fire-6-container" class="image-container-toggle mt-2 mb-2">
+                            <img src="https://raw.githubusercontent.com/a175cm1980/unit-converter2/main/%E5%AE%8C%E6%95%B4%E7%9A%84%E9%91%BD%E6%9C%A8%E5%8F%96%E7%81%AB%E5%A5%97%E4%BB%B6.jpg" 
+                                 alt="將火種吹向火絨巢使其燃燒的圖片" 
+                                class="step-img w-full">
+                        </div>
+                </div>
+            </div>
+
+            <!-- 2. 水源：尋找與淨化 (Water) --><div class="card p-6 rounded-xl">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleSection('water-section')">
+                    <div class="flex items-center space-x-4">
+                        <!-- Water Icon --><svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <h2 class="text-2xl font-bold text-gray-100">水源：尋找與淨化</h2>
+                    </div>
+                    <button class="bg-survival-accent hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-full text-sm flex items-center transition duration-150">
+                        查看詳細步驟
+                        <svg id="water-section-chevron" class="chevron-icon w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+
+                <div id="water-section" class="section-content mt-4">
+                    <p class="text-gray-300 border-l-4 border-blue-400 pl-4 py-2 my-4">
+                        人體三天不喝水就會面臨致命危險。即使找到水源，也必須先淨化才能飲用。
+                    </p>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-blue-400">水源尋找技巧</h3>
+                    <ul class="list-disc list-inside space-y-2 ml-4 text-gray-300">
+                        <li><strong class="text-white">低窪地區：</strong> 溪流、河流通常在山谷或低窪處匯集。</li>
+                        <li><strong class="text-white">追蹤動物：</strong> 觀察動物和昆蟲的軌跡，牠們常會引導你找到水源。</li>
+                        <li><strong class="text-white">清晨露水：</strong> 清晨用布或衣服收集草葉上的露水。
+                            <button onclick="toggleImage('step-img-water-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-water-1-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/3b82f6/ffffff?text=圖片:收集露水" alt="清晨在草地上收集露水的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li><strong class="text-white">植物凝結：</strong> 利用塑膠袋套住綠色植物的葉子，利用植物蒸散作用收集水氣。
+                            <button onclick="toggleImage('step-img-water-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-water-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/3b82f6/ffffff?text=圖片:植物蒸散集水器" alt="用塑膠袋套住植物收集水氣的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-blue-400">淨化處理 (三步驟)</h3>
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">物理過濾：</strong> 先用布料過濾掉水中的泥沙、葉子等大顆粒雜質。
+                            <button onclick="toggleImage('step-img-water-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-water-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/3b82f6/ffffff?text=圖片:簡易布料過濾水" alt="用布料過濾混濁水的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">煮沸消毒 (最佳)：</strong> 將水煮沸並維持沸騰狀態至少 <span class="text-survival-accent font-bold">1 分鐘</span>。這是最可靠的殺菌方式。
+                            <button onclick="toggleImage('step-img-water-4-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-water-4-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/3b82f6/ffffff?text=圖片:煮沸水消毒" alt="在火上煮沸水的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">化學處理 (備用)：</strong> 若無法生火，可使用碘片或漂白水（每公升水 2 滴，靜置 30 分鐘）進行消毒。
+                            <button onclick="toggleImage('step-img-water-5-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-water-5-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/3b82f6/ffffff?text=圖片:使用碘片淨水" alt="使用碘片淨化水的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 3. 庇護所與保暖 (Shelter & Warmth) --><div class="card p-6 rounded-xl">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleSection('shelter-section')">
+                    <div class="flex items-center space-x-4">
+                        <!-- Shelter Icon --><svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <h2 class="text-2xl font-bold text-gray-100">庇護所與保暖</h2>
+                    </div>
+                    <button class="bg-survival-accent hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-full text-sm flex items-center transition duration-150">
+                        查看基本原則
+                        <svg id="shelter-section-chevron" class="chevron-icon w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+
+                <div id="shelter-section" class="section-content mt-4">
+                    <p class="text-gray-300 border-l-4 border-yellow-500 pl-4 py-2 my-4">
+                        庇護所的目標是避免體溫過低 (Hypothermia) 或中暑，並隔絕惡劣天氣。
+                    </p>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-yellow-500">基本要求</h3>
+                    <ul class="list-disc list-inside space-y-2 ml-4 text-gray-300">
+                        <li><strong class="text-white">隔絕地面：：</strong> 使用乾燥的樹葉、松針或枝條鋪設厚厚的底層，避免身體熱量散失到冰冷的地面。
+                            <!--<button onclick="toggleImage('step-img-shelter-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-shelter-1-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/f59e0b/000000?text=圖片:鋪設地面隔層" alt="在庇護所內鋪設樹葉隔絕地面的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li><strong class="text-white">防風：</strong> 將開口朝向背風處。</li>
+                        <li><strong class="text-white">防水：</strong> 利用寬大樹皮、塑膠布或層層疊疊的樹枝做屋頂。</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-yellow-500">簡易庇護所類型</h3>
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">斜坡棚 (Lean-to)：</strong> 找到兩棵距離適中的樹，在中間架設一根主橫樑，然後將枝條斜靠在主樑上，覆蓋防水材料。
+                            <!--<button onclick="toggleImage('step-img-shelter-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-shelter-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://kknews.cc/zh-tw/news/em2483z.html" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">雪屋或樹洞：</strong> 在寒冷環境中，利用厚雪或濃密的針葉樹，可以獲得極佳的隔熱效果。
+                            <!--<button onclick="toggleImage('step-img-shelter-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-shelter-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/f59e0b/000000?text=圖片:樹洞庇護所" alt="雪屋或樹洞庇護所的圖片" class="step-img w-full">
+                            </div>
+                            <br>
+                            <a href="https://taeanimal.org.tw/model_action.php?sn=1514" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold ml-2">
+                                參考野外庇護所示範
+                            </a>
+                            
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- 4. 食物獲取 (Food & Foraging) --><div class="card p-6 rounded-xl">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleSection('food-section')">
+                    <div class="flex items-center space-x-4">
+                        <!-- Food Icon --><svg class="w-8 h-8 text-survival-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-2H8m4 2l4 4M5 12h14"></path></svg>
+                        <h2 class="text-2xl font-bold text-gray-100">食物獲取與辨識</h2>
+                    </div>
+                    <button class="bg-survival-accent hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-full text-sm flex items-center transition duration-150">
+                        查看詳細原則與陷阱
+                        <svg id="food-section-chevron" class="chevron-icon w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+
+                <div id="food-section" class="section-content mt-4">
+                    <p class="text-gray-300 border-l-4 border-survival-green pl-4 py-2 my-4">
+                        食物不是最緊急的需求（通常可撐數週），但持續獲取能維持體力與士氣。
+                    </p>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-survival-green">安全採集原則</h3>
+                    <ul class="list-disc list-inside space-y-2 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">謹慎辨識：：</strong> 除非你百分之百確定，否則不要吃任何植物、蘑菇或漿果。許多植物含有劇毒。
+                            <br>
+                            <!-- 新增外部連結：野外採集指南 -->
+                            <a href="https://foraging-safety-guide.org" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold ml-2">
+                                點此核對野外可食植物辨識指南
+                            </a>
+                        </li>
+                        <li><strong class="text-white">食用植物：：：</strong> 橡子、松樹內層樹皮、某些可食用的根莖類是常見的選項。</li>
+                        <li><strong class="text-white">檢查：：：</strong> 避開有白色/黃色汁液、苦味、傘狀的植物，以及看起來像蒜頭/洋蔥，但缺乏氣味的植物。</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-survival-green">簡易圈套陷阱 (Snare Trap)</h3>
+                    <p class="text-gray-300 my-2">
+                        圈套陷阱是最簡單且有效的生存陷阱之一，主要針對小型哺乳動物。
+                        <br>
+                        <!-- 新增外部連結：人道陷阱網站 (使用者提供的網址) -->
+                        <a href="https://taeanimal.org.tw/model_action.php?sn=1514" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold ml-2">
+                            參考人道捕捉陷阱示範網站
+                        </a>
+                        <!-- 新增外部連結：陷阱法規 -->
+                        <a href="https://survival-trap-regulations.net" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold ml-2">
+                            點此查閱當地狩獵和設陷阱法規
+                        </a>
+                    </p>
+
+                    <h4 class="text-lg font-semibold mt-4 mb-2 text-white">適合獵物：</h4>
+                    <ul class="list-disc list-inside space-y-1 ml-4 text-gray-300">
+                        <li><strong class="text-survival-accent">小型動物：：</strong> 兔子、松鼠、地鼠、黃鼠狼等。</li>
+                        <li>陷阱大小應根據目標獵物的頭部大小調整，確保套索能將其套住。</li>
+                    </ul>
+
+                    <!-- 新增：活套結教學 -->
+                    <h4 class="text-xl font-semibold mt-6 mb-2 text-survival-accent">活套結 (Running Knot) 教學</h4>
+                    <p class="text-gray-300 my-2">
+                        活套結是圈套陷阱的核心。它是一種能隨時收緊的繩結，對於陷阱的成功至關重要。
+                    </p>
+                        <a href="https://www.stsd-scout.org/media/resources/1516959775_%E5%9F%BA%E6%9C%AC%E7%B9%A9%E7%B5%90.pdf" 
+                           target="_blank" 
+                           class="text-blue-400 hover:text-blue-300 underline font-semibold ml-2">
+                            點此查閱活套結文件
+                        </a>
+
+                    <!-- 新增的參考網站連結按鈕區塊 -->
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4 mb-6">
+                        <a href="https://www.animatedknots.com/slip-knot" target="_blank" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-150 text-sm flex-grow sm:flex-grow-0">
+                            <!-- Link Icon -->
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M9 5h10m0 0l-7 7m7-7v7"></path></svg>
+                            觀看動畫教學 (英文)
+                        </a>
+                        <a href="https://zh.wikipedia.org/wiki/%E6%B4%BB%E5%A5%97%E7%B5%90" target="_blank" class="inline-flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-150 text-sm flex-grow sm:flex-grow-0">
+                            <!-- Book Icon -->
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.5v11m0 0l4-4m-4 4l-4-4m-7 8h18M5 10v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                            活套結中文介紹 (維基百科)
+                        </a>
+                    </div>
+                    <!-- 參考網站連結按鈕區塊結束 -->
+
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">步驟一：形成圈圈：：</strong> 將繩索末端繞過繩索主體（固定端），形成一個小的圓圈（如一個 O 字）。
+                            <!--<button onclick="toggleImage('step-img-knot-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-knot-1-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x200/10b981/ffffff?text=圖片:活套結步驟一+形成第一個圈" alt="活套結步驟一：形成圈圈的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">步驟二：穿過主體：：</strong> 將繩索末端再次繞過主體，然後從下方或上方（取決於您習慣的方式）穿過步驟一形成的小圓圈。
+                            <!--<button onclick="toggleImage('step-img-knot-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-knot-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x200/10b981/ffffff?text=圖片:活套結步驟二+末端穿過圈圈" alt="活套結步驟二：末端穿過圈圈的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">步驟三：拉緊確認：：：</strong> 將末端拉緊固定，並拉動主體繩索，確認您新建立的繩圈是否能順暢地收緊和放鬆。這個活動的圈就是陷阱的套索部分。
+                            <!--<button onclick="toggleImage('step-img-knot-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>-->
+                            <div id="step-img-knot-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x200/10b981/ffffff?text=圖片:活套結完成圖+可滑動的圈" alt="活套結完成圖，繩圈可自由滑動" class="step-img w-full">
+                            </div>
+                        </li>
+                    </ol>
+                    <!-- 活套結教學結束 -->
+
+                    <h4 class="text-lg font-semibold mt-4 mb-2 text-white">架設步驟說明：：</h4>
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">準備套索：：</strong> 使用細的金屬線、麻繩或降落傘繩內芯。在一端製作一個穩固的活套結（Running Knot），形成一個可收緊的圈套。（<span class="font-bold text-survival-accent">請參考上方的結繩教學</span>）
+                            <button onclick="toggleImage('step-img-snare-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-snare-1-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:製作活套結（Running+Knot）" alt="製作活套結的圖示" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">圈套尺寸：：：</strong> 將圈套直徑調整至約 8-10 公分（針對兔子/松鼠），圓心應距離地面約 5-8 公分（約半個腳掌高）。
+                            <button onclick="toggleImage('step-img-snare-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-snare-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:圈套尺寸示意圖" alt="圈套陷阱尺寸示意圖" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">選擇路徑：：：</strong> 找到動物經常使用的獸徑、圍欄下的開口或灌木叢中明顯的小通道。
+                        </li>
+                        <li>
+                            <strong class="text-white">固定與隱藏：：：：</strong> 將套索的另一端牢固地綁在一棵粗壯的樹或深埋的木樁上。使用細小的樹枝將圈套固定在路徑中央，使其保持打開狀態，並盡量用周圍的自然物隱藏陷阱。
+                            <button onclick="toggleImage('step-img-snare-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-snare-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:隱藏圈套陷阱" alt="架設完成並隱藏在獸徑中的圈套陷阱" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">耐心檢查：：：：</strong> 陷阱需每天檢查。捕捉到獵物後，請立即處理並重新設置陷阱。
+                        </li>
+                    </ol>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-survival-green">製作簡易長矛 (Simple Spear)</h3>
+                    <p class="text-gray-300 my-2">
+                        長矛是一種多功能的求生工具，可用於防禦、狩獵中型獵物，以及捕魚。
+                    </p>
+
+                    <h4 class="text-lg font-semibold mt-4 mb-2 text-white">適合用途：</h4>
+                    <ul class="list-disc list-inside space-y-1 ml-4 text-gray-300">
+                        <li><strong class="text-survival-accent">捕魚：：：：：</strong> 在淺水區刺魚。</li>
+                        <li><strong class="text-survival-accent">中小型獵物：：：：</strong> 靠近後突襲，或用於防禦。</li>
+                    </ul>
+
+                    <h4 class="text-lg font-semibold mt-4 mb-2 text-white">製作步驟說明：：：：</h4>
+                    <ol class="list-decimal list-inside space-y-3 ml-4 text-gray-300">
+                        <li>
+                            <strong class="text-white">選擇矛身：：：</strong> 尋找一根直、乾燥、結實的木棍或樹枝，長度約為使用者身高。
+                            <button onclick="toggleImage('step-img-spear-1-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-spear-1-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:選擇合適木棍" alt="選擇合適木棍作為長矛的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">削尖矛頭：：：</strong> 使用刀具或尖銳的石頭，將木棍的一端削尖，製成鋒利的錐形。
+                            <button onclick="toggleImage('step-img-spear-2-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-spear-2-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:削尖矛頭" alt="用刀具削尖木棍頭部的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">火烤硬化 (Fire Hardening)：：：</strong> 這是關鍵步驟。將削尖的矛頭在火堆的餘燼中輕微烘烤（不要燒焦），同時不斷旋轉。熱量會燒掉木材表面的水分和樹脂，使其變得更硬、更耐用。
+                            <button onclick="toggleImage('step-img-spear-3-container', this)" class="text-xs text-yellow-400 hover:text-yellow-300 underline mt-1 mb-3 block">顯示圖片</button>
+                            <div id="step-img-spear-3-container" class="image-container-toggle mt-2 mb-2">
+                                <img src="https://placehold.co/800x250/10b981/ffffff?text=圖片:火烤硬化矛頭" alt="將矛頭在火中烘烤硬化的圖片" class="step-img w-full">
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">重新磨尖：：：：</strong> 硬化後，如果需要，可以再次用石頭磨尖，以獲得最佳穿刺力。
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- 底部警告 --><footer class="mt-12 p-6 bg-red-900 bg-opacity-30 border border-red-800 rounded-xl text-center text-red-300">
+            <p class="font-bold mb-2">安全第一警告：</p>
+            <p class="text-sm">
+                這些是基礎求生知識，請勿在沒有專業人士指導下進行高風險的野外活動或嘗試不確定的食物。求生環境複雜多變，知識僅為應急準備。
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        /**
+         * 這是 JavaScript 的多行註解區塊。
+         * 這是 JSDoc 格式，用於描述函數功能、參數和返回值。
+         * 切換區塊內容的顯示/隱藏 (Accordion)
+         * @param {string} sectionId - 區塊的 ID (e.g., 'fire-section')
+         */
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const chevron = document.getElementById(sectionId + '-chevron');
+            
+            if (content && chevron) {
+                // 檢查是否處於隱藏狀態
+                const isHidden = !content.classList.contains('active');
+
+                // 移除所有其他區塊的 active 狀態
+                document.querySelectorAll('.section-content.active').forEach(item => {
+                    // 這是另一個單行註解
+                    if (item.id !== sectionId) {
+                        item.classList.remove('active');
+                        item.previousElementSibling.querySelector('.chevron-icon').classList.remove('rotate');
+                    }
+                });
+
+                // 切換當前區塊的 active 狀態
+                content.classList.toggle('active');
+                chevron.classList.toggle('rotate');
+
+                // 如果是展開，則平滑滾動到標題位置，確保標題可見
+                if (isHidden) {
+                    const header = content.previousElementSibling;
+                    if (header) {
+                        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+        }
+        
+        /**
+         * 切換單張圖片的顯示/隱藏
+         * @param {string} containerId - 圖片容器的 ID (e.g., 'step-img-fire-1-container')
+         * @param {HTMLElement} buttonElement - 觸發此動作的按鈕元素
+         */
+        function toggleImage(containerId, buttonElement) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                const isHidden = !container.classList.contains('active');
+                
+                if (isHidden) {
+                    container.classList.add('active');
+                    buttonElement.textContent = '隱藏圖片';
+                } else {
+                    container.classList.remove('active');
+                    buttonElement.textContent = '顯示圖片';
+                }
+            }
+        }
+
+        // 確保首次載入時所有區塊和圖片都是收起的
+        window.onload = () => {
+             document.querySelectorAll('.section-content').forEach(content => {
+                content.classList.remove('active');
+            });
+             document.querySelectorAll('.image-container-toggle').forEach(imgContainer => {
+                imgContainer.classList.remove('active');
+            });
+        };
+    </script>
+</body>
+</html>
