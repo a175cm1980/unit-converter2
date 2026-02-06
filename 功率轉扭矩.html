@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app_title">功率轉扭矩計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            padding: 1rem;
+        }
+        .input-group {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800" data-i18n="app_title">功率轉扭矩計算器</h1>
+            <select id="lang-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2">
+                <option value="zh">繁體中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <div id="input-container" class="space-y-6">
+            <!-- 功率轉扭矩群組 -->
+            <div id="torque-group" class="input-group">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="label_power">功率</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="torque-power-val" class="flex-1 p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="0">
+                            <select id="torque-power-unit" class="w-24 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                                <option value="kW">kW</option>
+                                <option value="hp">HP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="label_rpm">轉速 (RPM)</label>
+                        <input type="number" id="torque-rpm-val" class="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如: 1500">
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <p class="text-xs text-blue-700 font-medium mb-1">物理公式：</p>
+                        <p class="text-sm text-blue-800 italic font-serif">$T (Nm) = \frac{P (kW) \times 9550}{n (RPM)}$</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="calculate-btn" class="w-full mt-8 bg-blue-600 text-white font-bold py-4 rounded-lg hover:bg-blue-700 transition shadow-lg text-lg" data-i18n="btn_calculate">立即計算</button>
+
+        <div id="result-display" class="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200 hidden text-center">
+            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2" data-i18n="label_result">計算結果 (扭矩)</p>
+            <p id="result-text" class="text-4xl font-bold text-blue-600 break-all">0 Nm</p>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            zh: {
+                app_title: "功率轉扭矩計算器",
+                label_power: "功率 (P)",
+                label_rpm: "轉速 (n)",
+                label_result: "計算結果 (扭矩)",
+                btn_calculate: "立即計算",
+                error_rpm: "RPM 不能為 0"
+            },
+            en: {
+                app_title: "Power to Torque Calculator",
+                label_power: "Power (P)",
+                label_rpm: "Speed (RPM)",
+                label_result: "Result (Torque)",
+                btn_calculate: "Calculate Now",
+                error_rpm: "RPM cannot be 0"
+            }
+        };
+
+        let currentLang = 'zh';
+
+        const resultDisplay = document.getElementById('result-display');
+        const resultText = document.getElementById('result-text');
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.textContent = i18n[lang][el.getAttribute('data-i18n')];
+            });
+        }
+
+        function calculate() {
+            const p = parseFloat(document.getElementById('torque-power-val').value) || 0;
+            const rpm = parseFloat(document.getElementById('torque-rpm-val').value) || 0;
+            const unit = document.getElementById('torque-power-unit').value;
+            
+            let res = "";
+            
+            if (rpm === 0) {
+                res = i18n[currentLang].error_rpm;
+            } else {
+                // 如果是馬力 HP，先轉為 kW (1 HP = 0.7457 kW)
+                let kw = (unit === 'hp') ? p * 0.7457 : p;
+                // 公式: T = P(kW) * 9550 / n(rpm)
+                let torque = (kw * 9550 / rpm).toFixed(2);
+                res = torque + " Nm";
+            }
+            
+            resultText.textContent = res;
+            resultDisplay.classList.remove('hidden');
+        }
+
+        // 事件綁定
+        document.getElementById('lang-select').onchange = (e) => setLanguage(e.target.value);
+        document.getElementById('calculate-btn').onclick = calculate;
+
+        // 初始化
+        window.onload = () => {
+            setLanguage('zh');
+        };
+    </script>
+</body>
+</html>
