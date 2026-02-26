@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>傳統豆花製作比例計算器</title>
+    <title>豆製品職人比例計算器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -17,162 +17,219 @@
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-        .step-highlight {
-            border-left: 4px solid #d97706;
-            padding-left: 1rem;
-            margin: 0.5rem 0;
-            background: #fffbeb;
+        .mode-active {
+            background-color: #d97706 !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+        .warning-box {
+            border: 1px solid #fee2e2;
+            background-color: #fef2f2;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            color: #991b1b;
+        }
+        .step-num {
+            background: #d97706;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-amber-900 mb-2">🍮 傳統豆花比例計算器</h1>
-            <p class="text-amber-700">掌握「熟石灰」與「澱粉」的科學配方</p>
+            <h1 class="text-4xl font-bold text-amber-900 mb-2">🍶 豆製品職人比例計算器</h1>
+            <p class="text-amber-700">精準比例 x 職人工法 = 完美的豆味表現</p>
         </div>
 
-        <!-- Input Section -->
-        <div class="card p-6 mb-5 border-t-4 border-amber-500">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">輸入乾黃豆重量 (g)</label>
-                    <input type="number" id="soybeanInput" value="300" min="50" step="50"
-                        class="w-full px-4 py-3 rounded-xl border-2 border-amber-100 focus:border-amber-500 focus:outline-none text-xl font-bold text-amber-900 transition-all">
+        <!-- Mode Selector -->
+        <div class="flex justify-center gap-3 mb-8">
+            <button id="mode-douhua" onclick="setMode('douhua')" class="px-8 py-3 rounded-xl font-bold bg-white text-amber-800 shadow-sm transition-all mode-active">🍮 職人豆花 (石膏工法)</button>
+            <button id="mode-tofu" onclick="setMode('tofu')" class="px-8 py-3 rounded-xl font-bold bg-white text-amber-800 shadow-sm transition-all">🧊 傳統豆腐 (鹽滷工法)</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Inputs & Ratios -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="card p-6 border-t-4 border-amber-500">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">乾黃豆重量 (g)</label>
+                    <input type="number" id="soybeanInput" value="300" min="50" step="50" oninput="calculate()"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-amber-100 focus:border-amber-500 focus:outline-none text-2xl font-bold text-amber-900 transition-all">
                 </div>
-                <div class="flex items-end">
-                    <button onclick="calculate()" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-xl font-bold transition-all transform active:scale-95 shadow-lg w-full md:w-auto">
-                        重新計算比例
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Results Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-            <div class="card p-6 border-l-4 border-blue-400">
-                <h3 class="text-lg font-bold text-blue-800 mb-4">1. 熬煮豆漿階段</h3>
-                <ul class="space-y-3">
-                    <li class="flex justify-between border-b pb-2">
-                        <span class="text-gray-600">乾黃豆</span>
-                        <span class="font-bold text-gray-800"><span id="res-soybean">300</span> g</span>
-                    </li>
-                    <li class="flex justify-between border-b pb-2">
-                        <span class="text-gray-600">打漿用水量 (1:7)</span>
-                        <span class="font-bold text-blue-600"><span id="res-water">2100</span> ml</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card p-6 border-l-4 border-emerald-400">
-                <h3 class="text-lg font-bold text-emerald-800 mb-4">2. 凝固粉漿階段</h3>
-                <ul class="space-y-3">
-                    <li class="flex justify-between border-b pb-2">
-                        <span class="text-gray-600">熟石灰粉 (食用石膏)</span>
-                        <span class="font-bold text-emerald-600"><span id="res-gypsum">4</span> g</span>
-                    </li>
-                    <li class="flex justify-between border-b pb-2">
-                        <span class="text-gray-600">玉米粉或地瓜粉</span>
-                        <span class="font-bold text-emerald-600"><span id="res-starch">30</span> g</span>
-                    </li>
-                    <li class="flex justify-between border-b pb-2">
-                        <span class="text-gray-600">粉漿用水 (冷開水)</span>
-                        <span class="font-bold text-gray-800"><span id="res-mixwater">100</span> ml</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Scientific Note -->
-        <div class="card p-5 mb-5 bg-amber-50 border border-amber-200">
-            <h4 class="font-bold text-amber-800 text-sm mb-2 uppercase tracking-wider">💡 為什麼要這樣配？（粉漿原理）</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <p class="text-gray-700"><span class="font-bold text-emerald-700">● 熟石灰：</span>負責「凝固」。提供鈣離子讓豆漿蛋白質變性。過多會產生苦澀鹼味。</p>
-                <p class="text-gray-700"><span class="font-bold text-emerald-700">● 澱粉：</span>負責「保水」。防止豆花出水，讓質地從乾澀轉為絲滑順口。</p>
-                <p class="text-gray-700"><span class="font-bold text-emerald-700">● </span>豆漿必須夠濃（建議 1:7），濃度不足會導致豆花過軟無法成型。</p>                
-            </div>
-        </div>
-
-        <!-- Procedure -->
-        <div class="card p-8 shadow-inner">
-            <h2 class="text-2xl font-bold text-amber-900 mb-6 flex items-center">
-                <span class="bg-amber-100 p-2 rounded-lg mr-3">🥣</span> 職人級製作流程
-            </h2>
-            <div class="space-y-8">
-                <div class="flex gap-4">
-                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">1</span></div>
-                    <div>
-                        <h4 class="font-bold text-lg text-gray-800">精細打漿與過濾</h4>
-                        <p class="text-gray-600">黃豆泡水 6-8 小時吸飽水分。加入計算出的水量打漿。**務必使用細豆漿布徹底濾渣**，殘留豆渣會影響凝固效果。</p>
+                <div class="card p-6 border-l-4 border-blue-400">
+                    <h3 class="font-bold text-blue-800 mb-4 flex items-center">
+                        <span class="mr-2">🔥</span> 煮漿比例
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">打漿總用水</span>
+                            <span class="font-bold text-blue-600"><span id="res-water">2100</span> ml</span>
+                        </div>
+                        <div class="warning-box mt-2">
+                            <strong>職人提醒：</strong> 煮漿時若出現大量泡沫向上衝是「假沸」，此時蛋白質尚未熟透，務必轉極小火並續煮 5-8 分鐘。
+                        </div>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">2</span></div>
-                    <div>
-                        <h4 class="font-bold text-lg text-gray-800">精準溫控 (85°C - 90°C)</h4>
-                        <p class="text-gray-600">中火煮開豆漿，熄火靜置約 1-2 分鐘。**石膏粉在此溫度範圍凝固力最強**，過熱或過冷都容易造成分離。</p>
+
+                <div class="card p-6 border-l-4 border-emerald-400">
+                    <h3 class="font-bold text-emerald-800 mb-4 flex items-center">
+                        <span class="mr-2">🧪</span> 凝固劑比例
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b pb-2">
+                            <span id="label-coagulant" class="text-gray-600">熟石灰 (食用石膏)</span>
+                            <span class="font-bold text-emerald-600"><span id="res-coagulant">4</span> g</span>
+                        </div>
+                        <div id="row-starch" class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">地瓜粉 (增加Q彈度)</span>
+                            <span class="font-bold text-emerald-600"><span id="res-starch">30</span> g</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">調和冷開水</span>
+                            <span class="font-bold text-gray-800"><span id="res-mixwater">100</span> ml</span>
+                        </div>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">3</span></div>
-                    <div>
-                        <h4 class="font-bold text-lg text-gray-800">懸浮粉漿 (重要細節)</h4>
-                        <p class="text-gray-600">將石膏粉、澱粉與冷開水混合。**因為石膏不溶於水，在豆漿沖入的前一秒，必須再次攪勻粉漿**，確保石膏處於均勻懸浮狀態。</p>
-                        <div class="step-highlight italic text-sm text-amber-800">注意：若石膏沉澱在底部，豆漿沖入後將無法與凝固劑充分反應。</div>
+            </div>
+
+            <!-- Right Column: Procedure -->
+            <div class="lg:col-span-2">
+                <div class="card p-8 h-full">
+                    <div id="tip-section" class="mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-sm italic text-amber-800">
+                        <!-- Tips load here -->
                     </div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="flex-none"><span class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">4</span></div>
-                    <div>
-                        <h4 class="font-bold text-lg text-gray-800">一氣呵成的衝擊</h4>
-                        <p class="text-gray-600">從約 30 公分高處將熱豆漿快速倒入粉漿桶中。**倒入後嚴禁攪拌**。撈掉表面氣泡後，靜置 20 分鐘不可晃動。</p>
+
+                    <h2 class="text-2xl font-bold text-amber-900 mb-8 flex items-center">
+                        <span id="procedure-icon" class="mr-3">🥣</span> 
+                        <span id="procedure-title">詳細製作流程</span>
+                    </h2>
+                    
+                    <div id="procedure-steps" class="space-y-8">
+                        <!-- Steps load here -->
+                    </div>
+
+                    <div class="mt-12 pt-6 border-t border-amber-100">
+                        <h4 class="font-bold text-amber-900 mb-3">🛠️ 必備工具清單</h4>
+                        <div id="tool-list" class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                            <!-- Tools load here -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tips Section with specific margin and style -->
-        <div class="card p-6 mt-5 mb-5 bg-emerald-50 border-4 border-dashed border-emerald-200">
-            <h4 class="font-bold text-emerald-800 text-lg mb-4 flex items-center">
-                <span class="mr-2">✨</span> 成功小秘訣
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                <!--<div class="bg-white p-3 rounded-lg shadow-sm"> -->
-                    <p class="text-gray-700"><span class="font-bold text-emerald-700">● 豆漿濃度：</span>市售豆漿通常太稀（蛋白質不足），很難凝固。自製的豆漿一定要夠濃。</p>
-                <!--</div> -->
-                <!--<div class="bg-white p-3 rounded-lg shadow-sm"> -->
-                    <p class="text-gray-700"><span class="font-bold text-emerald-700">● 除泡技巧：</span>沖完豆漿後，表面的氣泡可以用小湯匙輕輕撈掉，成品表面才會像鏡面一樣漂亮。</p>
-                <!--</div> -->
-            </div>
-        </div>
-
-        <footer class="text-center mt-5 text-gray-500 text-sm leading-relaxed border-t border-amber-200 pt-8">
-            <p>🍯 建議搭配冷藏後的薑汁黑糖水，或是軟綿的花生仁與紅豆，口感層次更豐富。</p>
-            <p>📅 製作完成後建議冷藏 2-3 小時再食用，豆花質地會更為穩定。請於 2 日內食用完畢以保新鮮。</p>
+        <footer class="text-center mt-10 text-gray-400 text-xs pb-10">
+            © 豆製品科學實驗室 - 建議使用非基改黃豆以獲得最佳風味
         </footer>
     </div>
 
     <script>
+        let currentMode = 'douhua';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-douhua').classList.toggle('mode-active', mode === 'douhua');
+            document.getElementById('mode-tofu').classList.toggle('mode-active', mode === 'tofu');
+            calculate();
+        }
+
         function calculate() {
             const soy = parseFloat(document.getElementById('soybeanInput').value);
             if (isNaN(soy) || soy <= 0) return;
 
-            const waterRatio = 7;
-            const gypsumRatio = 0.013;
-            const starchRatio = 0.1;
-            const mixWaterRatio = 0.33;
+            if (currentMode === 'douhua') {
+                updateDouhua(soy);
+            } else {
+                updateTofu(soy);
+            }
+        }
 
-            const water = soy * waterRatio;
-            const gypsum = (soy * gypsumRatio).toFixed(1);
-            const starch = (soy * starchRatio).toFixed(0);
-            const mixWater = (soy * mixWaterRatio).toFixed(0);
+        function updateDouhua(soy) {
+            const water = soy * 7;
+            const gypsum = (soy * 0.013).toFixed(1);
+            const starch = (soy * 0.1).toFixed(0);
+            const mixWater = (soy * 0.33).toFixed(0);
 
-            document.getElementById('res-soybean').innerText = soy;
             document.getElementById('res-water').innerText = water;
-            document.getElementById('res-gypsum').innerText = gypsum;
+            document.getElementById('label-coagulant').innerText = "熟石灰 (食用石膏)";
+            document.getElementById('res-coagulant').innerText = gypsum;
+            document.getElementById('row-starch').style.display = 'flex';
             document.getElementById('res-starch').innerText = starch;
             document.getElementById('res-mixwater').innerText = mixWater;
+
+            document.getElementById('tip-section').innerText = "「沖漿」是豆花成敗的靈魂，關鍵在於瞬間產生的湍流，讓石膏液與熱豆漿在 1 秒內完美混合。";
+            document.getElementById('procedure-icon').innerText = "🍮";
+            document.getElementById('procedure-title').innerText = "職人級豆花製作工序";
+            
+            document.getElementById('procedure-steps').innerHTML = `
+                ${stepTpl(1, "浸泡與細磨", "選用非基改黃豆，浸泡 6-8 小時至豆芽處微突。以 1:7 比例加水研磨，並使用兩層密織豆漿布強力擠乾濾渣。建議濾完後「再濾一遍」以確保無殘渣。")}
+                ${stepTpl(2, "慢火熬漿", "將生豆漿大火煮沸，出現大量泡沫時轉極小火，撇除泡沫並續煮 5-8 分鐘。這能徹底煮熟皂素，避免腹瀉並讓豆香轉為甘甜。")}
+                ${stepTpl(3, "精準降溫", "熄火後，將豆漿靜置降溫。理想沖漿溫度為 85°C。溫度過高（>95°C）豆花會變老、滲水；過低（<75°C）則無法凝固。")}
+                ${stepTpl(4, "懸浮沖漿", "將石膏、地瓜粉、冷開水在容器底部攪勻。手持豆漿鍋從 30 公分高處一口氣「撞」入容器中。沖完後嚴禁攪拌，只需快速撈除表面大泡泡。")}
+                ${stepTpl(5, "靜置熟成", "蓋上鍋蓋保溫並靜置 20 分鐘。此時嚴禁晃動。待冷卻後放入冰箱冷藏 3 小時，質地會變得更加穩定滑順。")}
+            `;
+
+            document.getElementById('tool-list').innerHTML = `
+                <span>✅ 高密度濾豆渣袋</span>
+                <span>✅ 紅外線溫度計</span>
+                <span>✅ 不鏽鋼深桶 (沖漿用)</span>
+                <span>✅ 撇泡小匙或噴槍</span>
+            `;
+        }
+
+        function updateTofu(soy) {
+            const water = soy * 6;
+            const nigari = (soy * 0.02).toFixed(1);
+            const mixWater = (soy * 0.2).toFixed(0);
+
+            document.getElementById('res-water').innerText = water;
+            document.getElementById('label-coagulant').innerText = "天然鹽滷 (液態或粉)";
+            document.getElementById('res-coagulant').innerText = nigari;
+            document.getElementById('row-starch').style.display = 'none';
+            document.getElementById('res-mixwater').innerText = mixWater;
+
+            document.getElementById('tip-section').innerText = "豆腐與豆花不同，它需要「慢工出細活」。鹽滷的添加是為了讓蛋白質網格緩慢收縮，排出水分，留下扎實的豆香。";
+            document.getElementById('procedure-icon').innerText = "🧊";
+            document.getElementById('procedure-title').innerText = "古法板豆腐製作工序";
+
+            document.getElementById('procedure-steps').innerHTML = `
+                ${stepTpl(1, "高濃度煮漿", "使用 1:6 的比例製作濃豆漿。濾渣需比豆花更徹底。煮沸後同樣需續煮 5-8 分鐘，確保豆乳完全熟化。")}
+                ${stepTpl(2, "降溫與點滷", "將豆漿降溫至 75°C - 80°C。鹽滷液分 3 次點入：第一次繞圈加入、第二次在中間點入、第三次針對未凝固處補強。每加入一次都要用木鏟輕輕劃開豆漿。")}
+                ${stepTpl(3, "破花與悶煮", "當出現雲朵狀的白色塊狀物（豆花）與透明微黃的液體（黃漿水）分離時，停止攪動，蓋蓋靜置 15 分鐘讓結構強健。")}
+                ${stepTpl(4, "上模壓製", "豆腐模具鋪好濕紗布，將凝乳均勻舀入。包好紗布，壓上重物。壓 15 分鐘為嫩豆腐，壓 40 分鐘則為老豆腐。")}
+                ${stepTpl(5, "冷水定型", "將豆腐連同紗布輕輕移入一大盆冷水中脫模。這能冷卻核心溫度，並沖淡殘留鹽滷的苦澀味。")}
+            `;
+
+            document.getElementById('tool-list').innerHTML = `
+                <span>✅ 豆腐木模或不鏽鋼模</span>
+                <span>✅ 食品級透氣紗布</span>
+                <span>✅ 壓重物 (如大水瓶)</span>
+                <span>✅ 長柄木鏟</span>
+            `;
+        }
+
+        function stepTpl(num, title, desc) {
+            return `
+                <div class="flex gap-4">
+                    <div class="step-num">${num}</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 mb-1">${title}</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed">${desc}</p>
+                    </div>
+                </div>
+            `;
         }
 
         window.onload = calculate;
