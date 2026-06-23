@@ -53,9 +53,13 @@
             <button onclick="showTab('incense')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100" id="btn-incense">製香技術</button>
             <button onclick="showTab('perfume')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-rose-100" id="btn-perfume">香水製造</button>
             <button onclick="showTab('smoked-meat')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-red-900 hover:text-white" id="btn-smoked-meat">燻肉製造</button>
+            <button onclick="showTab('cured-meat')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all" id="btn-cured-meat">古法臘肉</button>
             <button onclick="showTab('dried-fish')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all" id="btn-dried-fish">古法魚乾</button>
             <button onclick="showTab('pickling')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-amber-600 hover:text-white" id="btn-pickling">醃菜工藝</button>
             <button onclick="showTab('dried-fruit')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-orange-500 hover:text-white" id="btn-dried-fruit">果乾製造</button>
+            <button onclick="showTab('dried-coriander')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all" id="btn-dried-coriander">乾香菜工藝</button>
+            <button onclick="showTab('tea-making')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-tea-making">傳統製茶</button>
+            <button onclick="showTab('coffee-craft')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-coffee-craft">咖啡烘焙</button>
             <button onclick="showTab('brown-sugar')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-orange-100" id="btn-brown-sugar">紅/黑糖</button>
             <button onclick="showTab('sugar')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-red-100" id="btn-sugar">白糖</button>
             <button onclick="showTab('salt')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-blue-100" id="btn-salt">精鹽</button>
@@ -73,6 +77,11 @@
             <button onclick="showTab('cement')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-stone-200" id="btn-cement">水泥</button>
             <button onclick="showTab('brick')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-red-200" id="btn-brick">磚頭</button>
             <button onclick="showTab('iron-smelting')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-orange-100" id="btn-iron-smelting">冶鐵工藝</button>
+            <button onclick="showTab('iron-forging')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-iron-forging">鍛鐵工藝</button>
+            <button onclick="showTab('hide-tanning')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-hide-tanning">獸皮鞣製</button>
+            <button onclick="showTab('leather-craft')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-leather-craft">皮革製作</button>
+            <button onclick="showTab('lacquer-craft')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-lacquer-craft">古法漆藝</button>
+            <button onclick="showTab('dyeing-craft')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all text-gray-500 hover:bg-gray-100" id="btn-dyeing-craft">染衣工藝</button>
             <button onclick="showTab('bow-making')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-yellow-800 hover:text-white" id="btn-bow-making">弓箭製造</button>
             <button onclick="showTab('snare-making')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-emerald-800 hover:text-white" id="btn-snare-making">套索陷阱</button>
             <button onclick="showTab('fishing')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-cyan-800 hover:text-white" id="btn-fishing">野外捕魚</button>
@@ -1493,6 +1502,157 @@
                 </div>
             </section>
 
+            <!-- 古法臘肉製作分頁 -->
+            <section id="cured-meat" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-rose-900 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <h2 class="text-2xl font-bold">歲月留香：古法臘肉製作全書</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    
+                    <!-- 1. 準備清單區：食材與器具 -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-2">📋 準備清單 (以 5kg 豬肉為基準)</h3>
+                            <p class="text-gray-600">工欲善其事，必先利其器。請依照以下比例準備，鹽分的比例是防腐的關鍵。</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- 主材 -->
+                            <div class="bg-rose-50/50 p-5 rounded-2xl border border-rose-100">
+                                <h4 class="font-bold text-rose-900 mb-3 flex items-center gap-2">🐖 主材料</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>精選五花肉：</b> 5kg (切成長條狀)</li>
+                                    <li><b>高度白酒：</b> 150ml (50度以上，如高粱)</li>
+                                </ul>
+                            </div>
+                            <!-- 醃料 -->
+                            <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-100">
+                                <h4 class="font-bold text-amber-900 mb-3 flex items-center gap-2">🧂 核心醃料</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>粗海鹽：</b> 150g - 175g (約 3% 比例)</li>
+                                    <li><b>冰糖粉：</b> 80g - 100g (提鮮上色)</li>
+                                    <li><b>大紅袍花椒：</b> 30g (香氣來源)</li>
+                                    <li><b>綜合香料：</b> 八角 5 顆、桂皮 2 片、丁香少許 (打碎效果更好)</li>
+                                </ul>
+                            </div>
+                            <!-- 器具 -->
+                            <div class="bg-stone-100 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3 flex items-center gap-2">🛠️ 必要器具</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>陶缸或大瓷盆：</b> 避光醃漬使用</li>
+                                    <li><b>棉線與掛鉤：</b> 用於晾曬懸掛</li>
+                                    <li><b>重石或大水盆：</b> 醃漬時壓重排氣</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-stone-100">
+
+                    <!-- 2. 製作工藝實戰：極詳細版 -->
+                    <div class="space-y-8">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-2">🛠️ 極詳細製作流程指南</h3>
+                        </div>
+
+                        <div class="space-y-10 text-sm text-gray-700">
+                            <!-- 階段一 -->
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3 font-bold text-rose-800 text-lg">【階段一：選材與殺菌】</div>
+                                <div class="md:w-2/3 space-y-3 bg-stone-50 p-5 rounded-xl border border-stone-200">
+                                    <p><b>1. 豬肉處理：</b> 挑選肥瘦相間的「下五花」。<b>絕對不可用水洗</b>，水中的細菌會導致後期發霉。若有血污，請用乾淨棉紙蘸白酒擦拭。</p>
+                                    <p><b>2. 白酒洗身：</b> 將白酒均勻抹在肉條上。酒不僅殺菌，還能誘發後期的「肉香味」分解。抹完後靜置 20 分鐘讓肉略微收縮。</p>
+                                </div>
+                            </div>
+
+                            <!-- 階段二 -->
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3 font-bold text-rose-800 text-lg">【階段二：炒鹽與揉搓】</div>
+                                <div class="md:w-2/3 space-y-3 bg-rose-50/30 p-5 rounded-xl border border-rose-100">
+                                    <p><b>3. 炒製香料鹽：</b> 淨鍋不放油，下海鹽與碎香料、花椒。小火不停翻炒約 10 分鐘，直到鹽變成焦黃色、花椒味濃郁。<b>必須徹底晾涼</b>才可使用。</p>
+                                    <p><b>4. 暴力揉肉：</b> 這是最累也最關鍵的一步。抓取冷卻的香料鹽，在肉條上來回摩擦推擠，讓鹽分滲入肌肉縫隙。揉至肉質表面感覺「黏手」且色澤微紅為止。</p>
+                                </div>
+                            </div>
+
+                            <!-- 階段三 -->
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3 font-bold text-rose-800 text-lg">【階段三：壓重醃漬】</div>
+                                <div class="md:w-2/3 space-y-3 bg-stone-50 p-5 rounded-xl border border-stone-200">
+                                    <p><b>5. 碼放壓實：</b> 每一層肉中間撒上一層冰糖粉。肉皮一律朝下放置。最上層鋪上乾淨紗布，壓上重物。環境溫度維持在 5-12°C 之間。</p>
+                                    <p><b>6. 三日翻缸：</b> 醃漬第 3 天，將缸底的肉（通常已滲出滷水）移到上方，重複揉搓一次，這能確保整缸肉的鹹甜度一致。</p>
+                                </div>
+                            </div>
+
+                            <!-- 階段四 -->
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3 font-bold text-rose-800 text-lg">【階段四：風乾熟成】</div>
+                                <div class="md:w-2/3 space-y-3 bg-orange-50/30 p-5 rounded-xl border border-orange-100">
+                                    <p><b>7. 晾掛要求：</b> 醃漬 7 天後取出，用麻繩穿孔掛起。頭 2 天可以曬太陽（定色殺菌），之後必須移至北牆根、陽台通風處陰乾。</p>
+                                    <p><b>8. 熟成：</b> 晾掛 10-15 天。觀察肥肉變黃透明、瘦肉乾硬呈深紅。切記：若遇連續雨天，請移至冷氣房或電風扇下強吹，嚴防「發酸」。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-stone-100">
+
+                    <!-- 3. 流派詳解 -->
+                    <div class="space-y-8">
+                        <div class="prose max-w-none text-center">
+                            <h3 class="text-2xl font-bold text-amber-900">🏮 三大經典流派深度解析</h3>
+                            <p class="text-gray-600">依據上述流程，您可透過調整「醃料」與「熟成方式」來改變風格：</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- 廣式 -->
+                            <div class="p-5 border border-rose-100 rounded-2xl bg-white shadow-sm">
+                                <h4 class="text-lg font-bold text-rose-900 mb-3">廣式：醇厚酒香</h4>
+                                <ul class="text-xs space-y-2 text-gray-600">
+                                    <li><b>調整：</b> 糖分加倍，加入醬油與玫瑰露酒。</li>
+                                    <li><b>工藝：</b> 生曬為主，絕不煙燻。</li>
+                                    <li><b>口感：</b> 甜口、酒氣迷人。</li>
+                                </ul>
+                            </div>
+                            <!-- 川味 -->
+                            <div class="p-5 border border-orange-100 rounded-2xl bg-white shadow-sm">
+                                <h4 class="text-lg font-bold text-orange-900 mb-3">川味：麻辣鮮香</h4>
+                                <ul class="text-xs space-y-2 text-gray-600">
+                                    <li><b>調整：</b> 鹽量稍重，加重花椒與乾辣椒粉。</li>
+                                    <li><b>工藝：</b> 風乾後以柏樹枝燻製 4 小時。</li>
+                                    <li><b>口感：</b> 麻辣鹹鮮。</li>
+                                </ul>
+                            </div>
+                            <!-- 湘西 -->
+                            <div class="p-5 border border-stone-300 rounded-2xl bg-white shadow-sm">
+                                <h4 class="text-lg font-bold text-stone-900 mb-3">湘西：深邃木香</h4>
+                                <ul class="text-xs space-y-2 text-gray-600">
+                                    <li><b>調整：</b> 單純鹽醃，保留肉香原味。</li>
+                                    <li><b>工藝：</b> 長期掛於火塘上方燻烤數月。</li>
+                                    <li><b>口感：</b> 煙香味極濃、質地乾硬。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-2xl overflow-hidden shadow-lg">
+                            <img src="https://images.unsplash.com/photo-1605204481354-998852332168?q=80&w=800&auto=format&fit=crop" alt="" class="w-full h-52 object-cover">
+                            <div class="p-3 bg-stone-900 text-white text-xs text-center">準備階段：選用層次分明的五花肉是成功的基礎</div>
+                        </div>
+                        <div class="bg-rose-50 p-6 rounded-2xl">
+                            <h4 class="font-bold text-rose-900 mb-4">🎬 實作教學影片</h4>
+                            <div class="space-y-2">
+                                <a href="https://www.youtube.com/results?search_query=臘肉詳細製作流程" target="_blank" class="block p-3 bg-white rounded-lg text-xs text-rose-700 hover:bg-rose-100 transition-all">📽️ 從選肉、炒鹽到醃漬：手把手教學</a>
+                                <a href="https://www.youtube.com/results?search_query=傳統廣式臘肉vs川味臘肉" target="_blank" class="block p-3 bg-white rounded-lg text-xs text-rose-700 hover:bg-rose-100 transition-all">📽️ 兩大流派風味調配秘訣</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- 古法魚乾製作分頁 (獨立出來) -->
             <section id="dried-fish" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
                 <div class="bg-cyan-700 p-6 text-white flex items-center gap-4">
@@ -1782,6 +1942,552 @@
                 </div>
             </section>
 
+            <!-- 乾香菜製作分頁 (更新品種詳解) -->
+            <section id="dried-coriander" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-emerald-800 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <h2 class="text-2xl font-bold">翠綠長存：乾香菜保存工藝</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 品種詳解：什麼是香菜？ -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-2">🌿 香菜品種鑑定指南</h3>
+                            <p class="text-gray-600">「香菜」在不同語境下指代不同植物，乾燥前請先確認您手上的品種，以便決定乾燥溫度與用途：</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- 核心種：芫荽 -->
+                            <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-200">
+                                <h4 class="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                                    🟢 芫荽 (Coriander / Cilantro)
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">學名：Coriandrum sativum</p>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>外觀：</b> 葉片圓形羽狀，根部有強烈辛香味。</li>
+                                    <li><b>特色：</b> 台灣人最熟悉的「香菜」。含有大量揮發性醛類。</li>
+                                    <li><b>乾燥建議：</b> 最適合**微波快乾**，能最大程度鎖住醛類香氣，防止變成乾草味。</li>
+                                </ul>
+                            </div>
+
+                            <!-- 歐芹 -->
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-2 flex items-center gap-2">
+                                    🟢 歐芹 / 義大利香菜 (Parsley)
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">學名：Petroselinum crispum</p>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>外觀：</b> 葉片較尖、質地較硬，分為平葉與捲葉兩類。</li>
+                                    <li><b>特色：</b> 味道較清新、帶草本感，不如芫荽強烈。</li>
+                                    <li><b>乾燥建議：</b> 適合**低溫烘烤**。乾燥後常用於西餐裝飾與濃湯提味，性質穩定。</li>
+                                </ul>
+                            </div>
+
+                            <!-- 刺芫荽 -->
+                            <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200">
+                                <h4 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                                    🟡 刺芫荽 / 墨西哥香菜 (Culantro)
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">又稱：長葉芫荽、野芫荽</p>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>外觀：</b> 葉片長條形，邊緣有細刺，質地堅韌。</li>
+                                    <li><b>特色：</b> 味道是普通芫荽的數倍濃縮，東南亞料理常用。</li>
+                                    <li><b>乾燥建議：</b> 極適合**自然風乾**，因其纖維多，乾燥後香氣依然驚人，適合燉煮。</li>
+                                </ul>
+                            </div>
+
+                            <!-- 土香菜 -->
+                            <div class="bg-emerald-50/30 p-5 rounded-2xl border border-emerald-100">
+                                <h4 class="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                                    🟢 本土細葉小香菜
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">地方栽培種</p>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>外觀：</b> 株型短小，梗細葉繁。</li>
+                                    <li><b>特色：</b> 香味極致濃烈，是製作高品質「香菜粉」的上等材料。</li>
+                                    <li><b>乾燥建議：</b> **自然陰乾**配合電風扇，能保留最翠綠的顏色與原始野香。</li>
+                                </ul>
+                            </div>
+
+                            <!-- 月桂葉 -->
+                            <div class="bg-emerald-50/30 p-5 rounded-2xl border border-emerald-100">
+                                <h4 class="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                                    🟢 月桂葉
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">又稱：香葉</p>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>外觀：</b> 香葉為樟科月桂屬小喬木植物；小枝圓，具縱紋，幼枝稍被微柔毛或近無毛；葉革質，長橢圓形或長圓狀披針形，先端尖或漸尖，基部楔形，兩面無毛，邊緣微波狀，葉柄帶紫紅色，略被微柔毛或近無毛；花序總苞片近圓形，無毛，內面被白絹毛，花序稍被微柔毛或近無毛</li>
+                                    <li><b>特色：</b> 具有獨特芳香的樹葉。新鮮採擇或脫水乾燥後的月桂葉都常作為調味應用於地中海烹飪中，例如煲湯、燜、燉、煙熏等。新鮮的月桂葉性質溫和，脫水後其香味會變得濃烈。。</li>
+                                    <li><b>乾燥建議：</b>質地厚實，精油含量高。**極度適合自然風乾**，乾燥後苦味減少、清香倍增。</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 2. 準備清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-2">📋 準備清單</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🥬 食材清單</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>新鮮香菜：</b> 建議一次準備 500g 以上 (脫水後極少)</li>
+                                    <li><b>小蘇打粉：</b> 10g (浸泡去除農藥及蟲卵)</li>
+                                    <li><b>稀釋白醋水：</b> 比例 1:50 (固色保綠)</li>
+                                    <li><b>深色貯存罐：</b> 香葉（月桂葉）尤其怕光照</li>
+                                </ul>
+                            </div>
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🛠️ 必備器材</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>蔬菜脫水轉盤：</b> (強烈建議) 移除水分愈徹底，成品愈綠</li>
+                                    <li><b>不鏽鋼細網架：</b> 防霉透氣用</li>
+                                    <li><b>深色遮光玻璃瓶：</b> 乾燥後避光儲存</li>
+                                    <li><b>棉線：</b> 適合將香葉或香菜綑紮掛曬</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 極詳細製作流程 -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-2">🛠️ 全流程工藝解析</h3>
+                        
+                        <div class="space-y-12">
+                            <!-- 步驟一 -->
+                            <div class="relative pl-8 border-l-2 border-emerald-200">
+                                <div class="absolute -left-3 top-0 w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs">1</div>
+                                <h4 class="font-bold text-lg text-emerald-900 mb-3">深度清洗與保鮮處理</h4>
+                                <div class="text-sm text-gray-700 space-y-2 bg-stone-50 p-5 rounded-xl">
+                                    <p><b>挑選：</b> 剪去根部及泛黃老葉。若欲製作高品質香菜粉，僅保留嫩葉部分。若有受傷或黑點應剔除，避免腐爛影響整批品質。</p>
+                                    <p><b>浸泡：</b> 準備一盆清水，加入一匙小蘇打粉與一匙白醋。攪拌後放入香菜浸泡 15 分鐘。小蘇打可分解脂溶性農藥，白醋則能讓葉片更鮮綠。</p>
+                                    <p><b>沖洗：</b> 用流動水輕柔沖洗二次，徹底去除土沙與蟲卵。</p>
+                                </div>
+                            </div>
+
+                            <!-- 步驟二 -->
+                            <div class="relative pl-8 border-l-2 border-emerald-200">
+                                <div class="absolute -left-3 top-0 w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs">2</div>
+                                <h4 class="font-bold text-lg text-emerald-900 mb-3">關鍵控水：脫水與修剪</h4>
+                                <div class="text-sm text-gray-700 space-y-2 bg-emerald-50/50 p-5 rounded-xl border border-emerald-100">
+                                    <p><b>物理脫水：</b> 將香菜分批放入脫水轉盤，高速旋轉直到聽不見水聲拍打。接著平舖在吸水毛巾上，靜置 20 分鐘讓表面殘餘濕氣自然蒸發。</p>
+                                    <p><b>細切：</b> 若使用烤箱或微波爐，建議將香菜切成約 2 公分的長段。**切記：切忌用力擠壓葉片，避免葉綠素滲出導致乾燥後發黑。**</p>
+                                    <p><b>修剪：</b> 芫荽切段乾燥效果好；<b>香葉（月桂葉）則建議保持完整全葉乾燥</b>，以留住內部的精油成分。</p>
+                                </div>
+                            </div>
+
+                            <!-- 步驟三 -->
+                            <div class="relative pl-8 border-l-2 border-emerald-200">
+                                <div class="absolute -left-3 top-0 w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs">3</div>
+                                <h4 class="font-bold text-lg text-emerald-900 mb-3">乾燥實作：技術三選一</h4>
+                                <div class="grid md:grid-cols-3 gap-6 mt-4">
+                                    <div class="p-5 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                                        <h5 class="font-bold text-emerald-700 mb-2">🌬️ 冷風陰乾法</h5>
+                                        <p class="text-xs text-gray-600 leading-relaxed">
+                                            適合大批量。將香菜裝入細網袋，吊掛在冷氣房或有強效除濕機的空間，配合電風扇直吹。約需 48 小時。成品色澤最接近原色。
+                                        </p>
+                                    </div>
+                                    <div class="p-5 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                                        <h5 class="font-bold text-amber-700 mb-2">🔥 低溫烘烤法</h5>
+                                        <p class="text-xs text-gray-600 leading-relaxed">
+                                            烤箱設定 55°C。平舖於網架。每 15 分鐘翻動一次，並保持烤箱門微開，讓水蒸氣逸出。約耗時 2-4 小時。
+                                        </p>
+                                    </div>
+                                    <div class="p-5 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                                        <h5 class="font-bold text-blue-700 mb-2">⚡ 微波快乾法(首推芫荽)</h5>
+                                        <p class="text-xs text-gray-600 leading-relaxed">
+                                            **速度最快**。底層鋪廚房紙巾，放上香菜，再蓋一張紙巾。強火加熱 60 秒 -> 取出散氣 -> 每次追加 20 秒直到酥脆。注意不可冒煙。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 步驟四 -->
+                            <div class="relative pl-8 border-l-2 border-emerald-200">
+                                <div class="absolute -left-3 top-0 w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs">4</div>
+                                <h4 class="font-bold text-lg text-emerald-900 mb-3">儲存與品質判定</h4>
+                                <div class="text-sm text-gray-700 bg-stone-50 p-5 rounded-xl">
+                                    <p><b>熟成指標：</b> 用手指輕搓葉片，必須發出「沙沙」聲並立即粉碎化，不可有任何韌性。香葉應維持整片完整但輕摺即斷。</p>
+                                    <p><b>入瓶：</b> 趁熱或乾燥結束立即裝入深色玻璃瓶。香葉與香菜建議分開存放。存放在避光乾燥處，可保存 6-12 個月。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體與連結 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-2xl overflow-hidden shadow-lg border border-emerald-100">
+                            <div class="h-64 bg-emerald-50 flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1588877381641-8b1b01da42a4?q=80&w=800&auto=format&fit=crop" alt="[各種香菜品種展示]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-3 bg-emerald-900 text-white text-xs text-center">分辨品種：圓葉為芫荽、尖葉多為歐芹</div>
+                        </div>
+                        <div class="bg-stone-50 p-6 rounded-2xl flex flex-col justify-center">
+                            <h4 class="font-bold text-emerald-900 mb-4">🎬 專業鑑定與製作教學</h4>
+                            <div class="space-y-3">
+                                <a href="https://www.youtube.com/results?search_query=cilantro+vs+parsley+vs+culantro" target="_blank" class="block p-3 bg-white rounded-lg shadow-sm text-sm text-emerald-700 hover:bg-emerald-100 transition-all">📽️ 國際版：如何分辨世界各地的「香菜」</a>
+                                <a href="https://www.youtube.com/results?search_query=乾香菜製作+顏色翠綠" target="_blank" class="block p-3 bg-white rounded-lg shadow-sm text-sm text-emerald-700 hover:bg-emerald-100 transition-all">📽️ 達人秘訣：保持乾香菜翠綠不發黃</a>
+                                <a href="https://www.youtube.com/results?search_query=香菜保存教學+乾燥" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-emerald-50 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">📺</span>
+                                    <div>
+                                        <p class="font-bold text-emerald-800 text-sm">完整保存方案</p>
+                                        <p class="text-xs text-gray-500">含清洗、脫水到長期存放全流程</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=how+to+dry+bay+leaves+at+home" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-emerald-50 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🍃</span>
+                                    <div>
+                                        <p class="font-bold text-emerald-800 text-sm">月桂葉乾燥專題</p>
+                                        <p class="text-xs text-gray-500">自然陰乾與保持香氣的細節</p>
+                                    </div>
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 傳統製茶分頁 (新工藝) -->
+            <section id="tea-making" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-teal-900 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22s1-4 4-4 5-4 5-4V3c0-1-1-2-2-2S7 2 7 3v15s-1 4-4 4-4 0-4 0Z"/><path d="M22 22s-1-4-4-4-5-4-5-4V3c0-1 1-2 2-2s2 1 2 2v15s1 4 4 4 4 0 4 0Z"/></svg>
+                    <h2 class="text-2xl font-bold">一片葉子的靈魂：傳統製茶工藝</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 茶葉種類說明 -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-teal-900 border-b-2 border-teal-100 pb-2">🍃 茶葉種類與發酵度</h3>
+                            <p class="text-gray-600">茶葉的種類主要取決於「發酵程度」(氧化程度)，而非茶樹品種：</p>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-green-50 p-5 rounded-2xl border border-green-200">
+                                <h4 class="font-bold text-green-900 mb-2">不發酵茶 (綠茶)</h4>
+                                <p class="text-xs text-gray-600">採摘後立即殺青，保留最多的兒茶素。代表：龍井、碧螺春。</p>
+                            </div>
+                            <div class="bg-orange-50 p-5 rounded-2xl border border-orange-200">
+                                <h4 class="font-bold text-orange-900 mb-2">部分發酵茶 (烏龍茶)</h4>
+                                <p class="text-xs text-gray-600">發酵度 15%-70%。工法最複雜，講究香氣與喉韻。代表：鐵觀音、高山茶。</p>
+                            </div>
+                            <div class="bg-red-50 p-5 rounded-2xl border border-red-200">
+                                <h4 class="font-bold text-red-900 mb-2">全發酵茶 (紅茶)</h4>
+                                <p class="text-xs text-gray-600">發酵度 100%。葉片完全氧化變紅，帶糖蜜香。代表：日月潭紅玉 (台茶18號)。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 準備清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-teal-900 border-b-2 border-teal-100 pb-2">📋 製茶清單</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🌿 原料要求</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>茶菁：</b> 採摘「一心二葉」或「一心三葉」，葉片需完整。</li>
+                                    <li><b>天氣：</b> 以晴天正午或下午採摘為佳，避開雨天及露水。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🛠️ 必備器材</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>茄藶 (竹編大盤)：</b> 萎凋與靜置用。</li>
+                                    <li><b>大炒鍋或殺青機：</b> 瞬間高溫破壞酵素活性。</li>
+                                    <li><b>揉捻布：</b> 用於團揉成型。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 製作步驟 (以半發酵烏龍茶為例) -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-teal-900 border-b-2 border-teal-100 pb-2">🛠️ 傳統製茶八大工序</h3>
+                        
+                        <div class="space-y-8">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">1. 日光萎凋 (Withering)</h4>
+                                    <p class="text-sm text-gray-700">將茶菁平鋪於陽光下，利用熱能散失水分，使細胞膜通透，引發發酵。葉片變軟、香氣初現。</p>
+                                </div>
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">2. 室內萎凋與浪菁</h4>
+                                    <p class="text-sm text-gray-700">移至室內，藉由翻動(浪菁)使葉緣摩擦破損，促進氧化並使水分分布均勻。</p>
+                                </div>
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">3. 炒青 / 殺青 (Fixing)</h4>
+                                    <p class="text-sm text-gray-700">以高溫（250-300°C）迅速破壞酵素活性，停止發酵，鎖住現有的香氣與色澤。</p>
+                                </div>
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">4. 揉捻 (Rolling)</h4>
+                                    <p class="text-sm text-gray-700">藉由外力滾壓，破壞茶葉細胞，使茶汁附著葉面，方便未來沖泡，並初步成條。</p>
+                                </div>
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">5. 團揉 (Cloth-wrap Rolling)</h4>
+                                    <p class="text-sm text-gray-700">烏龍茶特有步驟。用布巾包緊成球狀滾動，使茶葉捲曲成半球型，增加美觀與存放力。</p>
+                                </div>
+                                <div class="bg-teal-50/50 p-6 rounded-2xl border border-teal-100">
+                                    <h4 class="font-bold text-teal-900 mb-2">6. 焙火 / 乾燥 (Drying)</h4>
+                                    <p class="text-sm text-gray-700">最後的乾燥過程，去除殘餘水分，並藉由溫度進行「梅納反應」，產生焙火香。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-teal-100">
+                            <div class="h-64 bg-teal-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1544787210-282722163651?q=80&w=800&auto=format&fit=crop" alt="[製茶過程中的揉捻葉片]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-teal-950 text-white text-sm text-center">傳統製茶是一場與時間、溫度及濕度的賽跑</div>
+                        </div>
+                        <div class="bg-teal-50/30 p-8 rounded-3xl flex flex-col justify-center border border-teal-100">
+                            <h4 class="font-bold text-teal-900 mb-6 text-xl text-center">🎬 製茶工藝視覺導覽</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=台灣烏龍茶製作流程" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-teal-50 transition-all group">
+                                    <span class="text-2xl group-hover:rotate-12 transition-transform">🍵</span>
+                                    <div>
+                                        <p class="font-bold text-teal-800 text-sm">台灣烏龍茶全程紀錄</p>
+                                        <p class="text-xs text-gray-500">觀看從採摘到團揉的老師傅技法</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=紅茶製作工藝+台茶18號" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-teal-50 transition-all group">
+                                    <span class="text-2xl group-hover:rotate-12 transition-transform">🍂</span>
+                                    <div>
+                                        <p class="font-bold text-teal-800 text-sm">全發酵紅茶工法</p>
+                                        <p class="text-xs text-gray-500">了解紅茶如何透過發酵產生蜜香</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 咖啡烘焙分頁 -->
+            <section id="coffee-craft" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-stone-800 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+                    <h2 class="text-2xl font-bold">黑金工藝：從生豆到香醇咖啡</h2>
+                </div>
+                <div class="p-8 space-y-12">
+
+                    <!-- 1. 咖啡豆種類與烘焙度 -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">☕ 咖啡豆種類與烘焙等級</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-2">主流品種分類</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>阿拉比卡 (Arabica)：</b> 市佔 70%，風味細膩、帶有酸質與豐富果香，適應高海拔。</li>
+                                    <li><b>羅布斯塔 (Robusta)：</b> 咖啡因含量高，口感厚實偏苦，帶有麥香或木質調。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-2">烘焙程度指南</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>淺烘焙 (Light Roast)：</b> 呈現強烈酸質與產地花果香氣。</li>
+                                    <li><b>中烘焙 (Medium Roast)：</b> 甜感、酸質與苦味達到平衡，帶堅果巧克力調。</li>
+                                    <li><b>深烘焙 (Dark Roast)：</b> 苦感強，煙燻味顯著，幾乎無酸質。</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 2. 專業烘焙程度詳解 -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">☕ 專業烘焙程度詳解</h3>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- 淺烘焙系列 -->
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-200">
+                                <span class="text-xs font-bold bg-orange-200 text-orange-800 px-2 py-1 rounded">淺烘焙 Light</span>
+                                <h4 class="font-bold text-stone-900 mt-2">肉桂烘焙 (Cinnamon)</h4>
+                                <p class="text-xs text-gray-600 mt-1">一爆開始。色如肉桂，酸質強烈，具青草味，多用於杯測鑑定。</p>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-200">
+                                <span class="text-xs font-bold bg-orange-200 text-orange-800 px-2 py-1 rounded">淺烘焙 Light</span>
+                                <h4 class="font-bold text-stone-900 mt-2">肉焙 (Light Roast)</h4>
+                                <p class="text-xs text-gray-600 mt-1">一爆密集。酸度高但帶麥香，保留最強產地特性。適合手沖。</p>
+                            </div>
+                            <!-- 中烘焙系列 -->
+                            <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                                <span class="text-xs font-bold bg-yellow-200 text-yellow-800 px-2 py-1 rounded">中烘焙 Medium</span>
+                                <h4 class="font-bold text-stone-900 mt-2">城市烘焙 (City)</h4>
+                                <p class="text-xs text-gray-600 mt-1">一爆結束。酸甜平衡，口感柔和。一般大眾最能接受的程度。</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                                <span class="text-xs font-bold bg-yellow-200 text-yellow-800 px-2 py-1 rounded">中烘焙 Medium</span>
+                                <h4 class="font-bold text-stone-900 mt-2">深城市 (Full City)</h4>
+                                <p class="text-xs text-gray-600 mt-1">二爆開始。甜感極大化，苦味微現。適合虹吸壺或濃縮咖啡。</p>
+                            </div>
+                            <!-- 深烘焙系列 -->
+                            <div class="bg-stone-100 p-4 rounded-xl border border-stone-300">
+                                <span class="text-xs font-bold bg-stone-300 text-stone-800 px-2 py-1 rounded">深烘焙 Dark</span>
+                                <h4 class="font-bold text-stone-900 mt-2">法式烘焙 (French)</h4>
+                                <p class="text-xs text-gray-600 mt-1">二爆密集。豆表明顯出油，煙燻味、巧克力苦甜感。適作拿鐵。</p>
+                            </div>
+                            <div class="bg-stone-100 p-4 rounded-xl border border-stone-300">
+                                <span class="text-xs font-bold bg-stone-300 text-stone-800 px-2 py-1 rounded">深烘焙 Dark</span>
+                                <h4 class="font-bold text-stone-900 mt-2">義式烘焙 (Italian)</h4>
+                                <p class="text-xs text-gray-600 mt-1">二爆結束。豆身呈漆黑色。強烈焦苦感。多用於傳統義式濃縮。</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 3. 準備清單 -->
+                    <div class="space-y-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">📋 烘焙準備清單</h3>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-4">
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🌿 關鍵原料</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>精品生豆：</b> 需確認生豆含水率（約 10-12%），且色澤均勻。</li>
+                                    <li><b>新鮮度：</b> 生豆建議儲存於陰涼避光處，避免受潮發霉。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-stone-900 mb-3">🛠️ 烘焙器材</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>烘豆機或手網：</b> 初學者可用不鏽鋼手網在瓦斯爐上操作。</li>
+                                    <li><b>測溫儀：</b> 精準監控鍋溫與豆溫是成功的關鍵。</li>
+                                    <li><b>冷卻盤：</b> 具備強力抽風功能，必須在 3 分鐘內將豆溫降至室溫。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- 4. 深度解析烘焙五大階段 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">🛠️ 咖啡烘焙五大階段製作法</h3>
+                        <div class="space-y-6">
+                            <!-- 階段 1 -->
+                            <div class="relative pl-8 border-l-4 border-stone-200">
+                                <div class="absolute -left-[14px] top-0 w-6 h-6 bg-stone-800 rounded-full flex items-center justify-center text-white text-xs">1</div>
+                                <h4 class="text-xl font-bold text-stone-800">脫水期 (Drying Phase)</h4>
+                                <div class="mt-2 grid md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2 text-sm text-gray-700">
+                                        <p><b>操作方法：</b> 將生豆放入預熱至 160°C~180°C 的烘豆機。此時豆溫會迅速下降（回溫點），隨後緩慢回升。</p>
+                                        <p class="mt-2"><b>物理變化：</b> 咖啡豆從深綠轉向黃綠。目標是均勻地將豆心水分蒸發。若脫水不完全，咖啡會帶有難受的土腥味或澀感。</p>
+                                    </div>
+                                    <div class="bg-stone-50 p-3 rounded-lg border border-dashed border-stone-300">
+                                        <span class="text-xs font-bold text-stone-500">關鍵點</span>
+                                        <p class="text-xs italic">需維持穩定的火力，避免葉片邊緣燒焦（Scorching）。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 階段 2 -->
+                            <div class="relative pl-8 border-l-4 border-stone-200">
+                                <div class="absolute -left-[14px] top-0 w-6 h-6 bg-stone-800 rounded-full flex items-center justify-center text-white text-xs">2</div>
+                                <h4 class="text-xl font-bold text-stone-800">梅納反應期 (Maillard Reaction)</h4>
+                                <div class="mt-2 grid md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2 text-sm text-gray-700">
+                                        <p><b>操作方法：</b> 豆溫約達 150°C 時開始，豆身轉變為深黃或淺褐色。此階段是發展風味最重要的時期。</p>
+                                        <p class="mt-2"><b>物理變化：</b> 碳水化合物與胺基酸反應，產生數百種芳香化合物。烘焙者會在此調整火力與風門，控制反應速度，以平衡酸度與醇厚度。</p>
+                                    </div>
+                                    <div class="bg-stone-50 p-3 rounded-lg border border-dashed border-stone-300">
+                                        <span class="text-xs font-bold text-stone-500">關鍵點</span>
+                                        <p class="text-xs italic">這決定了咖啡的風味複雜度。太快則單調，太慢則乏味（Baked）。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 階段 3 -->
+                            <div class="relative pl-8 border-l-4 border-stone-200">
+                                <div class="absolute -left-[14px] top-0 w-6 h-6 bg-stone-800 rounded-full flex items-center justify-center text-white text-xs">3</div>
+                                <h4 class="text-xl font-bold text-stone-800">一爆與風味發展 (First Crack & Development)</h4>
+                                <div class="mt-2 grid md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2 text-sm text-gray-700">
+                                        <p><b>操作方法：</b> 豆溫約 190°C，內部蒸汽壓力衝破胞壁。聽到清脆響聲時，應適度降低火力，避免溫度失控失控飆升。</p>
+                                        <p class="mt-2"><b>物理變化：</b> 咖啡豆體積迅速膨脹，焦糖化反應達到頂峰。淺焙咖啡通常在一爆結束前或結束當下即完成烘焙。</p>
+                                    </div>
+                                    <div class="bg-stone-50 p-3 rounded-lg border border-dashed border-stone-300">
+                                        <span class="text-xs font-bold text-stone-500">關鍵點</span>
+                                        <p class="text-xs italic">計算「發展比」（Development Time Ratio），通常為總烘焙時間的 15-25%。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 階段 4 -->
+                            <div class="relative pl-8 border-l-4 border-stone-200">
+                                <div class="absolute -left-[14px] top-0 w-6 h-6 bg-stone-800 rounded-full flex items-center justify-center text-white text-xs">4</div>
+                                <h4 class="text-xl font-bold text-stone-800">二爆與碳化 (Second Crack)</h4>
+                                <div class="mt-2 grid md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2 text-sm text-gray-700">
+                                        <p><b>操作方法：</b> 豆溫續升至約 225°C。發出細碎如折斷樹枝的聲音。此時必須極度小心，因為豆子非常容易自燃。</p>
+                                        <p class="mt-2"><b>物理變化：</b> 木質纖維開始碳化，油脂被擠壓至表面。酸質消失殆盡，取而代之的是強烈的苦甜味與煙燻香氣。</p>
+                                    </div>
+                                    <div class="bg-stone-50 p-3 rounded-lg border border-dashed border-stone-300">
+                                        <span class="text-xs font-bold text-stone-500">關鍵點</span>
+                                        <p class="text-xs italic">二爆開始是深焙的標準，也是風味從產地特性轉向烘焙特性的轉折點。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 階段 5 -->
+                            <div class="relative pl-8 border-l-4 border-stone-200">
+                                <div class="absolute -left-[14px] top-0 w-6 h-6 bg-stone-800 rounded-full flex items-center justify-center text-white text-xs">5</div>
+                                <h4 class="text-xl font-bold text-stone-800">冷卻與養豆 (Cooling & Degassing)</h4>
+                                <div class="mt-2 grid md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2 text-sm text-gray-700">
+                                        <p><b>操作方法：</b> 出豆後必須在 3 分鐘內將溫度降至室溫。隨後放入單向透氣閥袋中靜置。</p>
+                                        <p class="mt-2"><b>物理變化：</b> 停止所有化學反應以鎖住風味。烘焙後的前 24 小時會排出大量二氧化碳，此時沖煮會有過多燥味，需養豆 3-7 天。</p>
+                                    </div>
+                                    <div class="bg-stone-50 p-3 rounded-lg border border-dashed border-stone-300">
+                                        <span class="text-xs font-bold text-stone-500">關鍵點</span>
+                                        <p class="text-xs italic">冷卻不夠快，咖啡豆會因餘熱繼續「自烘」，導致風味渾濁。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=800&auto=format&fit=crop" alt="[烘焙後的咖啡豆細節]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-stone-900 text-white text-sm text-center">烘焙火力的細微調整決定了最後杯中的風味地圖</div>
+                        </div>
+                        <div class="bg-stone-50/50 p-8 rounded-3xl flex flex-col justify-center border border-stone-100">
+                            <h4 class="font-bold text-stone-900 mb-6 text-xl text-center">🎬 烘焙技法視覺導覽</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=手網烘豆教學" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-stone-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🔥</span>
+                                    <div>
+                                        <p class="font-bold text-stone-800 text-sm">居家手網烘豆實作</p>
+                                        <p class="text-xs text-gray-500">用最簡單的工具掌握一爆的時機</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=coffee+roasting+stages+explained" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-stone-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">📖</span>
+                                    <div>
+                                        <p class="font-bold text-stone-800 text-sm">烘焙階段深度解析</p>
+                                        <p class="text-xs text-gray-500">深入了解梅納反應與焦糖化過程</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <!-- 紅糖/黑糖內容 -->
             <section id="brown-sugar" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
@@ -3226,6 +3932,770 @@
                             <li><strong>排碳增碳：</strong>熟鐵碳含量低，質軟；生鐵碳含量高，質脆。透過反覆鍛打（百鍊鋼）可以控制碳含量，產出高品質鋼材。</li>
                             <li><strong>安全防護：</strong>操作時必須穿戴厚實的麻布衣物與皮手套，防止高溫噴濺及一氧化碳中毒。</li>
                         </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 鍛鐵工藝分頁 -->
+            <section id="iron-forging" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-red-900 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path d="m10 10 4 4"/></svg>
+                    <h2 class="text-2xl font-bold">火與鋼的藝術：古法鍛鐵工藝</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 準備清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-red-900 border-b-2 border-red-100 pb-2">📋 鍛造準備清單</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                                <h4 class="font-bold text-red-900 mb-3">⚒️ 基本工具</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>鐵砧 (Anvil)：</b> 鍛造的基礎平台，需穩固安置。</li>
+                                    <li><b>鍛錘 (Hammer)：</b> 不同重量的交叉頭錘或圓頭錘。</li>
+                                    <li><b>鍛鉗 (Tongs)：</b> 用於穩固夾持高溫金屬。</li>
+                                    <li><b>鍛爐 (Forge)：</b> 煤炭爐或瓦斯爐，需具備鼓風系統。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                                <h4 class="font-bold text-red-900 mb-3">🛡️ 安全裝備</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>護目鏡/面罩：</b> 防止飛濺的火星傷害眼睛。</li>
+                                    <li><b>皮製圍裙：</b> 抵擋高溫輻射與火屑。</li>
+                                    <li><b>防燙手套：</b> 建議使用厚實的長袖皮手套。</li>
+                                    <li><b>通風系統：</b> 確保鍛造環境空氣流通。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                                <h4 class="font-bold text-red-900 mb-3">🧪 冷卻物資</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>淬火油/水：</b> 用於最終硬化處理。</li>
+                                    <li><b>硼砂 (Flux)：</b> 焊接時防止鋼材氧化的熔劑。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 鍛鐵核心流程詳解 -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">⚒️ 鍛鐵核心流程詳解</h3>
+                        
+                        <div class="space-y-10">
+                            <!-- 流程 1: 加熱與溫度判斷 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl">1</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-800">加熱與色彩觀察 (Heating & Color Reading)</h4>
+                                    <p class="text-gray-700 text-sm">鍛造的第一步是學會「讀色」。鋼材在不同溫度下呈現特定顏色：</p>
+                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                                        <div class="p-2 border-l-4 border-red-900 bg-gray-50 text-[10px]"><b>暗紅色 (約700°C)：</b> 剛達塑性，適合回火。</div>
+                                        <div class="p-2 border-l-4 border-orange-600 bg-gray-50 text-[10px]"><b>亮橙色 (約900°C)：</b> 最佳鍛造溫區，易塑形。</div>
+                                        <div class="p-2 border-l-4 border-yellow-400 bg-gray-50 text-[10px]"><b>鮮黃色 (約1100°C)：</b> 適合大型形變或焊接。</div>
+                                        <div class="p-2 border-l-4 border-black bg-gray-50 text-[10px]"><b>亮白色 (1300°C+)：</b> 危險！鋼材即將燒毀或熔化。</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 流程 2: 基礎成型技法 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl">2</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-800">基礎成型技法 (Basic Shaping)</h4>
+                                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                                        <li><b>拔長 (Drawing Out)：</b> 敲擊工件側面使其長度增加、直徑減少。應從四方形、八角形最後才敲成圓形。</li>
+                                        <li><b>墩粗 (Upsetting)：</b> 垂直敲擊工件末端，使其長度縮短、橫截面增大，常用於製作鉚釘頭或工具接頭。</li>
+                                        <li><b>平整 (Flattening)：</b> 使用平錘確保表面光滑，消除深坑。</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- 流程 3: 切割、穿孔與彎曲 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl">3</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-800">切割、穿孔與彎曲 (Manipulating)</h4>
+                                    <p class="text-gray-700 text-sm">利用鐵砧的多功能構造進行精密操作：</p>
+                                    <div class="bg-stone-50 p-4 rounded-xl text-sm border border-stone-200">
+                                        <p><b>鐵砧角 (Horn)：</b> 圓錐形構造，專用於製作平滑的圓弧與環狀物。</p>
+                                        <p class="mt-2"><b>方孔 (Hardie Hole)：</b> 插入切割刀或成型模具，利用重力與反作用力精準切斷紅熱鋼材。</p>
+                                        <p class="mt-2"><b>圓孔 (Pritchel Hole)：</b> 用於穿孔操作，讓沖頭能順利穿透工件而不損害砧面。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 流程 4: 鋼性的靈魂 - 熱處理 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl">4</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-800">熱處理與強化 (Heat Treatment)</h4>
+                                    <p class="text-gray-700 text-sm">這是決定鍛造品品質的科學階段：</p>
+                                    <div class="grid md:grid-cols-3 gap-3">
+                                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                            <p class="font-bold text-blue-900 text-xs">正火 (Normalizing)</p>
+                                            <p class="text-[11px] mt-1">加熱後空冷，細化晶粒，消除多次敲擊產生的內應力。</p>
+                                        </div>
+                                        <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                            <p class="font-bold text-red-900 text-xs">淬火 (Quenching)</p>
+                                            <p class="text-[11px] mt-1">將橙紅鋼材迅速沒入油或水。分子結構鎖定，硬度極高但易碎。</p>
+                                        </div>
+                                        <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                                            <p class="font-bold text-amber-900 text-xs">回火 (Tempering)</p>
+                                            <p class="text-[11px] mt-1">重新低溫加熱。犧牲些許硬度以換取韌性，防止斷裂。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 注意事項 -->
+                    <div class="bg-amber-50 p-6 rounded-3xl border border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            鍛造安全與核心準則
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-amber-800">
+                            <p><b>• 始終假設鐵是熱的：</b> 即使顏色變黑，金屬仍可能有數百度高溫，切勿直接觸摸。</p>
+                            <p><b>• 節奏敲擊：</b> 學習利用鍛錘的彈力，而非死力敲擊，以保護手肘與手腕。</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=800&auto=format&fit=crop" alt="[打鐵匠在敲擊通紅的鐵塊]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-red-950 text-white text-sm text-center">鋼鐵在千度高溫下如黏土般柔軟，關鍵在於溫度的精準捕捉</div>
+                        </div>
+                        <div class="bg-red-50/50 p-8 rounded-3xl flex flex-col justify-center border border-red-100">
+                            <h4 class="font-bold text-red-900 mb-6 text-xl text-center">🎬 鍛造技法視覺導覽</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=blacksmithing+for+beginners" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-red-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🔨</span>
+                                    <div>
+                                        <p class="font-bold text-red-800 text-sm">初學者打鐵入門教學</p>
+                                        <p class="text-xs text-gray-500">從火爐搭建到基礎敲擊技巧</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=forging+a+knife+start+to+finish" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-red-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">⚔️</span>
+                                    <div>
+                                        <p class="font-bold text-red-800 text-sm">手工鍛造刀具全紀錄</p>
+                                        <p class="text-xs text-gray-500">見證一塊廢鐵如何轉化為鋒利刃具</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 獸皮鞣製工藝分頁 (新工藝) -->
+            <section id="hide-tanning" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <div class="bg-amber-950 p-6 text-white flex items-center gap-4">
+                    <div class="p-3 bg-white/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">獸皮鞣製：荒野中的防腐與軟化工藝</h2>
+                        <p class="text-amber-200 text-sm">解密原始防腐機制，將生皮轉化為傳世毛皮的物理化學過程</p>
+                    </div>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 準備清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-amber-100 pb-2">📋 鞣製準備清單</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-amber-50/50 p-6 rounded-2xl border-l-4 border-amber-800">
+                                <h4 class="font-bold text-amber-950 mb-2 italic">A. Raw Hide 原料與環境</h4>
+                                <ul class="text-xs space-y-2 text-gray-700">
+                                    <li><span class="font-bold">生獸皮：</span> 羊皮、兔皮或鹿皮（確保無嚴重刀傷）。</li>
+                                    <li><span class="font-bold">大量粗鹽：</span> 用於初期脫水防腐（生皮重的 100%）。</li>
+                                    <li><span class="font-bold">低溫通風環境：</span> 避免細菌在溫熱潮濕環境下迅速繁殖。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50/50 p-6 rounded-2xl border-l-4 border-amber-800">
+                                <h4 class="font-bold text-amber-950 mb-2 italic">B. Tools 物理加工器材</h4>
+                                <ul class="text-xs space-y-2 text-gray-700">
+                                    <li><span class="font-bold">刮肉梁 (Fleshing Beam)：</span> 傾斜的半圓滑木座。</li>
+                                    <li><span class="font-bold">刮肉刀 (Fleshing Knife)：</span> 鈍刃雙手刀，用於推除脂肪與結締組織。</li>
+                                    <li><span class="font-bold">拉伸框架 (Stretching Frame)：</span> 繩索與大型木框，用於繃緊生皮。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50/50 p-6 rounded-2xl border-l-4 border-amber-800">
+                                <h4 class="font-bold text-amber-950 mb-2 italic">C. Agents 鞣劑選擇 (二選一)</h4>
+                                <ul class="text-xs space-y-2 text-gray-700">
+                                    <li><span class="font-bold">1. 古法腦鞣液：</span> 動物腦髓與溫水乳化（富含卵磷脂，親水性油脂）。</li>
+                                    <li><span class="font-bold">2. 鋁礬熟皮粉：</span> 藥用明礬（硫酸鋁鉀）與無碘鹽以 1:1 混合。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 製作流程 -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-amber-100 pb-2 flex items-center gap-3">
+                            <span class="bg-amber-950 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-serif">SOP</span>
+                            古法/礦物獸皮鞣製標準工序
+                        </h3>
+                        
+                        <div class="relative space-y-12 before:content-[''] before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-amber-100">
+                            
+                            <!-- 階段一 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-amber-950 rounded-xl flex items-center justify-center text-amber-950 font-black z-10">01</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-amber-950">生皮鹽漬與去肉 (Salting & Fleshing)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">耗時：24-48 小時</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        生皮剝下後必須立刻平鋪，在肉面撒上厚厚一層粗鹽，拉出水分，抑止細菌生長。
+                                        <br><span class="text-amber-900 font-medium">● 精密去肉：</span>將鹽漬後的獸皮搭在刮肉梁上，使用刮肉刀將殘留的紅色肌肉、白色脂肪和滑膩的內膜徹底刮除。<b>此步是成敗關鍵，任何殘留脂肪都會導致皮革腐爛、產生惡臭。</b>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段二 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-amber-950 rounded-xl flex items-center justify-center text-amber-950 font-black z-10">02</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-amber-950">清洗、浸泡與去鹼 (Washing & Neutralizing)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">耗時：12-24 小時</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        若要保留毛皮（帶毛鞣製），需用溫和的肥皂水清洗毛髮中的髒污與油脂；若不留毛，則需將生皮浸泡於石灰乳或木灰水中數日，使毛孔舒張，再用力刮除全毛（Unhairing）。
+                                        <br><span class="text-amber-900 font-medium">● 徹底脫鹽：</span>在清水中反覆漂洗，直至擠壓出的水分呈清澈無粘性，確保後續鞣劑能順利滲入纖維。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段三 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-amber-950 rounded-xl flex items-center justify-center text-amber-950 font-black z-10">03</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-amber-950">化學防腐：浸鞣處理 (Tanning Bath)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">關鍵：化學鏈結穩定</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        此步驟旨在使膠原蛋白結構不再互相黏連、且不再受潮腐爛。
+                                        <br><span class="text-amber-900 font-medium">● 鋁礬鞣製：</span>將明礬與鹽溶於溫水中，將皮浸入，每日翻動兩次，薄皮（如兔皮）需 3-5 天，厚皮（如鹿皮）需 7 天以上，直至皮心切面呈現完全的乳白色。
+                                        <br><span class="text-amber-900 font-medium">● 古法腦鞣/蛋黃鞣：</span>將乳化後的腦髓或蛋黃油均勻塗抹在微濕的皮面上，反覆搓揉，使其完全吸收。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段四 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-amber-950 rounded-xl flex items-center justify-center text-amber-950 font-black z-10">04</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-amber-950">物理軟化：動態拉伸 (Stretching & Softening)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">難度最高：體力與時機</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        鞣製完成後的皮料如果直接放乾，纖維會緊縮黏合，變成像紙板一樣硬挺。
+                                        <br><span class="text-amber-900 font-medium">● 纖維阻斷：</span>在皮革從濕漸乾的過程中，必須將其架在繃架上，或用繩索、鈍木棒的邊緣，反覆在皮面拉扯、揉搓、朝不同方向拉伸。<b>此過程必須持續到皮革完全乾燥為止。</b>纖維斷裂後，皮革會呈現驚人的柔軟度（如法蘭絨般）。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段五 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-amber-950 rounded-xl flex items-center justify-center text-amber-950 font-black z-10">05</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-amber-950">古法煙燻防水 (Smoking - 腦鞣法專用)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">耗時：2-4 小時</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        明礬鞣製的皮革不能下水（下水會變硬退鞣）。若要皮革可洗滌，需進行煙燻。
+                                        <br><span class="text-amber-900 font-medium">● 防水機制：</span>將皮革縫成袋狀，套在燃燒著「腐木（無火有煙）」的煙囪上。木煙中的焦油與酚類物質會包裹皮纖維，使其濕水後乾燥依然保持柔軟，同時具有天然的防蟲防霉效果。
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 3. 注意事項 -->
+                    <div class="bg-amber-950 rounded-3xl p-8 text-white">
+                        <div class="flex items-center gap-4 mb-6">
+                            <span class="text-2xl">⚠️</span>
+                            <h4 class="text-xl font-bold">鞣製禁忌與安全維護</h4>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 text-sm">
+                            <div class="space-y-3">
+                                <h5 class="text-amber-300 font-bold border-b border-amber-800 pb-1 uppercase tracking-wider">安全與衛生防護</h5>
+                                <ul class="space-y-2 list-disc list-inside text-amber-100/80">
+                                    <li><span class="text-white">防範人畜共通傳染病：</span>生鮮獸皮可能攜帶人畜共通的細菌（如炭疽桿菌）。去肉與清洗時必須全程配戴厚橡膠手套，嚴禁雙手有傷口接觸。</li>
+                                    <li><span class="text-white">化學安全：</span>使用明礬及鹽調配鞣液時，避免吸入粉塵；廢液處理需稀釋排放。</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-3">
+                                <h5 class="text-amber-300 font-bold border-b border-amber-800 pb-1 uppercase tracking-wider">工藝細節管理</h5>
+                                <ul class="space-y-2 list-disc list-inside text-amber-100/80">
+                                    <li><span class="text-white">禁中途放棄軟化：</span>一旦皮革在未拉伸的情況下變乾，將無法挽回，必須重新打濕、重新拉伸。</li>
+                                    <li><span class="text-white">控溫防脫毛：</span>清洗與鞣製過程中，水溫絕對不能超過 35°C。高溫會使生皮中的膠原蛋白變性（煮熟），導致嚴重脫毛且皮質碎裂。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體與連結 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center relative group">
+                                <img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?q=80&w=800&auto=format&fit=crop" alt="[獸皮鞣製室外軟化工序]" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                                    <p class="text-white text-xs">軟化拉伸：利用身體重心反覆在金屬索或鈍木上摩擦皮背</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50/30 p-8 rounded-3xl flex flex-col justify-center border border-amber-100">
+                            <h4 class="font-bold text-amber-950 mb-6 text-xl text-center">🎬 獸皮鞣製視聽與研究</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=brain+tanning+hide+process" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-amber-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🧠</span>
+                                    <div>
+                                        <p class="font-bold text-amber-950 text-sm">原始腦鞣法 (Brain Tanning)</p>
+                                        <p class="text-xs text-gray-500">深入了解原住民利用卵磷脂與煙燻的古老技術</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=how+to+tan+sheepskin+alum" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-amber-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🐑</span>
+                                    <div>
+                                        <p class="font-bold text-amber-950 text-sm">居家鋁礬羊皮鞣製 (Alum Tanning)</p>
+                                        <p class="text-xs text-gray-500">現代最適合新手的低氣味帶毛鞣製示範</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 皮革製作分頁 -->
+            <section id="leather-craft" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-amber-800 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <h2 class="text-2xl font-bold">溫潤皮革：手工皮件製作工藝</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 準備清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-amber-900 border-b-2 border-amber-100 pb-2">📋 皮革製作準備清單</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                <h4 class="font-bold text-amber-900 mb-3">🧶 基礎皮料</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>植鞣革 (Veg-Tan)：</b> 最適手工鍛造，質地堅硬，可雕刻上色。</li>
+                                    <li><b>鉻鞣革：</b> 柔軟多彩，適合製作手袋衣物。</li>
+                                    <li><b>床面處理劑：</b> 用於壓平皮革背面的纖維。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                <h4 class="font-bold text-amber-900 mb-3">🔪 裁切與打孔</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>裁皮刀/美工刀：</b> 需保持極度鋒利。</li>
+                                    <li><b>菱斬 (Pricking Iron)：</b> 用於打出整齊的縫線孔。</li>
+                                    <li><b>木槌/膠槌：</b> 敲擊菱斬時保護工具。</li>
+                                    <li><b>切割墊：</b> 保護桌面並增加裁切穩定度。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                <h4 class="font-bold text-amber-900 mb-3">🪡 縫製與封邊</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>蠟線：</b> 強韌且耐磨的專用線。</li>
+                                    <li><b>皮革針：</b> 針頭圓鈍，專為已打孔的皮革設計。</li>
+                                    <li><b>磨邊棒：</b> 用於摩擦邊緣產生光澤。</li>
+                                    <li><b>邊油/蜂蠟：</b> 密封邊緣增加美感與防水。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 優化後的製作流程 -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">🎨 職人級皮革製作工序</h3>
+                        
+                        <div class="space-y-10">
+                            <!-- 流程 1 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-amber-700 rounded-full flex items-center justify-center text-white font-bold text-xl">1</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-amber-800">精準開料與纖維處理 (Cutting & Bedding)</h4>
+                                    <p class="text-gray-700 text-sm">依版型避開皮革生長紋或傷疤。裁切時利用身體重心下壓，確保厚皮切面不歪斜。隨後在背面塗抹床面劑，以玻璃板順著纖維方向強力刮壓，使其光亮不掉屑。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 2 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-amber-700 rounded-full flex items-center justify-center text-white font-bold text-xl">2</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-amber-800">邊線標記與精密打孔 (Marking & Pricking)</h4>
+                                    <p class="text-gray-700 text-sm">使用間距規在邊緣劃出平行的定位線（通常為 3-4mm）。將菱斬垂直對準線跡，以膠槌輕快擊打。重點在於保持斬身垂直，否則背面孔洞會偏離。 </p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 3 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-amber-700 rounded-full flex items-center justify-center text-white font-bold text-xl">3</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-amber-800">雙針馬鞍縫製 (Saddle Stitching)</h4>
+                                    <p class="text-gray-700 text-sm">取線長約為縫合長度的 4 倍。雙針同時穿過孔洞交叉，形成「8」字型環繞。每一針拉緊後，線頭必須壓在同側，才能產出整齊傾斜的歐式波浪線跡。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 4 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-amber-700 rounded-full flex items-center justify-center text-white font-bold text-xl">4</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-amber-800">多層次打磨封邊 (Burnishing)</h4>
+                                    <p class="text-gray-700 text-sm">這是區分業餘與專業的分水嶺。修平邊緣後，先以粗砂紙磨去高低差，再上處理劑配合磨邊棒快速摩擦。此過程重複 3-5 次，直到邊緣呈現如玉石般的半透明光澤。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 5 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-amber-700 rounded-full flex items-center justify-center text-white font-bold text-xl">5</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-amber-800">油脂保養與定型 (Conditioning)</h4>
+                                    <p class="text-gray-700 text-sm">作品完工後，均勻塗抹一層高級牛腳油或貂油，讓皮革吸收養分。這能使色澤加深，並形成一層基礎防潑水膜。隨後進行最終定型與五金安裝。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 注意事項 -->
+                    <div class="bg-red-50 p-6 rounded-3xl border border-red-200">
+                        <h4 class="font-bold text-red-900 mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            製作注意事項
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-red-800">
+                            <p><b>• 刀具安全：</b> 皮革裁切需要力量，若刀片不夠鋒利極易滑脫。務必隨時折斷鈍損的刀尖。</p>
+                            <p><b>• 遠離酒精：</b> 手上若有酒精殘留（如乾洗手），切勿觸碰植鞣革，否則會留下永久的白斑。</p>
+                            <p><b>• 保存環境：</b> 皮件製作過程中應避免陽光直射，以免未上油前發生皮革乾裂。 </p>
+                            <p><b>• 黏劑氣味：</b> 膠水含有機溶劑，應在通風良好的環境下使用。</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1524292332623-3a5a75ffe4e9?q=80&w=800&auto=format&fit=crop" alt="[手工皮革製作工具近照]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-amber-900 text-white text-sm text-center">皮革會隨著時間留下使用者的痕跡，這正是其魅力所在</div>
+                        </div>
+                        <div class="bg-amber-50/50 p-8 rounded-3xl flex flex-col justify-center border border-amber-100">
+                            <h4 class="font-bold text-amber-900 mb-6 text-xl text-center">🎬 皮革工藝視覺導覽</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=leather+craft+for+beginners" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-amber-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">📐</span>
+                                    <div>
+                                        <p class="font-bold text-amber-800 text-sm">皮革製作入門基礎</p>
+                                        <p class="text-xs text-gray-500">從裁切到打孔的完整基本動作教學</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=saddle+stitch+leather" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-amber-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🪡</span>
+                                    <div>
+                                        <p class="font-bold text-amber-800 text-sm">馬鞍縫法深度示範</p>
+                                        <p class="text-xs text-gray-500">掌握雙針縫製出絕美線跡的秘訣</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 漆藝製作分頁 -->
+            <section id="lacquer-craft" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-red-950 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    <h2 class="text-2xl font-bold">永恆之光：大漆髹飾工藝</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 漆藝來源與準備 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-red-950 border-b-2 border-red-100 pb-2">🪵 漆材來源與工具準備</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-red-950 mb-3">🌳 取漆木材：漆樹</h4>
+                                <p class="text-sm text-gray-700 leading-relaxed">
+                                    大漆取自<b>漆樹</b>的韌皮部分泌液。古語云「百里採一斤」，採漆工需在三更半夜割開樹皮。漆樹多分布於高海拔溫帶山區。
+                                </p>
+                            </div>
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-red-950 mb-3">🧪 調漆資材</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>生漆 (Raw Lacquer)：</b> 未加工之乳白色原液。</li>
+                                    <li><b>熟漆：</b> 經攪拌脫水後的透明漆。</li>
+                                    <li><b>入色粉：</b> 朱砂（紅）、松煙（黑）等礦植物顏料。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                                <h4 class="font-bold text-red-950 mb-3">🖌️ 專用工具</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>漆刷：</b> 使用人髮製成，彈性適中。</li>
+                                    <li><b>牛角刀：</b> 調漆與刮灰的專用刮刀。</li>
+                                    <li><b>蔭房 (In-bo)：</b> 恆溫恆濕的乾燥空間。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 漆藝製作流程 -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-stone-100 pb-2">🎨 漆藝核心製作流程</h3>
+                        
+                        <div class="space-y-10">
+                            <!-- 流程 1 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-900 rounded-full flex items-center justify-center text-white font-bold text-xl">1</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-900">胎骨製作與灰底工序 (Priming)</h4>
+                                    <p class="text-gray-700 text-sm">漆藝需有支撐物（如木、布、脫胎）。先在胎骨上塗生漆並貼麻布（防開裂），隨後反覆刮塗「大、中、細」三層漆灰（生漆混和磚粉），每層需待乾後精細打磨。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 2 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-900 rounded-full flex items-center justify-center text-white font-bold text-xl">2</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-900">層層髹塗 (Lacquer Coating)</h4>
+                                    <p class="text-gray-700 text-sm">這是最耗時的過程。每一層漆液必須極薄、極均。髹塗後須送入蔭房（濕度 75% 以上），利用「漆酶」催化氧化。一件精品漆器往往需髹塗數十層甚至上百層。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 3 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-900 rounded-full flex items-center justify-center text-white font-bold text-xl">3</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-900">裝飾工藝 (Decorating)</h4>
+                                    <p class="text-gray-700 text-sm">在最後幾層漆未乾時，進行<b>螺鈿</b>（鑲嵌貝殼）、<b>描金</b>（泥金噴繪）或<b>剔紅</b>（在厚漆層上雕刻圖案）等複雜技法。</p>
+                                </div>
+                            </div>
+
+                            <!-- 流程 4 -->
+                            <div class="flex flex-col md:flex-row gap-6 items-start">
+                                <div class="flex-shrink-0 w-12 h-12 bg-red-900 rounded-full flex items-center justify-center text-white font-bold text-xl">4</div>
+                                <div class="flex-grow space-y-3">
+                                    <h4 class="text-xl font-bold text-red-900">推光與蹭亮 (Polishing)</h4>
+                                    <p class="text-gray-700 text-sm">使用極細的木炭、瓦粉打磨，最後用人手蘸取植物油配合極細粉末在漆面反覆摩擦，直到出現深邃的、如同靜止水面般的「寶光」。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 注意事項 -->
+                    <div class="bg-red-50 p-6 rounded-3xl border border-red-200">
+                        <h4 class="font-bold text-red-900 mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            漆藝安全與環境準則
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-red-800">
+                            <p><b>• 嚴防漆過敏：</b> 生漆含有「漆酚」，觸碰皮膚極易引發強烈紅腫搔癢（咬人漆）。初學者必須全程佩戴手套。</p>
+                            <p><b>• 濕度是乾的關鍵：</b> 大漆與普通油漆不同，它「喜濕畏乾」。環境濕度低於 65% 時，漆液將永遠不會乾燥變硬。</p>
+                            <p><b>• 無塵作業：</b> 髹漆時一粒微小的灰塵落入，都會在鏡面效果上留下永久瑕疵。 </p>
+                            <p><b>• 避光存放：</b> 強烈的紫外線會破壞漆膜分子，導致漆面老化龜裂。</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=800&auto=format&fit=crop" alt="[漆器表面光澤近照]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-red-950 text-white text-sm text-center">大漆之美在於其內斂而深邃的光澤，歷經千年而不腐</div>
+                        </div>
+                        <div class="bg-red-50/50 p-8 rounded-3xl flex flex-col justify-center border border-red-100">
+                            <h4 class="font-bold text-red-900 mb-6 text-xl text-center">🎬 漆藝工藝視覺導覽</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=Traditional+Lacquerware+making" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-red-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🏺</span>
+                                    <div>
+                                        <p class="font-bold text-red-950 text-sm">古法脫胎漆器全過程</p>
+                                        <p class="text-xs text-gray-500">了解從木胎到極致磨光的神奇轉化</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=gathering+raw+lacquer+from+tree" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-red-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🌲</span>
+                                    <div>
+                                        <p class="font-bold text-red-950 text-sm">入山採漆：大漆的誕生</p>
+                                        <p class="text-xs text-gray-500">見證採漆工如何在深夜提取森林的眼淚</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 染衣工藝分頁 -->
+            <section id="dyeing-craft" class="tab-content bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden active">
+                <div class="bg-indigo-900 p-6 text-white flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <h2 class="text-2xl font-bold">草木染：採擷自然的色彩</h2>
+                </div>
+
+                <div class="p-8 space-y-12">
+                    <!-- 1. 染料來源與清單 -->
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-indigo-950 border-b-2 border-indigo-100 pb-2">🌿 取色植物與資材清單</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                                <h4 class="font-bold text-indigo-900 mb-3">🎨 常用取色植物</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>藍色系：</b> 板藍根、木藍（用於靛藍染）。</li>
+                                    <li><b>紅色系：</b> 蘇木、茜草、紅花。</li>
+                                    <li><b>黃色系：</b> 梔子果實、槐花、黃檗。</li>
+                                    <li><b>棕黑色：</b> 柿漆、五倍子、橡實殼。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                                <h4 class="font-bold text-indigo-900 mb-3">🧪 媒染劑與助劑</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>明礬：</b> 最常用的媒染劑，維持原色。</li>
+                                    <li><b>青礬（鐵漿）：</b> 讓色彩轉為深沉與灰黑色系。</li>
+                                    <li><b>石灰水：</b> 用於藍染還原過程中的酸鹼調合。</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                                <h4 class="font-bold text-indigo-900 mb-3">🧺 專業設備</h4>
+                                <ul class="text-sm space-y-2 text-gray-700">
+                                    <li><b>不鏽鋼大鍋：</b> 用於萃取色素與熱染。</li>
+                                    <li><b>木棒：</b> 攪拌織物，確保染色均勻。</li>
+                                    <li><b>天然織物：</b> 必須是純棉、麻、絲或羊毛。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 優化製作流程：職人標準化作業 (SOP) -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-bold text-stone-900 border-b-2 border-indigo-100 pb-2 flex items-center gap-3">
+                            <span class="bg-indigo-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-serif">SOP</span>
+                            職人級標準染製工序
+                        </h3>
+                        
+                        <div class="relative space-y-12 before:content-[''] before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-indigo-100">
+                            
+                            <!-- 階段一：前置纖維改性 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-indigo-900 rounded-xl flex items-center justify-center text-indigo-900 font-black z-10">01</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-indigo-950">纖維改性與精煉 (Fiber Preparation)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-indigo-100 text-indigo-700 rounded">耗時：2-4 小時</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        植物纖維（棉、麻）缺乏蛋白質，色素難以固著。
+                                        <br><span class="text-indigo-800 font-medium">● 豆漿浸泡：</span>將洗淨的乾布浸入淡豆漿中 20 分鐘，取出陰乾。此過程讓纖維包裹一層蛋白質，模擬絲綢結構，顯色度可提升 40% 以上。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段二：染料動態萃取 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-indigo-900 rounded-xl flex items-center justify-center text-indigo-900 font-black z-10">02</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-indigo-950">多階梯度萃取 (Graded Extraction)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-indigo-100 text-indigo-700 rounded">耗時：1.5 小時</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        嚴格控管<span class="text-indigo-800 font-medium">「浴比」</span>（布重與水的比例，建議 1:30）。
+                                        <br><span class="text-indigo-800 font-medium">● 煎煮：</span>植物入鍋加水，升溫至 90°C 持續 40 分鐘。濾出頭汁後加水進行二染萃取。將兩次濾液混合，作為最終染浴。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段三：核心浸染控制 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-indigo-900 rounded-xl flex items-center justify-center text-indigo-900 font-black z-10">03</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-indigo-950">恆溫攪拌浸染 (Immersion Dyeing)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-indigo-100 text-indigo-700 rounded">關鍵：溫度與流動性</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        布料需<span class="text-indigo-800 font-medium">充分濕潤</span>後擰乾入缸。
+                                        <br><span class="text-indigo-800 font-medium">● 均染秘訣：</span>必須不斷翻動布料，防止色素沈澱造成「雲斑」。對於動物纖維（絲、毛），溫度控制在 60-70°C 為佳，過熱會導致纖維失去彈性；棉麻則可至 80-90°C 以利滲透。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 階段四：化學固色媒染 -->
+                            <div class="relative pl-16">
+                                <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-indigo-900 rounded-xl flex items-center justify-center text-indigo-900 font-black z-10">04</div>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-indigo-950">同步媒染與安定 (Mordanting)</h4>
+                                        <span class="text-xs font-medium px-2 py-1 bg-indigo-100 text-indigo-700 rounded">耗時：20-30 分鐘</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        將稀釋後的媒染劑加入染缸（或另闢媒染缸）。
+                                        <br><span class="text-indigo-800 font-medium">● 色調微調：</span>加入明礬顏色鮮亮；加入鐵水顏色轉深灰。此步驟透過金屬離子架橋作用，使色素與纖維形成穩定的螯合鍵結，提高耐洗牢度。
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 3. 注意事項 -->
+                    <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-200">
+                        <h4 class="font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            染衣核心注意事項
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-indigo-800">
+                            <p><b>• 織物材質限制：</b> 聚酯纖維等合成纖維無法吸收草木色素。必須選用純天然材質。</p>
+                            <p><b>• 避免陽光直射：</b> 天然染料易光解。完成後的衣物務必陰乾，否則色彩會出現不均勻褪色。</p>
+                            <p><b>• 溫度控制：</b> 絲綢與羊毛忌高溫煮染，否則纖維會受損變硬；棉麻則需較高溫以利滲透。 </p>
+                            <p><b>• 浴比原則：</b> 水量必須充足（通常為布重的 20-30 倍），讓布料能完全舒展翻動，否則會產生摺痕色斑。</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 媒體資源區 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+                            <div class="h-64 bg-stone-50 flex flex-col items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1590736962236-470a6c0b58e9?q=80&w=800&auto=format&fit=crop" alt="[曬製藍染織物的場景]" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4 bg-indigo-950 text-white text-sm text-center">古法染製的魅力，在於每一件衣物都有其獨特的色彩靈魂</div>
+                        </div>
+                        <div class="bg-indigo-50/50 p-8 rounded-3xl flex flex-col justify-center border border-indigo-100">
+                            <h4 class="font-bold text-indigo-900 mb-6 text-xl text-center">🎬 草木染教學視覺資源</h4>
+                            <div class="space-y-4">
+                                <a href="https://www.youtube.com/results?search_query=Natural+Dyeing+Tutorial+Indigo" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-indigo-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🌿</span>
+                                    <div>
+                                        <p class="font-bold text-indigo-950 text-sm">靛藍染：氧化還原的藝術</p>
+                                        <p class="text-xs text-gray-500">學習如何照顧一缸有生命的藍染液</p>
+                                    </div>
+                                </a>
+                                <a href="https://www.youtube.com/results?search_query=Traditional+plant+dyeing+process" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:bg-indigo-100 transition-all group">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🎨</span>
+                                    <div>
+                                        <p class="font-bold text-indigo-950 text-sm">五彩草木染：全流程解析</p>
+                                        <p class="text-xs text-gray-500">從採集植物到最終成品的完整紀實</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
