@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私房料理筆記閣</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Noto Serif TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Google Identity Services (GIS) for Google Drive OAuth -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        serif: ['Noto Serif TC', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fdf8f5',
+                            100: '#fbeee6',
+                            200: '#f5d5c3',
+                            500: '#e07a5f',
+                            600: '#ce6346',
+                            700: '#ab4a31',
+                            900: '#3d1c13',
+                        },
+                        accent: {
+                            50: '#f4f9f4',
+                            500: '#81b29a',
+                            600: '#62937a',
+                        },
+                        sand: {
+                            100: '#f4f1de',
+                            200: '#ebdcb9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-brand-50 min-h-screen font-sans text-gray-800 antialiased flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-brand-100 sticky top-0 z-40 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="backToDashboard()">
+                    <div class="bg-gradient-to-br from-brand-500 to-brand-700 p-2.5 rounded-2xl shadow-md flex items-center justify-center text-white">
+                        <i class="fa-solid fa-utensils text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold font-serif text-brand-900 tracking-wide">私房料理筆記閣</h1>
+                        <p class="text-xs text-brand-500 font-medium">記錄專屬你的掌廚美味與香氣</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <!-- Google Drive Sync Status Button -->
+                    <button id="gd-nav-status" onclick="openGdConfigModal()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100/80 transition duration-150">
+                        <i class="fa-brands fa-google-drive mr-1.5 text-sm"></i>
+                        <span>Google 備份設定</span>
+                    </button>
+                    <!-- Status / Cloud Sync Status -->
+                    <span id="sync-status" class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
+                        已連接本地儲存
+                    </span>
+                    <!-- Main CTA -->
+                    <button onclick="openRecipeForm()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm shadow-sm transition duration-150 flex items-center gap-2 transform hover:scale-[1.02]">
+                        <i class="fa-solid fa-plus text-xs"></i> 新增食譜
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Dashboard View (Shown by default) -->
+        <div id="dashboard-view" class="space-y-8 animate-fade-in">
+            <!-- Hero and AI Helper Intro -->
+            <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Abstract Food BG Elements -->
+                <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-12 translate-x-12">
+                    <i class="fa-solid fa-wheat-awn text-[240px]"></i>
+                </div>
+                
+                <div class="max-w-xl z-10">
+                    <span class="bg-brand-600/50 backdrop-blur-sm text-brand-100 text-xs px-3 py-1 rounded-full font-medium tracking-wider uppercase">AI 廚藝顧問助手已就緒</span>
+                    <h2 class="text-2xl md:text-3xl font-bold font-serif tracking-tight mt-3 text-brand-100">
+                        今天想研發或記錄什麼新料理？
+                    </h2>
+                    <p class="text-brand-100/80 text-sm mt-2 leading-relaxed">
+                        你可以自訂輸入料理步驟與配方。當靈感不足時，還可直接請 AI 協助一鍵生成「完整製作步驟」與「美味食物插圖」！
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3 z-10 w-full md:w-auto">
+                    <button onclick="openAIAssistantModal()" class="bg-white hover:bg-brand-50 text-brand-900 px-4 py-3 rounded-2xl text-sm font-semibold shadow-md transition duration-150 flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
+                        <i class="fa-solid fa-wand-magic-sparkles text-brand-500"></i> AI 幫我發想食譜
+                    </button>
+                    <button onclick="openRecipeForm()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-3 rounded-2xl text-sm font-semibold shadow-md transition duration-150 flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
+                        <i class="fa-solid fa-pen-to-square"></i> 手動記錄私房菜
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search, Category Quick Filters, Stats -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Left Sidebar Filters -->
+                <div class="space-y-6 lg:col-span-1">
+                    <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                            分類過濾
+                        </h3>
+                        <div id="category-filter-list" class="flex flex-wrap lg:flex-col gap-2">
+                            <!-- Categories rendered dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm space-y-3">
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                            廚房小檔案
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4 pt-1">
+                            <div class="bg-brand-50 p-3 rounded-xl text-center">
+                                <span class="block text-2xl font-bold text-brand-700" id="total-recipes-count">0</span>
+                                <span class="text-xs text-gray-500 font-medium">道私房菜餚</span>
+                            </div>
+                            <div class="bg-accent-50 p-3 rounded-xl text-center">
+                                <span class="block text-2xl font-bold text-accent-600" id="total-steps-count">0</span>
+                                <span class="text-xs text-gray-500 font-medium">累積紀錄步驟</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Recipe Cards Listing -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Search Input Box -->
+                    <div class="relative shadow-sm rounded-2xl">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <input type="text" id="recipe-search" oninput="handleSearch()" class="block w-full pl-11 pr-24 py-4 bg-white border border-brand-100 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm placeholder-gray-400 transition" placeholder="搜尋料理名稱、食材或分類標籤...">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span class="text-xs text-gray-400 font-medium hidden sm:inline-block px-2 py-1 bg-gray-50 border rounded-lg">Ctrl + K</span>
+                        </div>
+                    </div>
+
+                    <!-- Recipes Grid -->
+                    <div id="recipes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Dynamic Cards Rendered Here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 px-4 bg-white rounded-3xl border border-dashed border-brand-200 text-center">
+                        <div class="bg-brand-50 p-6 rounded-full mb-4">
+                            <i class="fa-solid fa-book-open text-brand-200 text-4xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">還沒有紀錄任何私房料理喔</h3>
+                        <p class="text-gray-500 text-sm max-w-sm mt-1">立刻點選右上方「新增食譜」或使用「AI 發想食譜」來寫下你引以為傲的家傳美味吧！</p>
+                        <button onclick="openRecipeForm()" class="mt-4 bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-xl text-sm font-semibold transition">
+                            立刻手動新增
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Detail Viewer -->
+        <div id="recipe-detail-view" class="hidden space-y-6 animate-fade-in">
+            <!-- Back navigation header -->
+            <div class="flex items-center justify-between">
+                <button onclick="backToDashboard()" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:text-brand-900 transition">
+                    <i class="fa-solid fa-arrow-left-long"></i> 返回料理閣首頁
+                </button>
+                <div class="flex items-center space-x-2" id="detail-actions">
+                    <!-- Rendered Dynamically (Edit/Delete Buttons) -->
+                </div>
+            </div>
+
+            <!-- Detail Sheet Container -->
+            <div id="recipe-detail-content" class="bg-white rounded-3xl border border-brand-100 shadow-lg overflow-hidden">
+                <!-- Banner Image Cover -->
+                <div class="h-64 md:h-96 w-full relative bg-gray-100">
+                    <img id="detail-cover-img" class="w-full h-full object-cover" src="https://placehold.co/1200x600/ce6346/ffffff?text=Private+Recipe" alt="Recipe Cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end">
+                        <div class="p-6 md:p-8 text-white w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                            <div>
+                                <span id="detail-category" class="bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full tracking-wide"></span>
+                                <h1 id="detail-title" class="text-3xl md:text-4xl font-black font-serif mt-2 tracking-wide drop-shadow-md"></h1>
+                                <p id="detail-desc" class="text-gray-200 text-sm md:text-base mt-2 max-w-2xl drop-shadow"></p>
+                            </div>
+                            <div class="flex gap-4 text-xs font-semibold bg-black/40 backdrop-blur-md p-3.5 rounded-2xl shrink-0 border border-white/10">
+                                <div class="text-center">
+                                    <span class="block text-brand-200 text-lg font-bold" id="detail-time">--</span>
+                                    <span class="text-gray-300">製作時長</span>
+                                </div>
+                                <div class="w-[1px] bg-white/20"></div>
+                                <div class="text-center">
+                                    <span class="block text-brand-200 text-lg font-bold" id="detail-ingredients-count">0</span>
+                                    <span class="text-gray-300">食材種類</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two columns Layout for Recipe Details -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-brand-100">
+                    <!-- Left Sidebar: Ingredients and tools list -->
+                    <div class="p-6 md:p-8 space-y-6 lg:col-span-1 bg-brand-50/30">
+                        <div>
+                            <h3 class="text-lg font-bold font-serif text-brand-900 border-b pb-3 border-brand-200 flex items-center justify-between">
+                                <span><i class="fa-solid fa-carrot text-brand-500 mr-2"></i>準備食材</span>
+                                <span class="text-xs text-gray-500 font-normal">勾選輔助備料</span>
+                            </h3>
+                            <ul id="detail-ingredients-list" class="mt-4 space-y-3.5">
+                                <!-- Dynamically added checked-off list -->
+                            </ul>
+                        </div>
+
+                        <div id="detail-notes-container" class="bg-brand-100/40 p-5 rounded-2xl border border-brand-200/50">
+                            <h4 class="text-sm font-bold text-brand-900 uppercase tracking-wide flex items-center">
+                                <i class="fa-solid fa-circle-exclamation text-brand-600 mr-1.5"></i> 獨家小撇步 & 注意事項
+                            </h4>
+                            <p id="detail-notes" class="text-sm text-gray-700 leading-relaxed mt-2 italic font-serif">
+                                <!-- Dynamic Note text -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Step-by-step visual workflow -->
+                    <div class="p-6 md:p-8 lg:col-span-2 space-y-6 bg-white">
+                        <h3 class="text-xl font-bold font-serif text-brand-900 border-b pb-3 border-brand-100">
+                            <i class="fa-solid fa-list-ol text-brand-500 mr-2"></i> 製作步驟與流程
+                        </h3>
+                        
+                        <!-- Timeline steps list -->
+                        <div id="detail-steps-timeline" class="space-y-8 relative before:absolute before:inset-y-0 before:left-4 before:w-[2px] before:bg-brand-100">
+                            <!-- Dynamic steps populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add / Edit Recipe Form Sheet -->
+        <div id="recipe-form-view" class="hidden space-y-6 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <button onclick="backToDashboard()" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
+                    <i class="fa-solid fa-xmark"></i> 放棄並返回
+                </button>
+                <h2 id="form-view-title" class="text-2xl font-bold font-serif text-brand-900">
+                    撰寫新私房料理食譜
+                </h2>
+                <div>
+                    <button onclick="saveRecipe()" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> 儲存食譜
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form Content container -->
+            <div class="bg-white rounded-3xl border border-brand-100 shadow-xl overflow-hidden p-6 md:p-8 space-y-8">
+                
+                <!-- Quick AI Assist Button Inside Form -->
+                <div class="bg-accent-50/50 rounded-2xl p-4 border border-accent-600/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <div class="bg-accent-500 text-white p-2.5 rounded-xl mt-0.5 shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-accent-600">靈感產生器</h4>
+                            <p class="text-xs text-gray-500">懶得手動輸入？只要提供菜名，讓 AI 立刻幫你草擬出完整步驟及食材！</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openAIAssistantModal()" class="bg-accent-600 hover:bg-accent-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shrink-0">
+                        開啟 AI 食譜助理
+                    </button>
+                </div>
+
+                <!-- Basic Meta Info -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">料理名稱 <span class="text-red-500">*</span></label>
+                        <input type="text" id="form-title" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 transition" placeholder="例如：香煎極脆皮焦糖鴨胸">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">料理分類 <span class="text-red-500">*</span></label>
+                        <select id="form-category" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 transition bg-white">
+                            <option value="家常主菜">家常主菜</option>
+                            <option value="慢燉香煲">慢燉香煲</option>
+                            <option value="手作甜點">手作甜點</option>
+                            <option value="烘焙麵包">烘焙麵包</option>
+                            <option value="發酵熟成">發酵熟成</option>
+                            <option value="開胃冷盤">開胃冷盤</option>
+                            <option value="湯品燉補">湯品燉補</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">一句短評描述料理</label>
+                        <input type="text" id="form-desc" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 transition" placeholder="例如：脆亮表皮與紅寶石般的內質，佐以自製橙香醬。">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">預計製作時長</label>
+                        <input type="text" id="form-time" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 transition" placeholder="例如：45 分鐘">
+                    </div>
+                </div>
+
+                <!-- Ingredients Selection Area -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between border-b pb-2 border-brand-100">
+                        <h3 class="text-lg font-bold font-serif text-brand-900 flex items-center">
+                            <i class="fa-solid fa-basket-shopping text-brand-500 mr-2"></i> 食材準備清單
+                        </h3>
+                        <button type="button" onclick="addIngredientRow('', '')" class="text-xs bg-brand-100 hover:bg-brand-200 text-brand-700 px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> 新增食材欄
+                        </button>
+                    </div>
+                    <div id="form-ingredients-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Ingredient rows rendered here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Recipe Steps Dynamic Area -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between border-b pb-2 border-brand-100">
+                        <h3 class="text-lg font-bold font-serif text-brand-900 flex items-center">
+                            <i class="fa-solid fa-stairs text-brand-500 mr-2"></i> 料理步驟設定
+                        </h3>
+                        <button type="button" onclick="addStepCard('', '')" class="text-xs bg-brand-100 hover:bg-brand-200 text-brand-700 px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> 增加下一個步驟
+                        </button>
+                    </div>
+                    <div id="form-steps-list" class="space-y-4">
+                        <!-- Steps cards rendered here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Chef's Secret Note Area -->
+                <div class="space-y-2 border-t pt-6 border-brand-100">
+                    <label class="block text-sm font-bold text-gray-700 flex items-center">
+                        <i class="fa-solid fa-key text-brand-500 mr-1.5"></i> 注意事項 / 主廚特別叮嚀
+                    </label>
+                    <textarea id="form-notes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 transition" placeholder="例如：鴨肉下鍋前一定要在鴨皮上劃菱格紋（不要劃到肉），冷鍋入火慢慢逼出鴨油才能做出超脆皮口感。"></textarea>
+                </div>
+
+                <!-- Big Bottom Save CTA -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-brand-100">
+                    <button type="button" onclick="backToDashboard()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition">
+                        取消編輯
+                    </button>
+                    <button type="button" onclick="saveRecipe()" class="bg-brand-600 hover:bg-brand-700 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition">
+                        儲存此道私房料理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI ASSISTANT MODAL (Draft Recipe text Generator) -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl border border-brand-100 transform scale-95 transition-transform duration-300" id="ai-modal-panel">
+            <div class="bg-gradient-to-r from-accent-600 to-brand-700 p-6 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-xl">
+                        <i class="fa-solid fa-wand-magic-sparkles text-lg animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold font-serif">Gemini 智慧廚藝助理</h3>
+                        <p class="text-xs text-white/80">輸入菜名，AI 自動幫你起草精緻美味的食譜架構</p>
+                    </div>
+                </div>
+                <button onclick="closeAIAssistantModal()" class="text-white/80 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-gray-700">你想做什麼好料？</label>
+                    <input type="text" id="ai-prompt-input" class="w-full px-4 py-3.5 border border-brand-100 rounded-xl focus:ring-accent-500 focus:border-accent-500 transition" placeholder="例如：經典紅酒燉牛肉 / 抹茶舒芙蕾鬆餅...">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-gray-700">料理風格設定 (選填)</label>
+                    <input type="text" id="ai-style-input" class="w-full px-4 py-3.5 border border-brand-100 rounded-xl focus:ring-accent-500 focus:border-accent-500 transition" placeholder="例如：法式正統、減脂少油版、極速快炒版、10人份份量...">
+                </div>
+                
+                <div id="ai-generation-loader" class="hidden flex-col items-center justify-center py-6">
+                    <div class="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+                    <p class="text-sm font-medium text-brand-700 mt-4 animate-pulse">主廚智囊團正在秘密研發中... 預估約 5-8 秒...</p>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4 border-t">
+                    <button onclick="closeAIAssistantModal()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition">
+                        取消
+                    </button>
+                    <button onclick="triggerAIRecipeDraft()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-sm transition flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-paper-plane"></i> 開始發想
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GOOGLE DRIVE CONFIG MODAL -->
+    <div id="gd-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-brand-100 transform scale-95 transition-transform duration-300" id="gd-modal-panel">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-xl">
+                        <i class="fa-brands fa-google-drive text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold font-serif">Google Drive 雲端備份</h3>
+                        <p class="text-xs text-white/80">將食譜以料理名稱開頭格式自動儲存至雲端</p>
+                    </div>
+                </div>
+                <button onclick="closeGdConfigModal()" class="text-white/80 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-gray-700">步驟 1：填寫 Google Oauth Client ID (選填)</label>
+                    <p class="text-[11px] text-gray-400 leading-normal">
+                        因 Google 安全條例限制，如欲自動將資料一鍵拋轉儲存至 Google 雲端硬碟，建議建立您個人的 Client ID。
+                    </p>
+                    <input type="text" id="gd-client-id-input" class="w-full px-3 py-2 border border-brand-100 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-xs transition" placeholder="例如: xxxxxx.apps.googleusercontent.com">
+                    <a href="https://console.cloud.google.com/" target="_blank" class="text-[10px] text-blue-600 hover:underline block text-right">
+                        <i class="fa-solid fa-circle-question mr-0.5"></i> 前往 Google Cloud Console 申請
+                    </a>
+                </div>
+                
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200/70 text-left space-y-1.5">
+                    <span class="block text-xs font-bold text-amber-900 flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 排除 400: origin_mismatch 錯誤
+                    </span>
+                    <p class="text-[11px] text-amber-800 leading-normal">
+                        請複製下方您目前的網域，並貼至您 Google Console 的<strong>「已授權的 JavaScript 來源」</strong>列表中，然後按下儲存。
+                    </p>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="detected-origin-input" readonly class="flex-grow px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg text-xs font-mono text-gray-700" value="">
+                        <button type="button" onclick="copyDetectedOrigin()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0">
+                            複製來源
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4 space-y-3">
+                    <label class="block text-xs font-bold text-gray-700">步驟 2：與 Google 雲端帳戶取得連線</label>
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200/60 flex items-center justify-between">
+                        <div id="gd-status-text" class="text-xs text-gray-500 font-medium">
+                            <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>尚未連線
+                        </div>
+                        <button onclick="initGoogleDriveAuth()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-link mr-1"></i>授權登入
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 space-y-2">
+                    <h4 class="text-xs font-bold text-blue-800 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info"></i> 💡 免設定超速方案
+                    </h4>
+                    <p class="text-[11px] text-blue-700/80 leading-relaxed">
+                        如果您不想花時間申請 Client ID，請不用擔心！在每道料理的「詳細頁」中，點選「<strong>匯出文字檔</strong>」，系統會立刻下載檔名格式完全符合（以料理名稱開頭）的 <code>.md</code> 文字食譜。您直接將該檔案<strong>手動拖曳</strong>丟進 Google 雲端硬碟中儲存也是完全一樣的喔！
+                    </p>
+                </div>
+
+                <div class="flex gap-2.5 justify-end pt-2 border-t">
+                    <button onclick="closeGdConfigModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs transition">
+                        關閉
+                    </button>
+                    <button onclick="saveGdClientId()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition shadow-sm">
+                        儲存 Client ID 設定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI IMAGE GENERATION LOADER / DIALOG -->
+    <div id="image-ai-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto text-2xl animate-bounce">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h3 class="text-lg font-bold font-serif text-brand-900">Imagen 4.0 正在精緻繪製中...</h3>
+            <p class="text-xs text-gray-500 leading-relaxed">
+                AI 正在根據你的步驟文字，生成最寫實、誘人的食物插畫！這需要一點時間，請稍候。
+            </p>
+            <div class="flex justify-center py-2">
+                <div class="flex space-x-1.5">
+                    <div class="w-2.5 h-2.5 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                    <div class="w-2.5 h-2.5 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                    <div class="w-2.5 h-2.5 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Custom Notification Toast -->
+    <div id="notification-toast" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 bg-gray-900 text-white px-5 py-4 rounded-2xl shadow-xl max-w-sm">
+        <div id="toast-icon-wrapper" class="p-1 rounded-full text-white text-lg shrink-0">
+            <!-- Dynamic icon -->
+        </div>
+        <div>
+            <p id="toast-text" class="text-sm font-semibold"></p>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (No alert!) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-4 transform scale-95 transition-transform duration-300" id="confirm-modal-panel">
+            <h3 class="text-lg font-bold font-serif text-gray-900" id="confirm-title">確認執行此操作？</h3>
+            <p class="text-sm text-gray-500 leading-relaxed" id="confirm-message">此操作無法復原，請確認是否繼續。</p>
+            <div class="flex gap-3 justify-end pt-2">
+                <button onclick="closeConfirmModal(false)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition">
+                    取消
+                </button>
+                <button id="confirm-action-btn" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold transition shadow-sm">
+                    確認刪除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-brand-900 text-brand-200/50 text-center py-6 mt-12 border-t border-brand-900 text-xs font-medium space-y-1 bg-gradient-to-b from-brand-900 to-black">
+        <p class="text-brand-200/80">© 2026 私房料理筆記閣 · 匠心掌勺味永存</p>
+        <p>結合 Gemini AI 智慧技術 · 探索極致的美食風味</p>
+    </footer>
+
+    <!-- Script module starts -->
+    <script type="module">
+        // Import Firebase Functions safely
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for recipe storage and UI state
+        let recipes = [];
+        let currentRecipeId = null;
+        let selectedCategoryFilter = '全部';
+        
+        // Google Drive API configuration state
+        let gdToken = sessionStorage.getItem('gd_access_token') || null;
+        let gdClientId = localStorage.getItem('gd_client_id') || '1019129007520-qlo3j0jshe844tmj21ttnunk1uvcg5da.apps.googleusercontent.com';
+
+        // Firebase Auth state & instances
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let appId = 'default-recipe-id';
+        let isCloudDbEnabled = false;
+
+        // Default local fallback key
+        const LOCAL_STORAGE_KEY = 'secret_recipes_list';
+
+        // Pre-populate dummy recipes to make the initial interface beautiful immediately!
+        const DEFAULT_PRESET_RECIPES = [
+            {
+                id: 'taiwanese-braised-pork',
+                title: '經典手切琥珀滷肉飯',
+                category: '慢燉香煲',
+                desc: '傳承外婆的香氣秘方。滷汁黏口滑順，肥而不膩，粒粒紅蔥頭香氣撲鼻。',
+                prepTime: '90 分鐘',
+                ingredients: [
+                    { name: '帶皮五花肉', amount: '1000g' },
+                    { name: '紅蔥頭', amount: '150g' },
+                    { name: '冰糖', amount: '40g' },
+                    { name: '醬油', amount: '150ml' },
+                    { name: '紹興酒', amount: '100ml' },
+                    { name: '八角', amount: '2顆' },
+                    { name: '五香粉', amount: '1茶匙' }
+                ],
+                steps: [
+                    {
+                        desc: '將帶皮五花肉稍微冷凍以便定型，隨後切成長條狀（手切約 0.8 cm 寬度最佳，比絞肉更有口感）。紅蔥頭切片備用。',
+                        image: ''
+                    },
+                    {
+                        desc: '起油鍋，中火將紅蔥頭片炸至金黃酥脆，撈出瀝乾，這便是「紅蔥酥」。原鍋逼出多餘油脂，加入五花肉條慢火煸炒至微焦。',
+                        image: ''
+                    }
+                ],
+                notes: '起鍋前15分鐘要把剩餘的红蔥酥撒入，可以維持滷汁的多層次紅蔥香！',
+                createdAt: Date.now() - 36000000
+            }
+        ];
+
+        // Highly efficient client-side image compression utility
+        function compressBase64Image(base64Str, maxDim = 400, quality = 0.5) {
+            return new Promise((resolve) => {
+                if (!base64Str || !base64Str.startsWith('data:image')) {
+                    resolve(base64Str);
+                    return;
+                }
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        } else {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compress to JPG with medium quality (reduces standard 1MB photos to ~10-25KB!)
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = function() {
+                    resolve(base64Str);
+                };
+                img.src = base64Str;
+            });
+        }
+
+        // Set up the cloud database integration if config is available
+        async function setupDatabase() {
+            try {
+                // Parse potential environment injected global variables safely
+                const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+                const injectedAppId = typeof __app_id !== 'undefined' ? __app_id : 'secret-recipes-app';
+                const customAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                
+                appId = injectedAppId;
+
+                if (firebaseConfigStr) {
+                    const firebaseConfig = JSON.parse(firebaseConfigStr);
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    // Priority Authentication (RULE 3)
+                    let userCredential;
+                    if (customAuthToken) {
+                        userCredential = await signInWithCustomToken(auth, customAuthToken);
+                    } else {
+                        userCredential = await signInAnonymously(auth);
+                    }
+                    
+                    if (userCredential && auth.currentUser) {
+                        userId = auth.currentUser.uid;
+                        isCloudDbEnabled = true;
+                        
+                        document.getElementById('sync-status').innerHTML = `
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
+                            雲端資料庫已連線 (ID: ${userId.substring(0, 6)})
+                        `;
+                        
+                        // Load data from cloud
+                        await loadRecipesFromCloud();
+                    }
+                } else {
+                    console.log("No Firebase config detected, reverting to localStorage fallback mode.");
+                    loadLocalRecipes();
+                }
+            } catch (err) {
+                console.error("Failed to initialize Cloud DB:", err);
+                showNotification("連線雲端失敗，已自動啟用本地保險庫存檔模式。", "warning");
+                loadLocalRecipes();
+            }
+        }
+
+        // Load Recipes from Cloud Firestore
+        async function loadRecipesFromCloud() {
+            if (!isCloudDbEnabled || !userId) return;
+            try {
+                // Rule 1: STRICT PATHS
+                const colRef = collection(db, 'artifacts', appId, 'users', userId, 'recipes');
+                
+                // Rule 2: NO COMPLEX QUERIES - Simple fetch all then we filter in JavaScript memory
+                const querySnapshot = await getDocs(colRef);
+                const cloudRecipes = [];
+                querySnapshot.forEach((doc) => {
+                    cloudRecipes.push({ id: doc.id, ...doc.data() });
+                });
+                
+                if (cloudRecipes.length > 0) {
+                    recipes = cloudRecipes;
+                } else {
+                    // Seed defaults if fresh cloud user
+                    recipes = [...DEFAULT_PRESET_RECIPES];
+                    for (const rec of recipes) {
+                        await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'recipes', rec.id), rec);
+                    }
+                }
+                renderDashboard();
+            } catch (error) {
+                console.error("Error reading cloud data:", error);
+                showNotification("讀取雲端食譜失敗，切換為本地預備庫。", "error");
+                loadLocalRecipes();
+            }
+        }
+
+        // Fallback Local Storage Loading
+        function loadLocalRecipes() {
+            const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (data) {
+                try {
+                    recipes = JSON.parse(data);
+                } catch (e) {
+                    recipes = [...DEFAULT_PRESET_RECIPES];
+                }
+            } else {
+                recipes = [...DEFAULT_PRESET_RECIPES];
+                saveLocalRecipes();
+            }
+            renderDashboard();
+        }
+
+        // Save data to Cloud / Local
+        async function persistRecipe(recipe) {
+            // DEEP CLEAN & SANITIZE the object (Fixes: Property array contains an invalid nested entity in Firestore)
+            // Strips custom prototypes, classes, undefined, and non-serializable fields before sending to Firestore
+            const sanitizedRecipe = JSON.parse(JSON.stringify(recipe, (key, value) => {
+                if (value === undefined) return "";
+                return value;
+            }));
+
+            if (isCloudDbEnabled && userId) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'recipes', sanitizedRecipe.id);
+                    await setDoc(docRef, sanitizedRecipe);
+                } catch (err) {
+                    console.error("Cloud saving failed:", err);
+                    showNotification("雲端資料同步遭遇異常，將先保存在瀏覽器本地。", "warning");
+                }
+            }
+            
+            // Local fallback & update memory cache
+            const idx = recipes.findIndex(r => r.id === sanitizedRecipe.id);
+            if (idx !== -1) {
+                recipes[idx] = sanitizedRecipe;
+            } else {
+                recipes.push(sanitizedRecipe);
+            }
+            saveLocalRecipes();
+            return true;
+        }
+
+        // Robust LocalStorage saver with memory degradation path (Fixes: QuotaExceededError)
+        function saveLocalRecipes() {
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(recipes));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    console.warn("LocalStorage space exceeded! Attempting to degrade and save textual data only.");
+                    
+                    // CRITICAL FALLBACK PATH: Keep all structured data, but strip extremely heavy base64 step images from local cache.
+                    // This allows the app to continue functioning beautifully while saving all text recipes safely.
+                    const degradedRecipes = recipes.map(r => ({
+                        ...r,
+                        steps: r.steps ? r.steps.map(s => ({ 
+                            ...s, 
+                            image: s.image ? '(圖片過大已被本地卸載，建議雲端備份)' : '' 
+                        })) : []
+                    }));
+                    
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(degradedRecipes));
+                        showNotification("瀏覽器暫存空間已滿！食譜文字已安全儲存，但步驟圖片已卸載，請連線 Google 雲端進行完整備份！", "warning");
+                    } catch (innerErr) {
+                        console.error("Degraded save also failed:", innerErr);
+                        showNotification("瀏覽器儲存庫已滿，請刪除部分不需要的食譜以釋出空間。", "error");
+                    }
+                } else {
+                    console.error("Failed to save local recipes:", e);
+                }
+            }
+        }
+
+        async function deleteRecipeFromStore(id) {
+            if (isCloudDbEnabled && userId) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'recipes', id);
+                    await deleteDoc(docRef);
+                } catch (err) {
+                    console.error("Cloud deleting failed:", err);
+                }
+            }
+            
+            recipes = recipes.filter(r => r.id !== id);
+            saveLocalRecipes();
+            renderDashboard();
+        }
+
+        // Render Dashboard Lists and Filters
+        function renderDashboard() {
+            const grid = document.getElementById('recipes-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Generate dynamic lists of categories present in recipes
+            const baseCategories = ["全部", "家常主菜", "慢燉香煲", "手作甜點", "烘焙麵包", "發酵熟成", "開胃冷盤", "湯品燉補"];
+            const categoryFilterContainer = document.getElementById('category-filter-list');
+            categoryFilterContainer.innerHTML = '';
+            
+            baseCategories.forEach(cat => {
+                const count = cat === '全部' ? recipes.length : recipes.filter(r => r.category === cat).length;
+                const isActive = selectedCategoryFilter === cat;
+                
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => {
+                    selectedCategoryFilter = cat;
+                    renderDashboard();
+                };
+                
+                btn.className = `flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition duration-150 flex-grow lg:flex-grow-0 cursor-pointer ${
+                    isActive 
+                    ? 'bg-brand-600 text-white shadow-sm' 
+                    : 'bg-brand-50/50 hover:bg-brand-100/50 text-gray-700 hover:text-brand-900'
+                }`;
+                btn.innerHTML = `
+                    <span>${cat}</span>
+                    <span class="ml-2 px-1.5 py-0.5 rounded-full text-[10px] ${isActive ? 'bg-brand-700/60 text-white' : 'bg-gray-200 text-gray-600'}">${count}</span>
+                `;
+                categoryFilterContainer.appendChild(btn);
+            });
+
+            // Update stats counter
+            document.getElementById('total-recipes-count').innerText = recipes.length;
+            const stepSum = recipes.reduce((acc, curr) => acc + (curr.steps ? curr.steps.length : 0), 0);
+            document.getElementById('total-steps-count').innerText = stepSum;
+
+            // Search query filtering
+            const searchVal = document.getElementById('recipe-search').value.toLowerCase().trim();
+            const filteredRecipes = recipes.filter(r => {
+                const matchesCategory = selectedCategoryFilter === '全部' || r.category === selectedCategoryFilter;
+                const matchesSearch = !searchVal || 
+                    r.title.toLowerCase().includes(searchVal) || 
+                    (r.desc && r.desc.toLowerCase().includes(searchVal)) ||
+                    r.ingredients.some(i => i.name.toLowerCase().includes(searchVal)) ||
+                    (r.category && r.category.toLowerCase().includes(searchVal));
+                return matchesCategory && matchesSearch;
+            });
+
+            // Populate Grid Cards
+            grid.innerHTML = '';
+            if (filteredRecipes.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+                
+                filteredRecipes.forEach(recipe => {
+                    const firstStepImg = recipe.steps && recipe.steps.length > 0 && recipe.steps[0].image ? recipe.steps[0].image : '';
+                    const defaultImg = firstStepImg || `https://placehold.co/600x400/ce6346/ffffff?text=${encodeURIComponent(recipe.title)}`;
+                    
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden hover:shadow-md transition duration-200 cursor-pointer flex flex-col h-full";
+                    card.onclick = () => showRecipeDetail(recipe.id);
+                    
+                    card.innerHTML = `
+                        <div class="h-48 w-full relative bg-gray-100 overflow-hidden">
+                            <img class="w-full h-full object-cover transform hover:scale-105 transition duration-500" src="${defaultImg}" alt="${recipe.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/ce6346/ffffff?text=Delicious+Meal';">
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-bold text-brand-700 shadow-sm">
+                                ${recipe.category}
+                            </div>
+                            <div class="absolute bottom-3 right-3 bg-brand-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-semibold text-brand-100 shadow-sm">
+                                <i class="fa-solid fa-clock mr-1"></i>${recipe.prepTime || '家常'}
+                            </div>
+                        </div>
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                            <div class="space-y-1.5">
+                                <h4 class="text-lg font-bold font-serif text-gray-900 line-clamp-1">${recipe.title}</h4>
+                                <p class="text-xs text-gray-500 line-clamp-2">${recipe.desc || '暫無料理描述小記'}</p>
+                            </div>
+                            <div class="mt-4 pt-3.5 border-t border-brand-50 flex items-center justify-between text-xs text-brand-600 font-semibold">
+                                <span>${recipe.ingredients ? recipe.ingredients.length : 0} 種備料食材</span>
+                                <span class="hover:underline">看步驟作法 <i class="fa-solid fa-angle-right ml-0.5"></i></span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // Search trigger
+        window.handleSearch = function() {
+            renderDashboard();
+        }
+
+        // Nav back to dashboard
+        window.backToDashboard = function() {
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('recipe-detail-view').classList.add('hidden');
+            document.getElementById('recipe-form-view').classList.add('hidden');
+            renderDashboard();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show detailed card for cooking
+        window.showRecipeDetail = function(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            currentRecipeId = id;
+
+            // Header Elements
+            const titleEl = document.getElementById('detail-title');
+            const catEl = document.getElementById('detail-category');
+            const descEl = document.getElementById('detail-desc');
+            const timeEl = document.getElementById('detail-time');
+            const ingCountEl = document.getElementById('detail-ingredients-count');
+            const coverImg = document.getElementById('detail-cover-img');
+            const notesText = document.getElementById('detail-notes');
+            const notesBox = document.getElementById('detail-notes-container');
+
+            titleEl.innerText = recipe.title;
+            catEl.innerText = recipe.category;
+            descEl.innerText = recipe.desc || '無描述';
+            timeEl.innerText = recipe.prepTime || '適中';
+            ingCountEl.innerText = recipe.ingredients ? recipe.ingredients.length : 0;
+            
+            // Choose image
+            const firstStepImg = recipe.steps && recipe.steps.length > 0 && recipe.steps[0].image ? recipe.steps[0].image : '';
+            const defaultImg = firstStepImg || `https://placehold.co/1200x600/ce6346/ffffff?text=${encodeURIComponent(recipe.title)}`;
+            coverImg.src = defaultImg;
+
+            // Notes
+            if (recipe.notes && recipe.notes.trim()) {
+                notesText.innerText = recipe.notes;
+                notesBox.classList.remove('hidden');
+            } else {
+                notesBox.classList.add('hidden');
+            }
+
+            // Setup Ingredients Checkoff List
+            const ingList = document.getElementById('detail-ingredients-list');
+            ingList.innerHTML = '';
+            if (recipe.ingredients && recipe.ingredients.length > 0) {
+                recipe.ingredients.forEach((ing, index) => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-center space-x-3 cursor-pointer group";
+                    const checkId = `ing-check-${index}`;
+                    
+                    li.innerHTML = `
+                        <input type="checkbox" id="${checkId}" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-gray-300 cursor-pointer accent-brand-600">
+                        <label for="${checkId}" class="text-sm font-medium text-gray-700 cursor-pointer flex-grow select-none group-hover:text-brand-900 transition flex justify-between">
+                            <span>${ing.name}</span>
+                            <span class="text-gray-400 text-xs font-normal">${ing.amount || '適量'}</span>
+                        </label>
+                    `;
+                    ingList.appendChild(li);
+                });
+            } else {
+                ingList.innerHTML = `<li class="text-xs text-gray-400 italic">本食譜尚未設定任何食材。</li>`;
+            }
+
+            // Render Timeline Steps
+            const stepsTimeline = document.getElementById('detail-steps-timeline');
+            stepsTimeline.innerHTML = '';
+            if (recipe.steps && recipe.steps.length > 0) {
+                recipe.steps.forEach((step, index) => {
+                    const stepCard = document.createElement('div');
+                    stepCard.className = "relative pl-10 group";
+                    
+                    const stepImgMarkup = step.image 
+                        ? `<div class="mt-4 rounded-2xl overflow-hidden border border-brand-100 max-w-lg bg-gray-50 aspect-video">
+                            <img class="w-full h-full object-cover shadow-sm cursor-zoom-in" src="${step.image}" alt="步驟 ${index + 1}" onclick="viewStepImageFullScreen('${step.image}')">
+                           </div>`
+                        : '';
+
+                    stepCard.innerHTML = `
+                        <!-- Step circle label -->
+                        <span class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-brand-100 group-hover:bg-brand-200 text-brand-700 font-bold text-sm flex items-center justify-center border border-brand-200 transition">
+                            ${index + 1}
+                        </span>
+                        <div>
+                            <p class="text-sm md:text-base text-gray-700 leading-relaxed font-medium">
+                                ${step.desc}
+                            </p>
+                            ${stepImgMarkup}
+                        </div>
+                    `;
+                    stepsTimeline.appendChild(stepCard);
+                });
+            } else {
+                stepsTimeline.innerHTML = `<p class="text-sm text-gray-400 italic pl-4">這份私密食譜尚未設定任何步驟，快點擊上方編輯新增步驟吧！</p>`;
+            }
+
+            // Action Buttons (Including Direct download and Google Drive Backup triggers)
+            const actionsDiv = document.getElementById('detail-actions');
+            actionsDiv.innerHTML = `
+                <button onclick="saveToGoogleDrive('${recipe.id}')" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-semibold text-xs transition flex items-center gap-1">
+                    <i class="fa-brands fa-google-drive"></i> 存至 Google Drive
+                </button>
+                <button onclick="downloadAsFile('${recipe.id}')" class="p-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl font-semibold text-xs transition flex items-center gap-1">
+                    <i class="fa-solid fa-download"></i> 匯出文字檔
+                </button>
+                <button onclick="editCurrentRecipe()" class="p-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl font-semibold text-xs transition flex items-center gap-1">
+                    <i class="fa-solid fa-pen-to-square"></i> 編輯食譜
+                </button>
+                <button onclick="confirmDeleteCurrentRecipe()" class="p-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold text-xs transition flex items-center gap-1">
+                    <i class="fa-solid fa-trash-can"></i> 刪除
+                </button>
+            `;
+
+            // Display Detail Frame
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('recipe-form-view').classList.add('hidden');
+            document.getElementById('recipe-detail-view').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Generate clean markdown contents of the recipe (fully embed images as base64 inside the file!)
+        function generateRecipeMarkdown(recipe) {
+            let md = `# ${recipe.title}\n\n`;
+            md += `* **料理分類**: ${recipe.category || '未分類'}\n`;
+            md += `* **製作時長**: ${recipe.prepTime || '未註明'}\n`;
+            md += `* **建立日期**: ${new Date(recipe.createdAt).toLocaleDateString('zh-TW')}\n\n`;
+            
+            md += `## 料理短評描述\n`;
+            md += `> ${recipe.desc || '暫無描述。'}\n\n`;
+            
+            md += `## 準備食材清單\n`;
+            if (recipe.ingredients && recipe.ingredients.length > 0) {
+                recipe.ingredients.forEach(i => {
+                    md += `- [ ] ${i.name}：${i.amount || '適量'}\n`;
+                });
+            } else {
+                md += `*(無食材)*\n`;
+            }
+            md += `\n`;
+
+            md += `## 料理製作步驟\n`;
+            if (recipe.steps && recipe.steps.length > 0) {
+                recipe.steps.forEach((s, idx) => {
+                    md += `### 步驟 ${idx + 1}\n`;
+                    md += `${s.desc}\n\n`;
+                    if (s.image) {
+                        md += `![步驟 ${idx + 1}](${s.image})\n\n`;
+                    }
+                });
+            } else {
+                md += `*(無步驟步驟)*\n`;
+            }
+            
+            if (recipe.notes) {
+                md += `## 主廚特別叮嚀 & 注意事項\n`;
+                md += `> ${recipe.notes}\n`;
+            }
+            return md;
+        }
+
+        // Save dynamically as markdown file starting with recipe title
+        window.downloadAsFile = function(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            const mdContent = generateRecipeMarkdown(recipe);
+            const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+            
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${recipe.title}_私房料理食譜.md`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`食譜「${recipe.title}」文字檔下載成功！您可以直接將它丟進 Google 雲端硬碟中。`, "success");
+        }
+
+        // Google Drive direct API save
+        window.saveToGoogleDrive = async function(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            if (!gdToken) {
+                showNotification("請先點選右上角『Google 備份設定』來連結您的帳戶！", "warning");
+                openGdConfigModal();
+                return;
+            }
+
+            showNotification("正在上傳至 Google 雲端硬碟...", "info");
+
+            const mdContent = generateRecipeMarkdown(recipe);
+            const fileName = `${recipe.title}_私房料理食譜.md`;
+
+            // Google Drive Multipart API upload structure
+            const metadata = {
+                name: fileName,
+                mimeType: 'text/markdown'
+            };
+
+            const boundary = 'foo_bar_baz_kitchen';
+            const delimiter = `\r\n--${boundary}\r\n`;
+            const closeDelimiter = `\r\n--${boundary}--`;
+
+            const multipartRequestBody =
+                delimiter +
+                'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                JSON.stringify(metadata) +
+                delimiter +
+                'Content-Type: text/markdown; charset=UTF-8\r\n\r\n' +
+                mdContent +
+                closeDelimiter;
+
+            try {
+                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${gdToken}`,
+                        'Content-Type': `multipart/related; boundary=${boundary}`
+                    },
+                    body: multipartRequestBody
+                });
+
+                if (response.ok) {
+                    showNotification(`已成功存入雲端硬碟！檔名為「${fileName}」`, "success");
+                } else if (response.status === 401) {
+                    sessionStorage.removeItem('gd_access_token');
+                    gdToken = null;
+                    updateGdStatusIndicator(false);
+                    showNotification("Google 登入憑證已過期，請再次點選『授權登入』取得連結。", "warning");
+                    openGdConfigModal();
+                } else {
+                    const errTxt = await response.text();
+                    throw new Error(errTxt);
+                }
+            } catch (err) {
+                console.error("GDrive Upload Error:", err);
+                showNotification("上傳雲端硬碟失敗，請檢查 Client ID 設定，或改用『匯出文字檔』手動儲存！", "error");
+            }
+        }
+
+        window.openGdConfigModal = function() {
+            const modal = document.getElementById('gd-modal');
+            const panel = document.getElementById('gd-modal-panel');
+            
+            document.getElementById('gd-client-id-input').value = gdClientId;
+            updateGdStatusIndicator(!!gdToken);
+            
+            document.getElementById('detected-origin-input').value = window.location.origin;
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+        }
+
+        window.closeGdConfigModal = function() {
+            const modal = document.getElementById('gd-modal');
+            const panel = document.getElementById('gd-modal-panel');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            panel.classList.add('scale-95');
+        }
+
+        window.saveGdClientId = function() {
+            const val = document.getElementById('gd-client-id-input').value.trim();
+            gdClientId = val;
+            localStorage.setItem('gd_client_id', val);
+            showNotification("Client ID 設定成功！現在您可以點選下方『授權連線』。", "success");
+        }
+
+        window.copyDetectedOrigin = function() {
+            const input = document.getElementById('detected-origin-input');
+            input.select();
+            document.execCommand('copy');
+            showNotification("網域來源（Origin）已複製！請至 Google Cloud 控制台貼上該網址並儲存。", "success");
+        }
+
+        window.initGoogleDriveAuth = function() {
+            if (!gdClientId) {
+                showNotification("請先在步驟 1 填寫您的 Google Oauth Client ID 才能開始連線授權喔！", "warning");
+                return;
+            }
+
+            try {
+                if (typeof google === 'undefined' || !google.accounts) {
+                    showNotification("Google SDK 加載中，請稍候再試。", "warning");
+                    return;
+                }
+
+                const client = google.accounts.oauth2.initTokenClient({
+                    client_id: gdClientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file',
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            gdToken = tokenResponse.access_token;
+                            sessionStorage.setItem('gd_access_token', gdToken);
+                            updateGdStatusIndicator(true);
+                            showNotification("成功授權並連結 Google 雲端硬碟！", "success");
+                        }
+                    },
+                });
+                client.requestAccessToken();
+            } catch (err) {
+                console.error("GSI Auth Error:", err);
+                showNotification("授權連線發生錯誤，請檢查您的 Client ID 欄位是否填寫正確。", "error");
+            }
+        }
+
+        function updateGdStatusIndicator(connected) {
+            const navBtn = document.getElementById('gd-nav-status');
+            const statusText = document.getElementById('gd-status-text');
+
+            if (connected) {
+                navBtn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/80 transition duration-150";
+                navBtn.innerHTML = `<i class="fa-brands fa-google-drive mr-1.5 text-sm"></i><span>Google 已連線</span>`;
+                if (statusText) {
+                    statusText.innerHTML = `<span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>已連線`;
+                }
+            } else {
+                navBtn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100/80 transition duration-150";
+                navBtn.innerHTML = `<i class="fa-brands fa-google-drive mr-1.5 text-sm"></i><span>Google 備份設定</span>`;
+                if (statusText) {
+                    statusText.innerHTML = `<span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>尚未連線`;
+                }
+            }
+        }
+
+        // Add Ingredient Row
+        window.addIngredientRow = function(name = '', amount = '') {
+            const container = document.getElementById('form-ingredients-list');
+            const rowId = 'ing-row-' + Math.random().toString(36).substr(2, 9);
+            
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = "flex items-center space-x-2 bg-brand-50/50 p-2.5 rounded-xl border border-brand-100/40 relative group";
+            div.innerHTML = `
+                <input type="text" class="ing-name-field flex-grow px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-brand-500 focus:border-brand-500 bg-white" placeholder="食材名稱 (例: 醬油)" value="${name}">
+                <input type="text" class="ing-amount-field w-20 px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-brand-500 focus:border-brand-500 bg-white" placeholder="量 (例: 3匙)" value="${amount}">
+                <button type="button" onclick="removeIngredientRow('${rowId}')" class="text-gray-400 hover:text-red-500 p-1.5 transition">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.removeIngredientRow = function(id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+        }
+
+        // Add Dynamic Step Card
+        window.addStepCard = function(desc = '', image = '') {
+            const container = document.getElementById('form-steps-list');
+            const stepId = 'step-card-' + Math.random().toString(36).substr(2, 9);
+            const stepNum = container.children.length + 1;
+            
+            const card = document.createElement('div');
+            card.id = stepId;
+            card.className = "bg-gray-50 rounded-2xl border border-gray-200 p-5 space-y-4 relative group step-form-block";
+            
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="step-badge-num bg-brand-900 text-brand-100 text-xs font-bold px-3 py-1 rounded-full">
+                        步驟 ${stepNum}
+                    </span>
+                    <button type="button" onclick="removeStepCard('${stepId}')" class="text-gray-400 hover:text-red-500 text-xs transition flex items-center gap-1">
+                        <i class="fa-solid fa-trash"></i> 移除步驟
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-xs font-bold text-gray-600">步驟說明</label>
+                        <textarea class="step-desc-field w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 bg-white" rows="4" placeholder="詳細描寫該步驟的火候、攪拌次數、食材下鍋順序...">${desc}</textarea>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-600">步驟照片 / 食物意境圖</label>
+                        
+                        <!-- Mini Dropzone container -->
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-3 text-center flex flex-col items-center justify-center relative bg-white hover:border-brand-500 transition h-32 overflow-hidden">
+                            
+                            <!-- Preview slot -->
+                            <img class="step-img-preview absolute inset-0 w-full h-full object-cover ${image ? '' : 'hidden'}" src="${image || ''}">
+                            <input type="hidden" class="step-img-base64" value="${image || ''}">
+                            
+                            <div class="step-upload-controls ${image ? 'opacity-0 hover:opacity-100' : ''} absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-2 gap-1.5 transition-all">
+                                <span class="text-[10px] text-gray-500 font-semibold">上傳或 AI 創作</span>
+                                <div class="flex gap-1.5">
+                                    <label class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition flex items-center gap-1">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> 照片
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleStepImageUpload(event, '${stepId}')">
+                                    </label>
+                                    <button type="button" onclick="generateAIStepImage('${stepId}')" class="bg-brand-500 hover:bg-brand-600 text-white px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 畫圖
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+            reindexSteps();
+        }
+
+        window.removeStepCard = function(id) {
+            const card = document.getElementById(id);
+            if (card) {
+                card.remove();
+                reindexSteps();
+            }
+        }
+
+        // Re-adjust steps count badge order
+        function reindexSteps() {
+            const container = document.getElementById('form-steps-list');
+            Array.from(container.children).forEach((card, idx) => {
+                const badge = card.querySelector('.step-badge-num');
+                if (badge) badge.innerText = `步驟 ${idx + 1}`;
+            });
+        }
+
+        // Process step image upload and perform high-rate JPG compression immediately
+        window.handleStepImageUpload = function(event, cardId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                // Resize to max 400px and compress to quality 0.5 immediately to keep footprint very low
+                const compressedData = await compressBase64Image(e.target.result, 400, 0.5);
+                
+                const card = document.getElementById(cardId);
+                const preview = card.querySelector('.step-img-preview');
+                const base64Field = card.querySelector('.step-img-base64');
+                const uploadControlPanel = card.querySelector('.step-upload-controls');
+
+                preview.src = compressedData;
+                preview.classList.remove('hidden');
+                base64Field.value = compressedData;
+                uploadControlPanel.classList.add('opacity-0', 'hover:opacity-100');
+                
+                showNotification("步驟照片上傳並壓縮完成！", "success");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // AI Draw step illustrations (Imagen API)
+        window.generateAIStepImage = async function(cardId) {
+            const card = document.getElementById(cardId);
+            const desc = card.querySelector('.step-desc-field').value.trim();
+            const recipeTitle = document.getElementById('form-title').value.trim();
+
+            if (!desc) {
+                showNotification("請先撰寫一些「步驟說明」文字，AI 才能根據你的敘述作畫喔！", "warning");
+                return;
+            }
+
+            // Bring up painter loader modal
+            const loaderModal = document.getElementById('image-ai-modal');
+            loaderModal.classList.remove('opacity-0', 'pointer-events-none');
+
+            const prompt = `A highly detailed, professional, appetizing close-up food photography of ${recipeTitle || 'delicious secret dish'}, illustrating this specific cooking step: ${desc}. Soft warm kitchen light, clean background, 4k resolution, gourmet magazine quality.`;
+            
+            try {
+                const payload = { 
+                    instances: { prompt: prompt }, 
+                    parameters: { "sampleCount": 1 } 
+                };
+                
+                const apiKey = ""; // Leave blank so the container dynamically injects the API key
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+
+                const makeRequest = async (retries = 3, delay = 1000) => {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error("Throttled or Request Error");
+                        return await response.json();
+                    } catch (err) {
+                        if (retries > 0) {
+                            await new Promise(res => setTimeout(res, delay));
+                            return makeRequest(retries - 1, delay * 2);
+                        }
+                        throw err;
+                    }
+                };
+
+                const result = await makeRequest();
+                
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const rawImgUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    
+                    // COMPRESS THE AI IMAGE IMMEDIATELY (Reduces massive PNG format to ultra-lightweight JPG)
+                    const compressedImgUrl = await compressBase64Image(rawImgUrl, 400, 0.5);
+                    
+                    // Display on specific card preview slot
+                    const preview = card.querySelector('.step-img-preview');
+                    const base64Field = card.querySelector('.step-img-base64');
+                    const uploadControlPanel = card.querySelector('.step-upload-controls');
+
+                    preview.src = compressedImgUrl;
+                    preview.classList.remove('hidden');
+                    base64Field.value = compressedImgUrl;
+                    uploadControlPanel.classList.add('opacity-0', 'hover:opacity-100');
+
+                    showNotification("AI 美味插圖畫好囉！", "success");
+                } else {
+                    throw new Error("Empty predictions output");
+                }
+            } catch (err) {
+                console.error("AI Painting Failed:", err);
+                showNotification("AI 繪圖伺服器忙碌中，請等會再試，或者可以先用手動上傳喔！", "error");
+            } finally {
+                loaderModal.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // Open Form Sheet View
+        window.openRecipeForm = function(existingId = null) {
+            currentRecipeId = existingId;
+            
+            const titleField = document.getElementById('form-title');
+            const catField = document.getElementById('form-category');
+            const descField = document.getElementById('form-desc');
+            const timeField = document.getElementById('form-time');
+            const notesField = document.getElementById('form-notes');
+            
+            const ingredientsContainer = document.getElementById('form-ingredients-list');
+            const stepsContainer = document.getElementById('form-steps-list');
+            
+            ingredientsContainer.innerHTML = '';
+            stepsContainer.innerHTML = '';
+
+            if (existingId) {
+                document.getElementById('form-view-title').innerText = "編輯私房食譜";
+                const recipe = recipes.find(r => r.id === existingId);
+                
+                titleField.value = recipe.title || '';
+                catField.value = recipe.category || '家常主菜';
+                descField.value = recipe.desc || '';
+                timeField.value = recipe.prepTime || '';
+                notesField.value = recipe.notes || '';
+                
+                if (recipe.ingredients && recipe.ingredients.length > 0) {
+                    recipe.ingredients.forEach(i => addIngredientRow(i.name, i.amount));
+                } else {
+                    addIngredientRow();
+                }
+                
+                if (recipe.steps && recipe.steps.length > 0) {
+                    recipe.steps.forEach(s => addStepCard(s.desc, s.image));
+                } else {
+                    addStepCard();
+                }
+            } else {
+                document.getElementById('form-view-title').innerText = "撰寫新私房料理食譜";
+                titleField.value = '';
+                catField.value = '家常主菜';
+                descField.value = '';
+                timeField.value = '';
+                notesField.value = '';
+                
+                addIngredientRow('', '');
+                addIngredientRow('', '');
+                addStepCard('', '');
+            }
+
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('recipe-detail-view').classList.add('hidden');
+            document.getElementById('recipe-form-view').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.editCurrentRecipe = function() {
+            if (currentRecipeId) openRecipeForm(currentRecipeId);
+        }
+
+        // Save Form State Data
+        window.saveRecipe = async function() {
+            const title = document.getElementById('form-title').value.trim();
+            const category = document.getElementById('form-category').value;
+            const desc = document.getElementById('form-desc').value.trim();
+            const prepTime = document.getElementById('form-time').value.trim();
+            const notes = document.getElementById('form-notes').value.trim();
+
+            if (!title) {
+                showNotification("料理名稱是必填項目喔！", "warning");
+                return;
+            }
+
+            // Extract Ingredients
+            const ingElements = document.querySelectorAll('#form-ingredients-list > div');
+            const ingredients = [];
+            ingElements.forEach(row => {
+                const name = row.querySelector('.ing-name-field').value.trim();
+                const amount = row.querySelector('.ing-amount-field').value.trim();
+                if (name) {
+                    ingredients.push({ name, amount });
+                }
+            });
+
+            // Extract Steps
+            const stepElements = document.querySelectorAll('.step-form-block');
+            const steps = [];
+            stepElements.forEach(card => {
+                const stepDesc = card.querySelector('.step-desc-field').value.trim();
+                const stepImg = card.querySelector('.step-img-base64').value;
+                if (stepDesc) {
+                    steps.push({ desc: stepDesc, image: stepImg });
+                }
+            });
+
+            const recipeId = currentRecipeId || 'recipe-' + Math.random().toString(36).substr(2, 9);
+            const timestamp = currentRecipeId 
+                ? (recipes.find(r => r.id === currentRecipeId)?.createdAt || Date.now()) 
+                : Date.now();
+
+            const finishedRecipe = {
+                id: recipeId,
+                title,
+                category,
+                desc,
+                prepTime,
+                ingredients,
+                steps,
+                notes,
+                createdAt: timestamp
+            };
+
+            showNotification("正為您精心打包儲存中...", "info");
+            
+            // Persist the clean data object
+            const success = await persistRecipe(finishedRecipe);
+            if (success) {
+                showNotification(`私房菜「${title}」紀錄成功！`, "success");
+                showRecipeDetail(recipeId);
+            }
+        }
+
+        // Delete recipe triggers modal
+        let recipeIdToDelete = null;
+        window.confirmDeleteCurrentRecipe = function() {
+            if (!currentRecipeId) return;
+            recipeIdToDelete = currentRecipeId;
+            
+            const recipe = recipes.find(r => r.id === recipeIdToDelete);
+            document.getElementById('confirm-title').innerText = `確定要刪除此道菜餚嗎？`;
+            document.getElementById('confirm-message').innerText = `您即將從資料庫永久刪除「${recipe.title}」食譜與其配圖步驟。此操作將無法復原。`;
+            
+            const actionBtn = document.getElementById('confirm-action-btn');
+            actionBtn.onclick = executeDelete;
+            
+            openConfirmModal();
+        }
+
+        async function executeDelete() {
+            if (recipeIdToDelete) {
+                await deleteRecipeFromStore(recipeIdToDelete);
+                showNotification("食譜已成功移出資料庫。", "success");
+                closeConfirmModal();
+                backToDashboard();
+            }
+        }
+
+        // AI Recipe Draft generator
+        window.openAIAssistantModal = function() {
+            const modal = document.getElementById('ai-modal');
+            const panel = document.getElementById('ai-modal-panel');
+            
+            document.getElementById('ai-prompt-input').value = '';
+            document.getElementById('ai-style-input').value = '';
+            document.getElementById('ai-generation-loader').classList.add('hidden');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+        }
+
+        window.closeAIAssistantModal = function() {
+            const modal = document.getElementById('ai-modal');
+            const panel = document.getElementById('ai-modal-panel');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            panel.classList.add('scale-95');
+        }
+
+        window.triggerAIRecipeDraft = async function() {
+            const dishName = document.getElementById('ai-prompt-input').value.trim();
+            const style = document.getElementById('ai-style-input').value.trim();
+
+            if (!dishName) {
+                showNotification("請至少提供一個「料理名稱」以便 AI 開始研發！", "warning");
+                return;
+            }
+
+            const loader = document.getElementById('ai-generation-loader');
+            loader.classList.remove('hidden');
+
+            const userQuery = `研發一道名為「${dishName}」的食譜。要求風格: ${style || '精緻家常、做法扎實'}。請以繁體中文撰寫。`;
+            const systemPrompt = `You are a 3-Star Michelin chef who records elegant recipes. 
+            Output must be structural JSON with these exact fields matching this Schema:
+            {
+                "title": "菜餚名稱",
+                "category": "分類名稱 (必須只能是以下其中之一: '家常主菜', '慢燉香煲', '手作甜點', '烘焙麵包', '發酵熟成', '開胃冷盤', '湯品燉補', '其他')",
+                "desc": "一句引人食指大動、優美的簡短推薦描述",
+                "prepTime": "估計製作總時長 (例如 '60 分鐘')",
+                "ingredients": [
+                    {"name": "食材名稱", "amount": "份量份數"}
+                ],
+                "steps": [
+                    {"desc": "步驟詳細說明敘述 (每步控制在100字內，著重手法、火候與溫度)"}
+                ],
+                "notes": "這道菜最容易失敗的重點細節 or 秘密叮嚀竅門"
+            }`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING" },
+                                "category": { "type": "STRING" },
+                                "desc": { "type": "STRING" },
+                                "prepTime": { "type": "STRING" },
+                                "ingredients": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "name": { "type": "STRING" },
+                                            "amount": { "type": "STRING" }
+                                        },
+                                        "required": ["name", "amount"]
+                                    }
+                                },
+                                "steps": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "desc": { "type": "STRING" }
+                                        },
+                                        "required": ["desc"]
+                                    }
+                                },
+                                "notes": { "type": "STRING" }
+                            },
+                            "required": ["title", "category", "desc", "prepTime", "ingredients", "steps", "notes"]
+                        }
+                    },
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    }
+                };
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const makeRequest = async (retries = 3, delay = 1000) => {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error("Throttled");
+                        return await response.json();
+                    } catch (err) {
+                        if (retries > 0) {
+                            await new Promise(res => setTimeout(res, delay));
+                            return makeRequest(retries - 1, delay * 2);
+                        }
+                        throw err;
+                    }
+                };
+
+                const result = await makeRequest();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (jsonText) {
+                    const parsedRecipe = JSON.parse(jsonText);
+                    
+                    closeAIAssistantModal();
+                    
+                    if (document.getElementById('recipe-form-view').classList.contains('hidden')) {
+                        openRecipeForm(null);
+                    }
+                    
+                    document.getElementById('form-title').value = parsedRecipe.title;
+                    document.getElementById('form-category').value = parsedRecipe.category;
+                    document.getElementById('form-desc').value = parsedRecipe.desc;
+                    document.getElementById('form-time').value = parsedRecipe.prepTime;
+                    document.getElementById('form-notes').value = parsedRecipe.notes;
+
+                    const ingredientsContainer = document.getElementById('form-ingredients-list');
+                    ingredientsContainer.innerHTML = '';
+                    if (parsedRecipe.ingredients && parsedRecipe.ingredients.length > 0) {
+                        parsedRecipe.ingredients.forEach(i => addIngredientRow(i.name, i.amount));
+                    }
+
+                    const stepsContainer = document.getElementById('form-steps-list');
+                    stepsContainer.innerHTML = '';
+                    if (parsedRecipe.steps && parsedRecipe.steps.length > 0) {
+                        parsedRecipe.steps.forEach(s => addStepCard(s.desc, ''));
+                    }
+
+                    showNotification("AI 創意食譜配方已起草完成！", "success");
+                } else {
+                    throw new Error("No parsed text returned");
+                }
+            } catch (err) {
+                console.error("Recipe draft error:", err);
+                showNotification("AI 廚藝大腦被煙霧擋住了，請重新再試一次或微調關鍵字！", "error");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Notification Toast Handler (Replaces browser alerts)
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('notification-toast');
+            const text = document.getElementById('toast-text');
+            const iconWrapper = document.getElementById('toast-icon-wrapper');
+
+            text.innerText = message;
+            
+            toast.className = "fixed bottom-5 right-5 z-50 transform transition-all duration-300 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl max-w-sm border ";
+            
+            if (type === 'success') {
+                toast.classList.add('bg-emerald-900', 'text-white', 'border-emerald-800');
+                iconWrapper.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+            } else if (type === 'warning') {
+                toast.classList.add('bg-amber-900', 'text-white', 'border-amber-800');
+                iconWrapper.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400"></i>`;
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-950', 'text-white', 'border-red-900');
+                iconWrapper.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-500"></i>`;
+            } else {
+                toast.classList.add('bg-gray-900', 'text-white', 'border-gray-800');
+                iconWrapper.innerHTML = `<i class="fa-solid fa-circle-info text-blue-400"></i>`;
+            }
+
+            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+            }, 5000);
+        }
+
+        // Custom Confirm dialog helper
+        function openConfirmModal() {
+            const modal = document.getElementById('confirm-modal');
+            const panel = document.getElementById('confirm-modal-panel');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+        }
+
+        window.closeConfirmModal = function(proceed = false) {
+            const modal = document.getElementById('confirm-modal');
+            const panel = document.getElementById('confirm-modal-panel');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            panel.classList.add('scale-95');
+        }
+
+        // Full Screen step photo viewing
+        window.viewStepImageFullScreen = function(url) {
+            const overlay = document.createElement('div');
+            overlay.className = "fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-zoom-out";
+            overlay.onclick = () => overlay.remove();
+            
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = "max-w-full max-h-full rounded-lg shadow-2xl object-contain";
+            
+            overlay.appendChild(img);
+            document.body.appendChild(overlay);
+        }
+
+        // Hotkey hookups (Ctrl + K searches)
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('recipe-search').focus();
+            }
+        });
+
+        // Initialize App on load
+        window.onload = function() {
+            setupDatabase();
+            if (gdToken) {
+                updateGdStatusIndicator(true);
+            }
+        }
+
+    </script>
+</body>
+</html>
