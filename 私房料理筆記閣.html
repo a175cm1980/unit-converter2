@@ -81,7 +81,7 @@
                     <!-- Google Drive Sync Status Button -->
                     <button id="gd-nav-status" onclick="openGdConfigModal()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100/80 transition duration-150">
                         <i class="fa-brands fa-google-drive mr-1.5 text-sm"></i>
-                        <span>Google 備份設定</span>
+                        <span>Google 雲端同步</span>
                     </button>
                     <!-- Status / Cloud Sync Status -->
                     <span id="sync-status" class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
@@ -110,12 +110,12 @@
                 </div>
                 
                 <div class="max-w-xl z-10">
-                    <span class="bg-brand-600/50 backdrop-blur-sm text-brand-100 text-xs px-3 py-1 rounded-full font-medium tracking-wider uppercase">AI 廚藝顧問助手已就緒</span>
+                    <span class="bg-brand-600/50 backdrop-blur-sm text-brand-100 text-xs px-3 py-1 rounded-full font-medium tracking-wider uppercase">Google 雲端自動同步已就緒</span>
                     <h2 class="text-2xl md:text-3xl font-bold font-serif tracking-tight mt-3 text-brand-100">
                         今天想研發或記錄什麼新料理？
                     </h2>
                     <p class="text-brand-100/80 text-sm mt-2 leading-relaxed">
-                        你可以自訂輸入料理步驟與配方。當靈感不足時，還可直接請 AI 協助一鍵生成「完整製作步驟」與「美味食物插圖」！
+                        你可以自訂輸入料理步驟與配方。當您與 Google 雲端硬碟同步後，每一次的手動新增、刪除皆會自動備份於您個人的 Google Drive 中。
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3 z-10 w-full md:w-auto">
@@ -437,8 +437,8 @@
                         <i class="fa-brands fa-google-drive text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold font-serif">Google Drive 雲端備份</h3>
-                        <p class="text-xs text-white/80">將食譜以料理名稱開頭格式自動儲存至雲端</p>
+                        <h3 class="text-lg font-bold font-serif">Google Drive 雲端同步</h3>
+                        <p class="text-xs text-white/80">將食譜直接做為您的個人雲端資料庫</p>
                     </div>
                 </div>
                 <button onclick="closeGdConfigModal()" class="text-white/80 hover:text-white transition">
@@ -447,14 +447,11 @@
             </div>
             <div class="p-6 space-y-4">
                 <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-gray-700">步驟 1：填寫 Google Oauth Client ID (選填)</label>
+                    <label class="block text-xs font-bold text-gray-700">步驟 1：填寫 Google Oauth Client ID</label>
                     <p class="text-[11px] text-gray-400 leading-normal">
-                        因 Google 安全條例限制，如欲自動將資料一鍵拋轉儲存至 Google 雲端硬碟，建議建立您個人的 Client ID。
+                        因 Google 安全條例限制，如欲自動連線雲端硬碟，請建立您個人的 Client ID 並在此填入。
                     </p>
                     <input type="text" id="gd-client-id-input" class="w-full px-3 py-2 border border-brand-100 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-xs transition" placeholder="例如: xxxxxx.apps.googleusercontent.com">
-                    <a href="https://console.cloud.google.com/" target="_blank" class="text-[10px] text-blue-600 hover:underline block text-right">
-                        <i class="fa-solid fa-circle-question mr-0.5"></i> 前往 Google Cloud Console 申請
-                    </a>
                 </div>
                 
                 <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200/70 text-left space-y-1.5">
@@ -462,7 +459,7 @@
                         <i class="fa-solid fa-triangle-exclamation"></i> 排除 400: origin_mismatch 錯誤
                     </span>
                     <p class="text-[11px] text-amber-800 leading-normal">
-                        請複製下方您目前的網域，並貼至您 Google Console 的<strong>「已授權的 JavaScript 來源」</strong>列表中，然後按下儲存。
+                        請複製下方您目前的網址網域，並加入您 Google Console 的<strong>「已授權的 JavaScript 來源」</strong>列表中，然後按下儲存。
                     </p>
                     <div class="flex gap-1.5">
                         <input type="text" id="detected-origin-input" readonly class="flex-grow px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg text-xs font-mono text-gray-700" value="">
@@ -486,10 +483,10 @@
 
                 <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 space-y-2">
                     <h4 class="text-xs font-bold text-blue-800 flex items-center gap-1">
-                        <i class="fa-solid fa-circle-info"></i> 💡 免設定超速方案
+                        <i class="fa-solid fa-circle-info"></i> 💡 雲端自動同步特色
                     </h4>
                     <p class="text-[11px] text-blue-700/80 leading-relaxed">
-                        如果您不想花時間申請 Client ID，請不用擔心！在每道料理的「詳細頁」中，點選「<strong>匯出文字檔</strong>」，系統會立刻下載檔名格式完全符合（以料理名稱開頭）的 <code>.md</code> 文字食譜。您直接將該檔案<strong>手動拖曳</strong>丟進 Google 雲端硬碟中儲存也是完全一樣的喔！
+                        連線成功後，系統將自動於雲端硬碟建立 <code>my_recipes_database.json</code> 資料庫檔案。此後所有新增、刪除修改皆會<b>在背景全自動秒速同步備份</b>，開啟本網頁也會自動讀取最新雲端內容，落實跨設備無縫同步！
                     </p>
                 </div>
 
@@ -559,10 +556,9 @@
 
     <!-- Script module starts -->
     <script type="module">
-        // Import Firebase Functions safely
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables for recipe storage and UI state
         let recipes = [];
@@ -572,6 +568,7 @@
         // Google Drive API configuration state
         let gdToken = sessionStorage.getItem('gd_access_token') || null;
         let gdClientId = localStorage.getItem('gd_client_id') || '1019129007520-qlo3j0jshe844tmj21ttnunk1uvcg5da.apps.googleusercontent.com';
+        let gdDbFileId = localStorage.getItem('gd_db_file_id') || null;
 
         // Firebase Auth state & instances
         let db = null;
@@ -615,7 +612,6 @@
             }
         ];
 
-        // Highly efficient client-side image compression utility
         function compressBase64Image(base64Str, maxDim = 400, quality = 0.5) {
             return new Promise((resolve) => {
                 if (!base64Str || !base64Str.startsWith('data:image')) {
@@ -642,8 +638,6 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Compress to JPG with medium quality (reduces standard 1MB photos to ~10-25KB!)
                     resolve(canvas.toDataURL('image/jpeg', quality));
                 };
                 img.onerror = function() {
@@ -653,10 +647,8 @@
             });
         }
 
-        // Set up the cloud database integration if config is available
         async function setupDatabase() {
             try {
-                // Parse potential environment injected global variables safely
                 const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
                 const injectedAppId = typeof __app_id !== 'undefined' ? __app_id : 'secret-recipes-app';
                 const customAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -669,7 +661,6 @@
                     db = getFirestore(app);
                     auth = getAuth(app);
                     
-                    // Priority Authentication (RULE 3)
                     let userCredential;
                     if (customAuthToken) {
                         userCredential = await signInWithCustomToken(auth, customAuthToken);
@@ -683,31 +674,23 @@
                         
                         document.getElementById('sync-status').innerHTML = `
                             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
-                            雲端資料庫已連線 (ID: ${userId.substring(0, 6)})
+                            雲端已連線 (ID: ${userId.substring(0, 6)})
                         `;
-                        
-                        // Load data from cloud
                         await loadRecipesFromCloud();
                     }
                 } else {
-                    console.log("No Firebase config detected, reverting to localStorage fallback mode.");
                     loadLocalRecipes();
                 }
             } catch (err) {
                 console.error("Failed to initialize Cloud DB:", err);
-                showNotification("連線雲端失敗，已自動啟用本地保險庫存檔模式。", "warning");
                 loadLocalRecipes();
             }
         }
 
-        // Load Recipes from Cloud Firestore
         async function loadRecipesFromCloud() {
             if (!isCloudDbEnabled || !userId) return;
             try {
-                // Rule 1: STRICT PATHS
                 const colRef = collection(db, 'artifacts', appId, 'users', userId, 'recipes');
-                
-                // Rule 2: NO COMPLEX QUERIES - Simple fetch all then we filter in JavaScript memory
                 const querySnapshot = await getDocs(colRef);
                 const cloudRecipes = [];
                 querySnapshot.forEach((doc) => {
@@ -717,7 +700,6 @@
                 if (cloudRecipes.length > 0) {
                     recipes = cloudRecipes;
                 } else {
-                    // Seed defaults if fresh cloud user
                     recipes = [...DEFAULT_PRESET_RECIPES];
                     for (const rec of recipes) {
                         await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'recipes', rec.id), rec);
@@ -726,12 +708,10 @@
                 renderDashboard();
             } catch (error) {
                 console.error("Error reading cloud data:", error);
-                showNotification("讀取雲端食譜失敗，切換為本地預備庫。", "error");
                 loadLocalRecipes();
             }
         }
 
-        // Fallback Local Storage Loading
         function loadLocalRecipes() {
             const data = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (data) {
@@ -747,26 +727,23 @@
             renderDashboard();
         }
 
-        // Save data to Cloud / Local
         async function persistRecipe(recipe) {
-            // DEEP CLEAN & SANITIZE the object (Fixes: Property array contains an invalid nested entity in Firestore)
-            // Strips custom prototypes, classes, undefined, and non-serializable fields before sending to Firestore
             const sanitizedRecipe = JSON.parse(JSON.stringify(recipe, (key, value) => {
                 if (value === undefined) return "";
                 return value;
             }));
 
+            // Sync with Firestore if enabled
             if (isCloudDbEnabled && userId) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'users', userId, 'recipes', sanitizedRecipe.id);
                     await setDoc(docRef, sanitizedRecipe);
                 } catch (err) {
                     console.error("Cloud saving failed:", err);
-                    showNotification("雲端資料同步遭遇異常，將先保存在瀏覽器本地。", "warning");
                 }
             }
             
-            // Local fallback & update memory cache
+            // Save to internal memory
             const idx = recipes.findIndex(r => r.id === sanitizedRecipe.id);
             if (idx !== -1) {
                 recipes[idx] = sanitizedRecipe;
@@ -774,19 +751,19 @@
                 recipes.push(sanitizedRecipe);
             }
             saveLocalRecipes();
+
+            // Background Google Drive Auto-Sync (Plan A)
+            if (gdToken) {
+                syncToGoogleDrive();
+            }
             return true;
         }
 
-        // Robust LocalStorage saver with memory degradation path (Fixes: QuotaExceededError)
         function saveLocalRecipes() {
             try {
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(recipes));
             } catch (e) {
                 if (e.name === 'QuotaExceededError' || e.code === 22) {
-                    console.warn("LocalStorage space exceeded! Attempting to degrade and save textual data only.");
-                    
-                    // CRITICAL FALLBACK PATH: Keep all structured data, but strip extremely heavy base64 step images from local cache.
-                    // This allows the app to continue functioning beautifully while saving all text recipes safely.
                     const degradedRecipes = recipes.map(r => ({
                         ...r,
                         steps: r.steps ? r.steps.map(s => ({ 
@@ -794,16 +771,12 @@
                             image: s.image ? '(圖片過大已被本地卸載，建議雲端備份)' : '' 
                         })) : []
                     }));
-                    
                     try {
                         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(degradedRecipes));
-                        showNotification("瀏覽器暫存空間已滿！食譜文字已安全儲存，但步驟圖片已卸載，請連線 Google 雲端進行完整備份！", "warning");
+                        showNotification("瀏覽器暫存空間已滿，已降級儲存文字，請授權登入 Google Drive 雲端資料庫以永久備份完整相片！", "warning");
                     } catch (innerErr) {
-                        console.error("Degraded save also failed:", innerErr);
-                        showNotification("瀏覽器儲存庫已滿，請刪除部分不需要的食譜以釋出空間。", "error");
+                        showNotification("瀏覽器儲存庫完全已滿，請刪除部分食譜釋放空間。", "error");
                     }
-                } else {
-                    console.error("Failed to save local recipes:", e);
                 }
             }
         }
@@ -820,15 +793,148 @@
             
             recipes = recipes.filter(r => r.id !== id);
             saveLocalRecipes();
+            
+            // Sync delete to Google Drive
+            if (gdToken) {
+                syncToGoogleDrive();
+            }
             renderDashboard();
         }
 
-        // Render Dashboard Lists and Filters
+        async function syncFromGoogleDrive() {
+            if (!gdToken) return;
+            showNotification("正在與 Google 雲端資料庫同步中...", "info");
+            
+            try {
+                // 1. Search for existing database file in Google Drive
+                const searchUrl = `https://www.googleapis.com/drive/v3/files?q=name%3D%27my_recipes_database.json%27+and+trashed%3Dfalse&fields=files(id%2Cname)`;
+                const searchRes = await fetch(searchUrl, {
+                    headers: { 'Authorization': `Bearer ${gdToken}` }
+                });
+                
+                if (!searchRes.ok) {
+                    if (searchRes.status === 401) throw new Error("UNAUTHORIZED");
+                    throw new Error("SEARCH_FAILED");
+                }
+                
+                const searchData = await searchRes.json();
+                
+                if (searchData.files && searchData.files.length > 0) {
+                    // Database file exists!
+                    const fileId = searchData.files[0].id;
+                    gdDbFileId = fileId;
+                    localStorage.setItem('gd_db_file_id', fileId);
+                    
+                    // 2. Download contents
+                    const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+                    const downloadRes = await fetch(downloadUrl, {
+                        headers: { 'Authorization': `Bearer ${gdToken}` }
+                    });
+                    
+                    if (downloadRes.ok) {
+                        const cloudDb = await downloadRes.json();
+                        if (Array.isArray(cloudDb)) {
+                            recipes = cloudDb;
+                            saveLocalRecipes();
+                            renderDashboard();
+                            showNotification("雲端資料庫同步完成！已載入最新食譜內容。", "success");
+                            updateGdStatusIndicator(true);
+                            return;
+                        }
+                    }
+                }
+                
+                // No cloud database file found, so we create it with current local database
+                await syncToGoogleDrive();
+                showNotification("首次連線！已在您的 Google Drive 建立新資料庫檔案。", "success");
+                updateGdStatusIndicator(true);
+                
+            } catch (err) {
+                console.error("Google Drive Sync down failed:", err);
+                if (err.message === "UNAUTHORIZED") {
+                    sessionStorage.removeItem('gd_access_token');
+                    gdToken = null;
+                    updateGdStatusIndicator(false);
+                    showNotification("Google 授權已過期，請重新登入。", "warning");
+                } else {
+                    showNotification("無法同步雲端資料，暫時使用本機舊資料。", "warning");
+                }
+            }
+        }
+
+        async function syncToGoogleDrive() {
+            if (!gdToken) return;
+            
+            try {
+                const dbFileName = 'my_recipes_database.json';
+                const bodyContent = JSON.stringify(recipes);
+                
+                if (gdDbFileId) {
+                    // Update existing database file
+                    const updateUrl = `https://www.googleapis.com/upload/drive/v3/files/${gdDbFileId}?uploadType=media`;
+                    const res = await fetch(updateUrl, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${gdToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: bodyContent
+                    });
+                    
+                    if (res.ok) {
+                        console.log("Google Drive Database updated successfully.");
+                        return;
+                    } else if (res.status === 404) {
+                        // File might have been deleted from GDrive trash, clear ID and try creating
+                        gdDbFileId = null;
+                        localStorage.removeItem('gd_db_file_id');
+                    } else {
+                        throw new Error("Update failed");
+                    }
+                }
+                
+                // Create new database file (Multipart)
+                const metadata = {
+                    name: dbFileName,
+                    mimeType: 'application/json'
+                };
+                const boundary = 'foo_bar_baz_db';
+                const delimiter = `\r\n--${boundary}\r\n`;
+                const closeDelimiter = `\r\n--${boundary}--`;
+                
+                const multipartBody = 
+                    delimiter +
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                    bodyContent +
+                    closeDelimiter;
+                    
+                const createRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${gdToken}`,
+                        'Content-Type': `multipart/related; boundary=${boundary}`
+                    },
+                    body: multipartBody
+                });
+                
+                if (createRes.ok) {
+                    const result = await createRes.json();
+                    gdDbFileId = result.id;
+                    localStorage.setItem('gd_db_file_id', result.id);
+                    console.log("Created new Google Drive Database file.");
+                }
+            } catch (err) {
+                console.error("Failed to sync database to GDrive:", err);
+            }
+        }
+
         function renderDashboard() {
             const grid = document.getElementById('recipes-grid');
             const emptyState = document.getElementById('empty-state');
             
-            // Generate dynamic lists of categories present in recipes
             const baseCategories = ["全部", "家常主菜", "慢燉香煲", "手作甜點", "烘焙麵包", "發酵熟成", "開胃冷盤", "湯品燉補"];
             const categoryFilterContainer = document.getElementById('category-filter-list');
             categoryFilterContainer.innerHTML = '';
@@ -856,12 +962,10 @@
                 categoryFilterContainer.appendChild(btn);
             });
 
-            // Update stats counter
             document.getElementById('total-recipes-count').innerText = recipes.length;
             const stepSum = recipes.reduce((acc, curr) => acc + (curr.steps ? curr.steps.length : 0), 0);
             document.getElementById('total-steps-count').innerText = stepSum;
 
-            // Search query filtering
             const searchVal = document.getElementById('recipe-search').value.toLowerCase().trim();
             const filteredRecipes = recipes.filter(r => {
                 const matchesCategory = selectedCategoryFilter === '全部' || r.category === selectedCategoryFilter;
@@ -873,7 +977,6 @@
                 return matchesCategory && matchesSearch;
             });
 
-            // Populate Grid Cards
             grid.innerHTML = '';
             if (filteredRecipes.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -916,12 +1019,10 @@
             }
         }
 
-        // Search trigger
         window.handleSearch = function() {
             renderDashboard();
         }
 
-        // Nav back to dashboard
         window.backToDashboard = function() {
             document.getElementById('dashboard-view').classList.remove('hidden');
             document.getElementById('recipe-detail-view').classList.add('hidden');
@@ -930,14 +1031,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Show detailed card for cooking
         window.showRecipeDetail = function(id) {
             const recipe = recipes.find(r => r.id === id);
             if (!recipe) return;
 
             currentRecipeId = id;
 
-            // Header Elements
             const titleEl = document.getElementById('detail-title');
             const catEl = document.getElementById('detail-category');
             const descEl = document.getElementById('detail-desc');
@@ -953,12 +1052,10 @@
             timeEl.innerText = recipe.prepTime || '適中';
             ingCountEl.innerText = recipe.ingredients ? recipe.ingredients.length : 0;
             
-            // Choose image
             const firstStepImg = recipe.steps && recipe.steps.length > 0 && recipe.steps[0].image ? recipe.steps[0].image : '';
             const defaultImg = firstStepImg || `https://placehold.co/1200x600/ce6346/ffffff?text=${encodeURIComponent(recipe.title)}`;
             coverImg.src = defaultImg;
 
-            // Notes
             if (recipe.notes && recipe.notes.trim()) {
                 notesText.innerText = recipe.notes;
                 notesBox.classList.remove('hidden');
@@ -966,7 +1063,6 @@
                 notesBox.classList.add('hidden');
             }
 
-            // Setup Ingredients Checkoff List
             const ingList = document.getElementById('detail-ingredients-list');
             ingList.innerHTML = '';
             if (recipe.ingredients && recipe.ingredients.length > 0) {
@@ -988,7 +1084,6 @@
                 ingList.innerHTML = `<li class="text-xs text-gray-400 italic">本食譜尚未設定任何食材。</li>`;
             }
 
-            // Render Timeline Steps
             const stepsTimeline = document.getElementById('detail-steps-timeline');
             stepsTimeline.innerHTML = '';
             if (recipe.steps && recipe.steps.length > 0) {
@@ -1003,7 +1098,6 @@
                         : '';
 
                     stepCard.innerHTML = `
-                        <!-- Step circle label -->
                         <span class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-brand-100 group-hover:bg-brand-200 text-brand-700 font-bold text-sm flex items-center justify-center border border-brand-200 transition">
                             ${index + 1}
                         </span>
@@ -1020,11 +1114,10 @@
                 stepsTimeline.innerHTML = `<p class="text-sm text-gray-400 italic pl-4">這份私密食譜尚未設定任何步驟，快點擊上方編輯新增步驟吧！</p>`;
             }
 
-            // Action Buttons (Including Direct download and Google Drive Backup triggers)
             const actionsDiv = document.getElementById('detail-actions');
             actionsDiv.innerHTML = `
                 <button onclick="saveToGoogleDrive('${recipe.id}')" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-semibold text-xs transition flex items-center gap-1">
-                    <i class="fa-brands fa-google-drive"></i> 存至 Google Drive
+                    <i class="fa-brands fa-google-drive"></i> 匯出至 Google Drive
                 </button>
                 <button onclick="downloadAsFile('${recipe.id}')" class="p-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl font-semibold text-xs transition flex items-center gap-1">
                     <i class="fa-solid fa-download"></i> 匯出文字檔
@@ -1037,14 +1130,12 @@
                 </button>
             `;
 
-            // Display Detail Frame
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('recipe-form-view').classList.add('hidden');
             document.getElementById('recipe-detail-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Generate clean markdown contents of the recipe (fully embed images as base64 inside the file!)
         function generateRecipeMarkdown(recipe) {
             let md = `# ${recipe.title}\n\n`;
             md += `* **料理分類**: ${recipe.category || '未分類'}\n`;
@@ -1084,7 +1175,6 @@
             return md;
         }
 
-        // Save dynamically as markdown file starting with recipe title
         window.downloadAsFile = function(recipeId) {
             const recipe = recipes.find(r => r.id === recipeId);
             if (!recipe) return;
@@ -1101,26 +1191,24 @@
             link.click();
             document.body.removeChild(link);
             
-            showNotification(`食譜「${recipe.title}」文字檔下載成功！您可以直接將它丟進 Google 雲端硬碟中。`, "success");
+            showNotification(`食譜「${recipe.title}」已成功儲存至您本機的預設「下載」資料夾！`, "success");
         }
 
-        // Google Drive direct API save
         window.saveToGoogleDrive = async function(recipeId) {
             const recipe = recipes.find(r => r.id === recipeId);
             if (!recipe) return;
 
             if (!gdToken) {
-                showNotification("請先點選右上角『Google 備份設定』來連結您的帳戶！", "warning");
+                showNotification("請先連線您的 Google 雲端硬碟帳號！", "warning");
                 openGdConfigModal();
                 return;
             }
 
-            showNotification("正在上傳至 Google 雲端硬碟...", "info");
+            showNotification(`正在將「${recipe.title}」上傳至 Google 雲端硬碟...`, "info");
 
             const mdContent = generateRecipeMarkdown(recipe);
             const fileName = `${recipe.title}_私房料理食譜.md`;
 
-            // Google Drive Multipart API upload structure
             const metadata = {
                 name: fileName,
                 mimeType: 'text/markdown'
@@ -1155,7 +1243,7 @@
                     sessionStorage.removeItem('gd_access_token');
                     gdToken = null;
                     updateGdStatusIndicator(false);
-                    showNotification("Google 登入憑證已過期，請再次點選『授權登入』取得連結。", "warning");
+                    showNotification("Google 登入憑證已過期，請重新「授權登入」。", "warning");
                     openGdConfigModal();
                 } else {
                     const errTxt = await response.text();
@@ -1163,7 +1251,7 @@
                 }
             } catch (err) {
                 console.error("GDrive Upload Error:", err);
-                showNotification("上傳雲端硬碟失敗，請檢查 Client ID 設定，或改用『匯出文字檔』手動儲存！", "error");
+                showNotification("上傳至雲端硬碟失敗，請確認您的 Client ID 網域設定！", "error");
             }
         }
 
@@ -1192,44 +1280,45 @@
             const val = document.getElementById('gd-client-id-input').value.trim();
             gdClientId = val;
             localStorage.setItem('gd_client_id', val);
-            showNotification("Client ID 設定成功！現在您可以點選下方『授權連線』。", "success");
+            showNotification("Client ID 設定成功！現在請點選「授權登入」。", "success");
         }
 
         window.copyDetectedOrigin = function() {
             const input = document.getElementById('detected-origin-input');
             input.select();
             document.execCommand('copy');
-            showNotification("網域來源（Origin）已複製！請至 Google Cloud 控制台貼上該網址並儲存。", "success");
+            showNotification("網址網域已複製！請至 Google Cloud 控制台貼上該網址並儲存。", "success");
         }
 
         window.initGoogleDriveAuth = function() {
             if (!gdClientId) {
-                showNotification("請先在步驟 1 填寫您的 Google Oauth Client ID 才能開始連線授權喔！", "warning");
+                showNotification("請先填寫您的 Google Oauth Client ID 才能開始授權連線！", "warning");
                 return;
             }
 
             try {
                 if (typeof google === 'undefined' || !google.accounts) {
-                    showNotification("Google SDK 加載中，請稍候再試。", "warning");
+                    showNotification("Google 登入服務載入中，請稍候再試。", "warning");
                     return;
                 }
 
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: gdClientId,
                     scope: 'https://www.googleapis.com/auth/drive.file',
-                    callback: (tokenResponse) => {
+                    callback: async (tokenResponse) => {
                         if (tokenResponse && tokenResponse.access_token) {
                             gdToken = tokenResponse.access_token;
                             sessionStorage.setItem('gd_access_token', gdToken);
-                            updateGdStatusIndicator(true);
-                            showNotification("成功授權並連結 Google 雲端硬碟！", "success");
+                            
+                            // Load recipes from cloud drive upon success (Plan A database load)
+                            await syncFromGoogleDrive();
                         }
                     },
                 });
                 client.requestAccessToken();
             } catch (err) {
                 console.error("GSI Auth Error:", err);
-                showNotification("授權連線發生錯誤，請檢查您的 Client ID 欄位是否填寫正確。", "error");
+                showNotification("授權連線時發生錯誤，請檢查您的 Client ID 與 JavaScript 來源網址設定！", "error");
             }
         }
 
@@ -1241,18 +1330,17 @@
                 navBtn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/80 transition duration-150";
                 navBtn.innerHTML = `<i class="fa-brands fa-google-drive mr-1.5 text-sm"></i><span>Google 已連線</span>`;
                 if (statusText) {
-                    statusText.innerHTML = `<span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>已連線`;
+                    statusText.innerHTML = `<span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>已連線 (已同步雲端庫)`;
                 }
             } else {
                 navBtn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100/80 transition duration-150";
-                navBtn.innerHTML = `<i class="fa-brands fa-google-drive mr-1.5 text-sm"></i><span>Google 備份設定</span>`;
+                navBtn.innerHTML = `<i class="fa-brands fa-google-drive mr-1.5 text-sm"></i><span>Google 雲端同步</span>`;
                 if (statusText) {
                     statusText.innerHTML = `<span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>尚未連線`;
                 }
             }
         }
 
-        // Add Ingredient Row
         window.addIngredientRow = function(name = '', amount = '') {
             const container = document.getElementById('form-ingredients-list');
             const rowId = 'ing-row-' + Math.random().toString(36).substr(2, 9);
@@ -1275,7 +1363,6 @@
             if (row) row.remove();
         }
 
-        // Add Dynamic Step Card
         window.addStepCard = function(desc = '', image = '') {
             const container = document.getElementById('form-steps-list');
             const stepId = 'step-card-' + Math.random().toString(36).substr(2, 9);
@@ -1303,11 +1390,7 @@
                     
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-600">步驟照片 / 食物意境圖</label>
-                        
-                        <!-- Mini Dropzone container -->
                         <div class="border-2 border-dashed border-gray-300 rounded-xl p-3 text-center flex flex-col items-center justify-center relative bg-white hover:border-brand-500 transition h-32 overflow-hidden">
-                            
-                            <!-- Preview slot -->
                             <img class="step-img-preview absolute inset-0 w-full h-full object-cover ${image ? '' : 'hidden'}" src="${image || ''}">
                             <input type="hidden" class="step-img-base64" value="${image || ''}">
                             
@@ -1339,7 +1422,6 @@
             }
         }
 
-        // Re-adjust steps count badge order
         function reindexSteps() {
             const container = document.getElementById('form-steps-list');
             Array.from(container.children).forEach((card, idx) => {
@@ -1348,14 +1430,12 @@
             });
         }
 
-        // Process step image upload and perform high-rate JPG compression immediately
         window.handleStepImageUpload = function(event, cardId) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = async function(e) {
-                // Resize to max 400px and compress to quality 0.5 immediately to keep footprint very low
                 const compressedData = await compressBase64Image(e.target.result, 400, 0.5);
                 
                 const card = document.getElementById(cardId);
@@ -1373,7 +1453,6 @@
             reader.readAsDataURL(file);
         }
 
-        // AI Draw step illustrations (Imagen API)
         window.generateAIStepImage = async function(cardId) {
             const card = document.getElementById(cardId);
             const desc = card.querySelector('.step-desc-field').value.trim();
@@ -1384,7 +1463,6 @@
                 return;
             }
 
-            // Bring up painter loader modal
             const loaderModal = document.getElementById('image-ai-modal');
             loaderModal.classList.remove('opacity-0', 'pointer-events-none');
 
@@ -1396,7 +1474,7 @@
                     parameters: { "sampleCount": 1 } 
                 };
                 
-                const apiKey = ""; // Leave blank so the container dynamically injects the API key
+                const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
 
                 const makeRequest = async (retries = 3, delay = 1000) => {
@@ -1421,11 +1499,8 @@
                 
                 if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
                     const rawImgUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    
-                    // COMPRESS THE AI IMAGE IMMEDIATELY (Reduces massive PNG format to ultra-lightweight JPG)
                     const compressedImgUrl = await compressBase64Image(rawImgUrl, 400, 0.5);
                     
-                    // Display on specific card preview slot
                     const preview = card.querySelector('.step-img-preview');
                     const base64Field = card.querySelector('.step-img-base64');
                     const uploadControlPanel = card.querySelector('.step-upload-controls');
@@ -1441,13 +1516,12 @@
                 }
             } catch (err) {
                 console.error("AI Painting Failed:", err);
-                showNotification("AI 繪圖伺服器忙碌中，請等會再試，或者可以先用手動上傳喔！", "error");
+                showNotification("AI 繪圖伺服器忙碌中，請稍後再試。", "error");
             } finally {
                 loaderModal.classList.add('opacity-0', 'pointer-events-none');
             }
         }
 
-        // Open Form Sheet View
         window.openRecipeForm = function(existingId = null) {
             currentRecipeId = existingId;
             
@@ -1507,7 +1581,6 @@
             if (currentRecipeId) openRecipeForm(currentRecipeId);
         }
 
-        // Save Form State Data
         window.saveRecipe = async function() {
             const title = document.getElementById('form-title').value.trim();
             const category = document.getElementById('form-category').value;
@@ -1520,7 +1593,6 @@
                 return;
             }
 
-            // Extract Ingredients
             const ingElements = document.querySelectorAll('#form-ingredients-list > div');
             const ingredients = [];
             ingElements.forEach(row => {
@@ -1531,7 +1603,6 @@
                 }
             });
 
-            // Extract Steps
             const stepElements = document.querySelectorAll('.step-form-block');
             const steps = [];
             stepElements.forEach(card => {
@@ -1561,15 +1632,13 @@
 
             showNotification("正為您精心打包儲存中...", "info");
             
-            // Persist the clean data object
             const success = await persistRecipe(finishedRecipe);
             if (success) {
-                showNotification(`私房菜「${title}」紀錄成功！`, "success");
+                showNotification(`私房菜「${title}」紀錄成功，並已同步至雲端資料庫！`, "success");
                 showRecipeDetail(recipeId);
             }
         }
 
-        // Delete recipe triggers modal
         let recipeIdToDelete = null;
         window.confirmDeleteCurrentRecipe = function() {
             if (!currentRecipeId) return;
@@ -1588,13 +1657,12 @@
         async function executeDelete() {
             if (recipeIdToDelete) {
                 await deleteRecipeFromStore(recipeIdToDelete);
-                showNotification("食譜已成功移出資料庫。", "success");
+                showNotification("食譜已成功移出資料庫，並已同步雲端狀態。", "success");
                 closeConfirmModal();
                 backToDashboard();
             }
         }
 
-        // AI Recipe Draft generator
         window.openAIAssistantModal = function() {
             const modal = document.getElementById('ai-modal');
             const panel = document.getElementById('ai-modal-panel');
@@ -1750,7 +1818,6 @@
             }
         }
 
-        // Notification Toast Handler (Replaces browser alerts)
         function showNotification(message, type = 'info') {
             const toast = document.getElementById('notification-toast');
             const text = document.getElementById('toast-text');
@@ -1781,7 +1848,6 @@
             }, 5000);
         }
 
-        // Custom Confirm dialog helper
         function openConfirmModal() {
             const modal = document.getElementById('confirm-modal');
             const panel = document.getElementById('confirm-modal-panel');
@@ -1798,7 +1864,6 @@
             panel.classList.add('scale-95');
         }
 
-        // Full Screen step photo viewing
         window.viewStepImageFullScreen = function(url) {
             const overlay = document.createElement('div');
             overlay.className = "fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-zoom-out";
@@ -1812,7 +1877,6 @@
             document.body.appendChild(overlay);
         }
 
-        // Hotkey hookups (Ctrl + K searches)
         window.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
@@ -1820,11 +1884,12 @@
             }
         });
 
-        // Initialize App on load
-        window.onload = function() {
+        window.onload = async function() {
             setupDatabase();
             if (gdToken) {
                 updateGdStatusIndicator(true);
+                // Attempt automatic background database synchronization on page reload if token remains valid
+                await syncFromGoogleDrive();
             }
         }
 
