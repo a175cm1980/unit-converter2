@@ -566,9 +566,12 @@
         let selectedCategoryFilter = '全部';
         
         // Google Drive API configuration state
-        let gdToken = sessionStorage.getItem('gd_access_token') || null;
+        let gdToken = localStorage.getItem('gd_access_token') || null;
+        let gdTokenExpiry = localStorage.getItem('gd_token_expiry') || null;
         let gdClientId = localStorage.getItem('gd_client_id') || '1019129007520-qlo3j0jshe844tmj21ttnunk1uvcg5da.apps.googleusercontent.com';
-        let gdDbFileId = localStorage.getItem('gd_db_file_id') || 'hope.fp.6521@gmail.com';
+        let gdDbFileId = localStorage.getItem('gd_db_file_id') || null;
+        // ⭐【您的專屬信箱在這裡記錄】
+        const GD_USER_EMAIL = 'hope.fp.6521@gmail.com';
 
         // Firebase Auth state & instances
         let db = null;
@@ -801,6 +804,15 @@
             renderDashboard();
         }
 
+        function clearCachedToken() {
+            gdToken = null;
+            gdTokenExpiry = null;
+            localStorage.removeItem('gd_access_token');
+            localStorage.removeItem('gd_token_expiry');
+            localStorage.removeItem('gd_previously_authorized');
+            updateGdStatusIndicator(false);
+        }
+
         async function syncFromGoogleDrive() {
             if (!gdToken) return;
             showNotification("正在與 Google 雲端資料庫同步中...", "info");
@@ -852,10 +864,8 @@
             } catch (err) {
                 console.error("Google Drive Sync down failed:", err);
                 if (err.message === "UNAUTHORIZED") {
-                    sessionStorage.removeItem('gd_access_token');
-                    gdToken = null;
-                    updateGdStatusIndicator(false);
-                    showNotification("Google 授權已過期，請重新登入。", "warning");
+                    clearCachedToken();
+                    showNotification("Google 授權已過期，請點選同步按鈕重新授權。", "warning");
                 } else {
                     showNotification("無法同步雲端資料，暫時使用本機舊資料。", "warning");
                 }
@@ -1240,9 +1250,7 @@
                 if (response.ok) {
                     showNotification(`已成功存入雲端硬碟！檔名為「${fileName}」`, "success");
                 } else if (response.status === 401) {
-                    sessionStorage.removeItem('gd_access_token');
-                    gdToken = null;
-                    updateGdStatusIndicator(false);
+                    clearCachedToken();
                     showNotification("Google 登入憑證已過期，請重新「授權登入」。", "warning");
                     openGdConfigModal();
                 } else {
@@ -1290,35 +1298,52 @@
             showNotification("網址網域已複製！請至 Google Cloud 控制台貼上該網址並儲存。", "success");
         }
 
-        window.initGoogleDriveAuth = function() {
+        window.initGoogleDriveAuth = function(isAuto = false) {
             if (!gdClientId) {
-                showNotification("請先填寫您的 Google Oauth Client ID 才能開始授權連線！", "warning");
+                if (!isAuto) showNotification("請先填寫您的 Google Oauth Client ID 才能開始授權連線！", "warning");
                 return;
             }
 
             try {
                 if (typeof google === 'undefined' || !google.accounts) {
-                    showNotification("Google 登入服務載入中，請稍候再試。", "warning");
+                    if (!isAuto) showNotification("Google 登入服務載入中，請稍候再試。", "warning");
                     return;
                 }
 
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: gdClientId,
                     scope: 'https://www.googleapis.com/auth/drive.file',
+                    hint: GD_USER_EMAIL,
                     callback: async (tokenResponse) => {
                         if (tokenResponse && tokenResponse.access_token) {
                             gdToken = tokenResponse.access_token;
-                            sessionStorage.setItem('gd_access_token', gdToken);
+                            localStorage.setItem('gd_access_token', gdToken);
                             
-                            // Load recipes from cloud drive upon success (Plan A database load)
+                            // Parse and store expiry time
+                            const expiresIn = tokenResponse.expires_in || 3600;
+                            gdTokenExpiry = (Date.now() + expiresIn * 1000).toString();
+                            localStorage.setItem('gd_token_expiry', gdTokenExpiry);
+                            localStorage.setItem('gd_previously_authorized', 'true');
+                            
+                            updateGdStatusIndicator(true);
                             await syncFromGoogleDrive();
+                            if (!isAuto) showNotification("Google 雲端自動同步已開通！", "success");
                         }
                     },
                 });
-                client.requestAccessToken();
+
+                if (isAuto) {
+                    // Silent refresh logic (no popup windows)
+                    client.requestAccessToken({ prompt: 'none', hint: GD_USER_EMAIL });
+                } else {
+                    // Manual interactive consent flow
+                    client.requestAccessToken({ hint: GD_USER_EMAIL });
+                }
             } catch (err) {
                 console.error("GSI Auth Error:", err);
-                showNotification("授權連線時發生錯誤，請檢查您的 Client ID 與 JavaScript 來源網址設定！", "error");
+                if (!isAuto) {
+                    showNotification("授權連線時發生錯誤，請檢查您的 Client ID 與 JavaScript 來源網址設定！", "error");
+                }
             }
         }
 
@@ -1886,10 +1911,22 @@
 
         window.onload = async function() {
             setupDatabase();
-            if (gdToken) {
-                updateGdStatusIndicator(true);
-                // Attempt automatic background database synchronization on page reload if token remains valid
-                await syncFromGoogleDrive();
+            
+            // Auto-reconnect flow on page load
+            if (localStorage.getItem('gd_previously_authorized') === 'true') {
+                const now = Date.now();
+                const expiry = parseInt(gdTokenExpiry || '0');
+                
+                if (gdToken && expiry > now) {
+                    // Token is cached and still active: connect instantly
+                    updateGdStatusIndicator(true);
+                    await syncFromGoogleDrive();
+                } else {
+                    // Token is expired: perform a silent refresh in the background
+                    setTimeout(() => {
+                        window.initGoogleDriveAuth(true);
+                    }, 800); // Wait briefly for GIS client script initialization
+                }
             }
         }
 
